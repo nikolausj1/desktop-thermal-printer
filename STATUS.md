@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 2.4
+version: 2.5
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -77,7 +77,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - The public page and social card are committed to `nikolausj1/justinnikolaus.com` at commit `b3c5610` and deployed over encrypted FTP to `public_html/printer/`. The live page and all assets return HTTP 200, render without browser warnings, and expose no root-site navigation link.
 - DNS resolves `justinnikolaus.com` to `192.185.78.222`; ARIN identifies the network as HostGator, reverse DNS uses `websitewelcome.com`, and authoritative nameservers are `ns1.justinpaulhosting.com` and `ns2.justinpaulhosting.com`.
 - Public submissions are enabled and `PUBLIC_API_MODE` is `live`. The first controlled production submission, public ID `msg_104c7a5465794582a5884057caff6da5`, progressed from queued to claimed to `sent_to_printer` in about three seconds. Justin physically confirmed that it printed and cut completely, completing Phase 2 acceptance.
-- A local-only page revision removes the top header, three-step journey, and privacy paragraph; changes the name field label to `Your name`; uses `Your note to a real printer.` as the eyebrow; updates the intro description; and moves the real-paper note beneath the form. It has not been committed to the site repository or deployed.
+- A local-only page revision removes the top header, three-step journey, and privacy paragraph; changes the name field label to `Your name`; uses `Your note to a real printer.` as the eyebrow; updates the intro description; and centers the revised real-paper note beneath the form. The form heading remains under review. The revision has not been committed to the site repository or deployed.
 
 ## Lessons
 

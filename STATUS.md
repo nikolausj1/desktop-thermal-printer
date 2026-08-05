@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 3.6
+version: 3.8
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -83,8 +83,9 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - Approximate city lookup is best-effort and fails open after a short timeout. If it is unavailable, the receipt prints only the device phrase. The first live test, public ID `msg_92d1c32e7b2a452eacd7298f74d27576`, stored `iPhone` and `Seattle, WA`, reached `sent_to_printer` with no failure, and advanced the printer's successful-print timestamp. Justin physically confirmed that the origin line printed correctly and the receipt cut successfully.
 - The NUC deployment restarted only `DesktopThermalPrinter`. Afterward that service, Sports Box, and Plex were all running, while printer heartbeats reported worker v0.2.0, reachable, accepting messages, and no error.
 - End-of-day checkpoint on 2026-08-05: the project moved to MVP. The public page, protected queue, Windows worker, physical printer path, and origin metadata are live. Phase 3 has not started and remains subject to Justin's approval.
+- The project-story headline tracking was loosened from `-0.065em` to `-0.035em` for readability. Site commit `63557c8` is deployed, and the live stylesheet matches the committed file.
 
 ## Lessons
 
-- Supabase CLI `db query --linked` can apply and verify SQL through the authenticated Management API even when direct pooler password authentication fails. This path does not automatically create migration history, so record the applied version deliberately or repair it after database-password access is restored.
-- Verify a legacy site's current hosting through DNS, certificate, and network ownership before requesting credentials. Project notes can outlive a hosting migration.
+- Supabase CLI `db query --linked` can apply and verify SQL through the authenticated Management API even when direct pooler password authentication fails. This path does not automatically create migration history, so record the applied version deliberately or repair it after database-password access is restored. (promoted to Build Guide v7.0, 2026-08-05)
+- Verify a legacy site's current hosting through DNS, certificate, and network ownership before requesting credentials. Project notes can outlive a hosting migration. (promoted to Build Guide v7.0, 2026-08-05)

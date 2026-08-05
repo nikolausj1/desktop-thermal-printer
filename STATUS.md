@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 3.5
+version: 3.6
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -19,20 +19,18 @@ MVP
 
 ## Health
 
-🟢 On-track - The public end-to-end experience is live as an MVP. Automatic broad device and approximate-city metadata is deployed, and the printer is online on worker v0.2.0.
+🟢 On-track - The public end-to-end experience is live and physically verified as an MVP. Automatic broad device and approximate-city metadata is deployed, and the printer is online on worker v0.2.0.
 
 ## Waiting on Me
 
-- [ ] **Confirm the Codex origin-metadata test receipt printed, cut, and says `Sent from an iPhone near Seattle, WA`** (~1 min)
-      - unblocks: physical confirmation of the final receipt layout; cloud and worker delivery are already verified
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
       - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
 ## Next Up
 
-1. Confirm the origin-metadata test receipt's physical wording and cut.
-2. Reset the Supabase database password when convenient.
-3. When work resumes, scope and approve Phase 3 admin controls, including visual message history.
+1. Reset the Supabase database password when convenient.
+2. When work resumes, scope and approve Phase 3 admin controls, including visual message history.
+3. Monitor the live public queue and printer health.
 
 ## Biggest Risk
 
@@ -82,7 +80,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - Justin chose to retain the current visual direction. The approved two-section extension is live: `The idea` introduces the weekend-project story and a compact four-step ordered list, while `How it was made` explains the cloud queue and home print worker alongside the technical spec card. The steps render as one tight horizontal sequence on wide screens and padded vertical rows at narrower widths, with the decorative arrows removed. The source is committed at `2dedeb1`, production matches the local files, and the printer remained online after deployment.
 - Justin approved automatic origin metadata on both physical receipts and administrative message records, with no disclosure and no opt-in. The system stores only coarse fields (`device_label`, city, region, country, and a friendly location label), retaining the existing hashes rather than raw IP addresses or full browser identifiers.
 - Worker v0.2.0 and the updated Supabase public and worker APIs are live from commit `69c0718`. Device classification intentionally uses broad labels such as `iPhone`, `Android device`, `Mac`, and `Windows computer`; it does not claim to distinguish a Windows laptop from a desktop.
-- Approximate city lookup is best-effort and fails open after a short timeout. If it is unavailable, the receipt prints only the device phrase. The first live test, public ID `msg_92d1c32e7b2a452eacd7298f74d27576`, stored `iPhone` and `Seattle, WA`, reached `sent_to_printer` with no failure, and advanced the printer's successful-print timestamp. Physical paper and cutter confirmation remain with Justin.
+- Approximate city lookup is best-effort and fails open after a short timeout. If it is unavailable, the receipt prints only the device phrase. The first live test, public ID `msg_92d1c32e7b2a452eacd7298f74d27576`, stored `iPhone` and `Seattle, WA`, reached `sent_to_printer` with no failure, and advanced the printer's successful-print timestamp. Justin physically confirmed that the origin line printed correctly and the receipt cut successfully.
 - The NUC deployment restarted only `DesktopThermalPrinter`. Afterward that service, Sports Box, and Plex were all running, while printer heartbeats reported worker v0.2.0, reachable, accepting messages, and no error.
 - End-of-day checkpoint on 2026-08-05: the project moved to MVP. The public page, protected queue, Windows worker, physical printer path, and origin metadata are live. Phase 3 has not started and remains subject to Justin's approval.
 

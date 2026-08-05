@@ -1,0 +1,26 @@
+{
+  "name": "desktop-thermal-printer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build:worker": "npm run build --workspace @desktop-printer/worker",
+    "build:worker:local": "npm run build --workspace @desktop-printer/worker -- --outDir /tmp/desktop-thermal-printer-worker",
+    "typecheck": "npm run typecheck --workspace @desktop-printer/worker",
+    "test": "npm run test --workspace @desktop-printer/worker",
+    "worker:dev": "npm run dev --workspace @desktop-printer/worker",
+    "supabase": "supabase"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "supabase": "2.111.0",
+    "tsx": "4.23.7",
+    "typescript": "7.0.2"
+  }
+}

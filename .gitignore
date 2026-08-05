@@ -21,6 +21,7 @@ coverage/
 .vercel/
 .idea/
 .vscode/
+supabase/.temp/
 
 # Shared guide is referenced from the portfolio master
 Project Build Guide.md

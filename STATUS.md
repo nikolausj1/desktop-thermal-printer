@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 3.8
+version: 3.9
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -84,6 +84,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - The NUC deployment restarted only `DesktopThermalPrinter`. Afterward that service, Sports Box, and Plex were all running, while printer heartbeats reported worker v0.2.0, reachable, accepting messages, and no error.
 - End-of-day checkpoint on 2026-08-05: the project moved to MVP. The public page, protected queue, Windows worker, physical printer path, and origin metadata are live. Phase 3 has not started and remains subject to Justin's approval.
 - The project-story headline tracking was loosened from `-0.065em` to `-0.035em` for readability. Site commit `63557c8` is deployed, and the live stylesheet matches the committed file.
+- The Open Graph social card subtitle now reads `CONNECTED TO REAL PRINTER`. Site commit `2d56c7e` is deployed with a versioned `og-v2.jpg` URL to bypass stale social-preview caches, and the live image matches the committed file.
 
 ## Lessons
 

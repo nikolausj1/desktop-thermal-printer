@@ -1,0 +1,12 @@
+build
+DerivedData
+node_modules
+.next
+.build
+out
+dist
+coverage
+.venv
+__pycache__
+*.pyc
+.vercel

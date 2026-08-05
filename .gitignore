@@ -1,0 +1,26 @@
+.DS_Store
+
+# Local collaboration folders
+_inbox/
+_review/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Node and Next.js artifacts
+node_modules/
+.next/
+dist/
+out/
+coverage/
+*.log
+
+# Local tooling
+.vercel/
+.idea/
+.vscode/
+
+# Shared guide is referenced from the portfolio master
+Project Build Guide.md

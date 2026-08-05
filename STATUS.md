@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 2.1
+version: 2.2
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -19,19 +19,17 @@ Active Development
 
 ## Health
 
-🟢 On-track - Phase 1 is physically confirmed complete. The Phase 2 API and public `/printer/` page are live, and the first controlled public submission physically printed; cut confirmation remains.
+🟢 On-track - Phases 0, 1, and 2 are complete. The public `/printer/` page is live, and the first controlled public submission physically printed and cut completely.
 
 ## Waiting on Me
 
-- [ ] **Confirm the Phase 2 test receipt cut completely** (~1 min)
-      - unblocks: closing Phase 2 acceptance
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
       - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
 ## Next Up
 
-1. Physically confirm the controlled Phase 2 receipt cut completely.
-2. Close Phase 2 and monitor the live public queue.
+1. Monitor the live public queue and printer health.
+2. Await approval to begin Phase 3 admin controls.
 3. Reset the Supabase database password when convenient to restore the standard direct CLI migration path.
 
 ## Biggest Risk
@@ -76,7 +74,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - No-print integration testing verified idempotent retries, duplicate blocking, the 3-per-10-minute limit, moderation, origin rejection, and held-for-review behavior. Synthetic test records were removed and public submissions were disabled afterward. Supabase security and performance advisors report no issues.
 - The public page and social card are committed to `nikolausj1/justinnikolaus.com` at commit `b3c5610` and deployed over encrypted FTP to `public_html/printer/`. The live page and all assets return HTTP 200, render without browser warnings, and expose no root-site navigation link.
 - DNS resolves `justinnikolaus.com` to `192.185.78.222`; ARIN identifies the network as HostGator, reverse DNS uses `websitewelcome.com`, and authoritative nameservers are `ns1.justinpaulhosting.com` and `ns2.justinpaulhosting.com`.
-- Public submissions are enabled and `PUBLIC_API_MODE` is `live`. The first controlled production submission, public ID `msg_104c7a5465794582a5884057caff6da5`, progressed from queued to claimed to `sent_to_printer` in about three seconds. Justin physically confirmed that it printed; cut confirmation is pending.
+- Public submissions are enabled and `PUBLIC_API_MODE` is `live`. The first controlled production submission, public ID `msg_104c7a5465794582a5884057caff6da5`, progressed from queued to claimed to `sent_to_printer` in about three seconds. Justin physically confirmed that it printed and cut completely, completing Phase 2 acceptance.
 
 ## Lessons
 

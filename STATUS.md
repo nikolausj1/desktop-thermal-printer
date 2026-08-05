@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-04
-version: 1.7
+version: 1.8
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -19,24 +19,26 @@ Active Development
 
 ## Health
 
-🟢 On-track - Phase 1 is deployed. Supabase has the secured queue and worker endpoint, and the automatic Windows NUC service completed a cloud job through the RP820 with no recorded failure.
+🟢 On-track - Phase 1 is deployed. The Phase 2 public URL is now set to `https://www.justinnikolaus.com/printer/`, with the hosting architecture awaiting approval.
 
 ## Waiting on Me
 
 - [ ] **Confirm receipt #2 physically printed and cut** (~15 sec)
       - unblocks: closing the last physical acceptance check for Phase 1
+- [ ] **Approve static DreamHost page plus Supabase Edge API for `/printer/`** (~2 min decision)
+      - unblocks: Phase 2 implementation without moving or proxying the existing `justinnikolaus.com` site
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
       - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
 ## Next Up
 
-1. Get Justin's physical confirmation that receipt #2 printed and cut.
-2. Reset and securely store the Supabase database password so future migrations can use the standard CLI path.
-3. Begin Phase 2: build the public Next.js submission website, server-side status API, validation, moderation, and rate limits.
+1. Confirm the recommended `/printer/` hosting architecture.
+2. Build the static public page and Supabase submission/status API with validation, moderation, CAPTCHA, and rate limits.
+3. Test without producing accidental receipts, deploy to DreamHost, and run one controlled public submission.
 
 ## Biggest Risk
 
-The worker cannot prove exactly-once physical printing after an ambiguous mid-transmission failure, so job state and retry behavior must preserve an explicit delivery-unknown outcome.
+The public submission endpoint will directly cause a physical action, so rate limiting, CAPTCHA, moderation, idempotency, and an emergency pause must be in place before the URL is shared.
 
 ---
 
@@ -69,6 +71,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - Cloud receipt #1 completed through the Mac worker. Cloud receipt #2 was claimed by `desktop-printer-nuc`, sent as 365 ESC/POS bytes, and recorded as `sent_to_printer` with no failure code.
 - The separate nssm service `DesktopThermalPrinter` is running with automatic startup from `C:\Services\DesktopThermalPrinter`. Its log directory was created before service installation. Plex and Sports Box remained running throughout deployment.
 - The database password supplied during project creation did not authenticate against Supabase's pooler. Schema setup succeeded through the authenticated Management API, and migration history was recorded manually. Dashboard password reset remains cleanup for future standard CLI pushes.
+- Justin selected `https://www.justinnikolaus.com/printer/` as the public URL. The existing domain is a static Apache site on DreamHost with source in `nikolausj1/justinnikolaus.com`, so the recommended Phase 2 architecture is a standalone static page at that path backed by protected Supabase Edge Functions. This avoids moving the existing site to Vercel and does not add a root-site or portfolio navigation link.
 
 ## Lessons
 

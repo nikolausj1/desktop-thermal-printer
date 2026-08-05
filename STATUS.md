@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-04
-version: 1.5
+version: 1.6
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -19,26 +19,24 @@ Active Development
 
 ## Health
 
-🟢 On-track - Phase 0's core acceptance test is complete. A formatted raw-TCP ESC/POS receipt physically printed from the Mac and the explicit full-cut command completely separated it.
+🟢 On-track - Phase 0 is complete, network cleanup is verified, and the public GitHub baseline is published. Phase 1 is waiting on backend and Windows NUC authorization decisions.
 
 ## Waiting on Me
 
-- [ ] **Remove the Mac's temporary `192.168.1.200` network alias** (~1 min)
-      - unblocks: returning the Mac's wired interface to its normal configuration after printer setup
-- [ ] **Reserve the printer's `192.168.4.77` lease in Eero** (~2 min)
-      - unblocks: keeping the script and future worker configuration stable across lease renewals
-- [ ] **Decide whether this project may run a service on the Windows NUC** (~2 min decision)
-      - unblocks: the entire worker architecture. The PRD assumes the NUC, and the standing rule is that nothing runs there without your explicit go-ahead
+- [ ] **Approve Supabase Postgres as the Phase 1 queue and status backend** (~2 min decision)
+      - unblocks: creating the schema, atomic job-claim functions, heartbeat storage, and worker credentials
+- [ ] **Explicitly approve access to the Windows NUC for this project** (~2 min decision)
+      - unblocks: inspecting the existing runtime safely and later deploying the print worker as a separate nssm service without changing Plex or other services
 
 ## Next Up
 
-1. Remove the Mac's temporary `192.168.1.200` address and reserve `192.168.4.77` for Ethernet ID `A8-01-57-51-77-8B` in Eero.
-2. Optionally exercise cover-open, paper-end, and related status fields to determine whether they are dependable.
-3. Stop after Phase 0 and wait for Justin's explicit approval before any Windows NUC or Phase 1 work.
+1. Confirm Supabase and Windows NUC authorization boundaries.
+2. Scaffold the Phase 1 TypeScript workspace and implement the queue schema, heartbeat, authentication, and atomic job claim.
+3. Run a manually created cloud job through the worker to the physical printer, first from the Mac and then from the NUC if approved.
 
 ## Biggest Risk
 
-The printer advertises paper-near-end and cutter support, but it remains unknown whether paper-out, cover-open, and cutter state can be read reliably over Ethernet.
+The worker cannot prove exactly-once physical printing after an ambiguous mid-transmission failure, so job state and retry behavior must preserve an explicit delivery-unknown outcome.
 
 ---
 
@@ -62,3 +60,5 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - DHCP was enabled through the printer's built-in web configuration, and Eero assigned `192.168.4.77/22`. The local `scripts/print-test-receipt.mjs` script uses no dependencies and successfully sent a fixed 762-byte ESC/POS payload ending in the full-cut command `1d 56 00`.
 - Justin physically confirmed that the Phase 0 receipt printed from the Mac.
 - Justin confirmed that the explicit full-cut command cut automatically and completely separated the receipt.
+- Network cleanup completed: Eero has a manual reservation for `192.168.4.77`, the printer returns there with DHCP enabled, and the temporary Mac alias is no longer active.
+- Public GitHub repository created at `https://github.com/nikolausj1/desktop-thermal-printer`; initial commit `ddabdc6` contains the verified Phase 0 baseline.

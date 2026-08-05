@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 3.3
+version: 3.4
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -19,18 +19,20 @@ Active Development
 
 ## Health
 
-🟢 On-track - Phases 0, 1, and 2 are complete. The approved `/printer/` design and project-story section are live, and the printer is online.
+🟢 On-track - Phases 0, 1, and 2 are complete. Automatic broad device and approximate-city metadata is live, and the printer is online on worker v0.2.0.
 
 ## Waiting on Me
 
+- [ ] **Confirm the Codex origin-metadata test receipt printed, cut, and says `Sent from an iPhone near Seattle, WA`** (~1 min)
+      - unblocks: physical confirmation of the final receipt layout; cloud and worker delivery are already verified
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
       - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
 ## Next Up
 
-1. Monitor the live public queue and printer health.
-2. Await approval to begin Phase 3 admin controls.
-3. Reset the Supabase database password when convenient to restore the standard direct CLI migration path.
+1. Confirm the origin-metadata test receipt's physical wording and cut.
+2. Monitor the live public queue and printer health.
+3. Await approval to begin Phase 3 admin controls, including the visual administrative history.
 
 ## Biggest Risk
 
@@ -78,6 +80,10 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - The approved copy revision removes the top header, three-step journey, and privacy paragraph; changes the name field label to `Your name`; uses `Your note to a real printer.` as the eyebrow; updates the intro description; and centers the revised real-paper note beneath the form with extra spacing. It is committed to the site repository at `9752f0c`, deployed, and verified live while the printer remained online.
 - Six disconnected local visual concepts are available in `_review/printer-concepts/`: Carbon Receipt, Signal Red, Swiss Terminal, Midnight Signal, Postal Warmth, and Tiny Machine. They cannot submit messages or reach the printer API.
 - Justin chose to retain the current visual direction. The approved two-section extension is live: `The idea` introduces the weekend-project story and a compact four-step ordered list, while `How it was made` explains the cloud queue and home print worker alongside the technical spec card. The steps render as one tight horizontal sequence on wide screens and padded vertical rows at narrower widths, with the decorative arrows removed. The source is committed at `2dedeb1`, production matches the local files, and the printer remained online after deployment.
+- Justin approved automatic origin metadata on both physical receipts and administrative message records, with no disclosure and no opt-in. The system stores only coarse fields (`device_label`, city, region, country, and a friendly location label), retaining the existing hashes rather than raw IP addresses or full browser identifiers.
+- Worker v0.2.0 and the updated Supabase public and worker APIs are live from commit `69c0718`. Device classification intentionally uses broad labels such as `iPhone`, `Android device`, `Mac`, and `Windows computer`; it does not claim to distinguish a Windows laptop from a desktop.
+- Approximate city lookup is best-effort and fails open after a short timeout. If it is unavailable, the receipt prints only the device phrase. The first live test, public ID `msg_92d1c32e7b2a452eacd7298f74d27576`, stored `iPhone` and `Seattle, WA`, reached `sent_to_printer` with no failure, and advanced the printer's successful-print timestamp. Physical paper and cutter confirmation remain with Justin.
+- The NUC deployment restarted only `DesktopThermalPrinter`. Afterward that service, Sports Box, and Plex were all running, while printer heartbeats reported worker v0.2.0, reachable, accepting messages, and no error.
 
 ## Lessons
 

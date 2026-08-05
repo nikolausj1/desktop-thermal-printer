@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 2.6
+version: 2.7
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -19,19 +19,19 @@ Active Development
 
 ## Health
 
-🟢 On-track - Phases 0, 1, and 2 are complete. The approved simplified `/printer/` revision is live, and six local visual concepts are ready for review.
+🟢 On-track - Phases 0, 1, and 2 are complete. The approved simplified `/printer/` revision is live, the current visual direction is retained, and a local project-story section is ready for review.
 
 ## Waiting on Me
 
-- [ ] **Review six local printer-page visual concepts** (~10 min)
-      - unblocks: choosing whether to retain or redesign the current visual direction
+- [ ] **Review the local project-story section** (~5 min)
+      - unblocks: revising or approving the new explanatory content before deployment
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
       - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
 ## Next Up
 
-1. Review the six local visual concepts and choose a direction, or retain the live design.
-2. Implement and validate the selected direction before any further deployment.
+1. Review and refine the local project-story section.
+2. Deploy the explanatory section only after approval.
 3. Await approval to begin Phase 3 admin controls.
 
 ## Biggest Risk
@@ -79,6 +79,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - Public submissions are enabled and `PUBLIC_API_MODE` is `live`. The first controlled production submission, public ID `msg_104c7a5465794582a5884057caff6da5`, progressed from queued to claimed to `sent_to_printer` in about three seconds. Justin physically confirmed that it printed and cut completely, completing Phase 2 acceptance.
 - The approved copy revision removes the top header, three-step journey, and privacy paragraph; changes the name field label to `Your name`; uses `Your note to a real printer.` as the eyebrow; updates the intro description; and centers the revised real-paper note beneath the form with extra spacing. It is committed to the site repository at `9752f0c`, deployed, and verified live while the printer remained online.
 - Six disconnected local visual concepts are available in `_review/printer-concepts/`: Carbon Receipt, Signal Red, Swiss Terminal, Midnight Signal, Postal Warmth, and Tiny Machine. They cannot submit messages or reach the printer API.
+- Justin chose to retain the current visual direction. A local-only extension now adds a plain-language project summary, a four-step browser-to-printer flow, a short build story, and a layered technical spec card. It requires no new assets and has not been committed to the site repository or deployed.
 
 ## Lessons
 

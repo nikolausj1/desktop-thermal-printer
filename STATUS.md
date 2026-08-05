@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 2.8
+version: 2.9
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -79,7 +79,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - Public submissions are enabled and `PUBLIC_API_MODE` is `live`. The first controlled production submission, public ID `msg_104c7a5465794582a5884057caff6da5`, progressed from queued to claimed to `sent_to_printer` in about three seconds. Justin physically confirmed that it printed and cut completely, completing Phase 2 acceptance.
 - The approved copy revision removes the top header, three-step journey, and privacy paragraph; changes the name field label to `Your name`; uses `Your note to a real printer.` as the eyebrow; updates the intro description; and centers the revised real-paper note beneath the form with extra spacing. It is committed to the site repository at `9752f0c`, deployed, and verified live while the printer remained online.
 - Six disconnected local visual concepts are available in `_review/printer-concepts/`: Carbon Receipt, Signal Red, Swiss Terminal, Midnight Signal, Postal Warmth, and Tiny Machine. They cannot submit messages or reach the printer API.
-- Justin chose to retain the current visual direction. A local-only extension now combines the plain-language project summary and build story under `How I made it`, presents the four browser-to-printer steps as one ordered horizontal flex list that becomes vertical on smaller screens, and follows it with a layered technical spec card. It requires no new assets and has not been committed to the site repository or deployed.
+- Justin chose to retain the current visual direction. The local-only extension is back to the preferred two-section version: `Behind the receipt` introduces the plain-language summary and four-step flow, while `How I made it` pairs the build narrative with a layered technical spec card. It requires no new assets and has not been committed to the site repository or deployed.
 
 ## Lessons
 

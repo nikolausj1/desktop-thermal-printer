@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 1.9
+version: 2.0
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -19,20 +19,20 @@ Active Development
 
 ## Health
 
-🟢 On-track - Phase 1 is physically confirmed complete. The protected Phase 2 API and public `/printer/` page are implemented and verified in no-print mode; DreamHost upload and one controlled live receipt remain.
+🟢 On-track - Phase 1 is physically confirmed complete. The Phase 2 API and public `/printer/` page are live, and the first controlled public submission reached `sent_to_printer`; physical confirmation of its print and cut remains.
 
 ## Waiting on Me
 
-- [ ] **Store the DreamHost FTP password locally for this session** (~2 min)
-      - unblocks: uploading the four `/printer/` site files to `public_html/printer/`
+- [ ] **Confirm the Phase 2 test receipt printed and cut** (~1 min)
+      - unblocks: closing Phase 2 acceptance
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
       - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
 ## Next Up
 
-1. Upload the prepared static page to DreamHost while the API remains paused.
-2. Verify the production page, switch the API from hold to live, and enable public submissions.
-3. Run one controlled browser submission, verify the receipt and cut, then close Phase 2.
+1. Physically confirm the controlled Phase 2 receipt printed and cut.
+2. Close Phase 2 and monitor the live public queue.
+3. Reset the Supabase database password when convenient to restore the standard direct CLI migration path.
 
 ## Biggest Risk
 
@@ -69,13 +69,16 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - Cloud receipt #1 completed through the Mac worker. Cloud receipt #2 was claimed by `desktop-printer-nuc`, sent as 365 ESC/POS bytes, and recorded as `sent_to_printer` with no failure code.
 - The separate nssm service `DesktopThermalPrinter` is running with automatic startup from `C:\Services\DesktopThermalPrinter`. Its log directory was created before service installation. Plex and Sports Box remained running throughout deployment.
 - The database password supplied during project creation did not authenticate against Supabase's pooler. Schema setup succeeded through the authenticated Management API, and migration history was recorded manually. Dashboard password reset remains cleanup for future standard CLI pushes.
-- Justin selected `https://www.justinnikolaus.com/printer/` as the public URL. The existing domain is a static Apache site on DreamHost with source in `nikolausj1/justinnikolaus.com`, so the recommended Phase 2 architecture is a standalone static page at that path backed by protected Supabase Edge Functions. This avoids moving the existing site to Vercel and does not add a root-site or portfolio navigation link.
+- Justin selected `https://www.justinnikolaus.com/printer/` as the public URL. The existing domain is a static Apache site on HostGator infrastructure, apparently through a reseller or account branded Justin Paul Hosting, with source in `nikolausj1/justinnikolaus.com`. The prior project note naming DreamHost was stale. The Phase 2 architecture is a standalone static page at that path backed by protected Supabase Edge Functions. This avoids moving the existing site and does not add a root-site or portfolio navigation link.
 - Justin physically confirmed that receipt #2 printed from the Windows NUC and cut successfully, completing Phase 1 acceptance.
-- Justin approved the static DreamHost page plus Supabase Edge API architecture for Phase 2.
+- Justin approved the existing static site plus Supabase Edge API architecture for Phase 2.
 - The public API is deployed with origin restrictions, server-side printer-health rechecks, atomic idempotency and rate limits, hashed connection data, rule-based moderation, a honeypot, coarse public status, message-status polling, and configurable emergency pause. Anonymous database access remains disabled.
 - No-print integration testing verified idempotent retries, duplicate blocking, the 3-per-10-minute limit, moderation, origin rejection, and held-for-review behavior. Synthetic test records were removed and public submissions were disabled afterward. Supabase security and performance advisors report no issues.
-- The public page and social card are committed to `nikolausj1/justinnikolaus.com` at commit `b3c5610` and synced to the local DreamHost mirror. The live URL still returns 404 until FTP deployment.
+- The public page and social card are committed to `nikolausj1/justinnikolaus.com` at commit `b3c5610` and deployed over encrypted FTP to `public_html/printer/`. The live page and all assets return HTTP 200, render without browser warnings, and expose no root-site navigation link.
+- DNS resolves `justinnikolaus.com` to `192.185.78.222`; ARIN identifies the network as HostGator, reverse DNS uses `websitewelcome.com`, and authoritative nameservers are `ns1.justinpaulhosting.com` and `ns2.justinpaulhosting.com`.
+- Public submissions are enabled and `PUBLIC_API_MODE` is `live`. The first controlled production submission, public ID `msg_104c7a5465794582a5884057caff6da5`, progressed from queued to claimed to `sent_to_printer` in about three seconds. Physical print and cut confirmation is pending.
 
 ## Lessons
 
 - Supabase CLI `db query --linked` can apply and verify SQL through the authenticated Management API even when direct pooler password authentication fails. This path does not automatically create migration history, so record the applied version deliberately or repair it after database-password access is restored.
+- Verify a legacy site's current hosting through DNS, certificate, and network ownership before requesting credentials. Project notes can outlive a hosting migration.

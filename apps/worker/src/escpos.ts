@@ -75,9 +75,22 @@ function seattleTimestamp(isoTimestamp: string, timezone: string): string {
   }).format(new Date(isoTimestamp));
 }
 
+export function buildOriginSummary(
+  deviceLabel: string | null,
+  locationLabel: string | null,
+): string | null {
+  const device = sanitizeReceiptText(deviceLabel || "device").slice(0, 40) || "device";
+  const location = sanitizeReceiptText(locationLabel || "").slice(0, 220);
+  if (!deviceLabel && !location) return null;
+
+  const article = /^(?:Android|iPad|iPhone)\b/u.test(device) ? "an" : "a";
+  return `Sent from ${article} ${device}${location ? ` near ${location}` : ""}`;
+}
+
 export function buildMessageReceipt(job: PrintJob, timezone: string): Buffer {
   const sender = sanitizeReceiptText(job.senderName || "ANONYMOUS").slice(0, 30);
   const message = sanitizeReceiptText(job.messageText);
+  const originSummary = buildOriginSummary(job.deviceLabel, job.locationLabel);
   if (!message) {
     throw new Error("Message is empty after receipt sanitization.");
   }
@@ -99,8 +112,15 @@ export function buildMessageReceipt(job: PrintJob, timezone: string): Buffer {
     command(ESC, 0x45, 0x01),
     line(`FROM: ${sender}`),
     command(ESC, 0x45, 0x00),
-    line(),
   ];
+
+  if (originSummary) {
+    for (const wrappedLine of wrapReceiptText(originSummary)) {
+      chunks.push(line(wrappedLine));
+    }
+  }
+
+  chunks.push(line());
 
   for (const wrappedLine of wrapReceiptText(message)) {
     chunks.push(line(wrappedLine));

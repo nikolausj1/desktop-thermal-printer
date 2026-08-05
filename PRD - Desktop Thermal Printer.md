@@ -1,10 +1,19 @@
+---
+title: "Internet-Connected Desk Printer - Product Requirements Document"
+created: 2026-08-04
+modified: 2026-08-05
+version: 1.1
+author: OpenAI Codex (GPT-5)
+tags:
+---
+
 # Internet-Connected Desk Printer
 ## Product Requirements Document
 
-**Status:** Initial build specification  
-**Version:** 1.0  
-**Date:** August 4, 2026  
-**Owner:** Justin Nikolaus  
+**Status:** Initial build specification
+**Version:** 1.1
+**Date:** August 5, 2026
+**Owner:** Justin Nikolaus
 
 ---
 
@@ -73,7 +82,7 @@ V1 will not include:
 - Images, drawings, GIFs, or photos
 - Rich-text formatting
 - Scheduled messages
-- Location collection
+- Precise browser location collection or GPS permission prompts
 - Public webcam or printer camera
 - Native iOS or Android apps
 - Browser extensions
@@ -412,6 +421,18 @@ Anonymous example:
 FROM: ANONYMOUS
 ```
 
+Web submissions also include a friendly, inferred origin line:
+
+```text
+Sent from an iPhone near Portland, OR
+```
+
+If approximate location is unavailable, print only the broad device label:
+
+```text
+Sent from an iPhone
+```
+
 ### 8.2 Formatting rules
 
 - Use printer-native ESC/POS text where practical.
@@ -421,6 +442,7 @@ FROM: ANONYMOUS
 - Wrap text according to the printer’s actual character width.
 - Normalize line endings.
 - Prevent sender-controlled ESC/POS commands.
+- Treat the device and location labels as approximate display metadata, never as security signals.
 - Feed enough paper after the footer for readability.
 - Cut automatically after each message.
 - Avoid emoji as regular text unless converted to a supported bitmap.
@@ -621,6 +643,12 @@ client_idempotency_key
 sender_fingerprint
 ip_hash
 user_agent_summary
+device_label
+location_city
+location_region
+location_country
+location_country_code
+location_label
 failure_code
 failure_message
 worker_id
@@ -902,6 +930,8 @@ The public page should state:
 
 Do not store raw IP addresses longer than necessary. Prefer a salted hash for rate limiting and blocking.
 
+For web submissions, derive a broad device label and approximate city from request metadata. Store only the friendly device and location fields, the existing salted IP hash, and the existing browser hash. Do not store the raw IP address or full browser identifier. This project does not show a location permission prompt or a separate disclosure for the inferred receipt metadata.
+
 ### 14.5 Emergency controls
 
 Justin must be able to:
@@ -1134,6 +1164,7 @@ V1 is complete when all of the following are true:
 18. The worker starts automatically after the Windows server restarts.
 19. Secrets are not stored in the public codebase.
 20. Internal network and error details are not exposed publicly.
+21. Web receipts and administrative message records include a broad device label and approximate city when available, with graceful device-only fallback.
 
 ---
 

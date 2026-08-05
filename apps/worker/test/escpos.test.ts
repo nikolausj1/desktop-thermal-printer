@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildMessageReceipt, sanitizeReceiptText, wrapReceiptText } from "../src/escpos.js";
+import {
+  buildMessageReceipt,
+  buildOriginSummary,
+  sanitizeReceiptText,
+  wrapReceiptText,
+} from "../src/escpos.js";
 
 test("sanitizes receipt text to printable ASCII", () => {
   assert.equal(sanitizeReceiptText("  Héllo\tSeattle 👋  "), "Hello Seattle ?");
@@ -21,6 +26,8 @@ test("receipt initializes the printer and ends with full cut", () => {
       messageText: "Hope this works.",
       submittedAt: "2026-08-05T05:00:00.000Z",
       expiresAt: "2026-08-05T05:10:00.000Z",
+      deviceLabel: "iPhone",
+      locationLabel: "Portland, OR",
     },
     "America/Los_Angeles",
   );
@@ -29,4 +36,14 @@ test("receipt initializes the printer and ends with full cut", () => {
   assert.deepEqual([...receipt.subarray(-3)], [0x1d, 0x56, 0x00]);
   assert.match(receipt.toString("ascii"), /Message #0042/);
   assert.match(receipt.toString("ascii"), /Hope this works\./);
+  assert.match(receipt.toString("ascii"), /Sent from an iPhone near Portland, OR/);
+});
+
+test("origin summary falls back cleanly when location or all metadata is missing", () => {
+  assert.equal(buildOriginSummary("iPhone", null), "Sent from an iPhone");
+  assert.equal(
+    buildOriginSummary("Windows computer", "Seattle, WA"),
+    "Sent from a Windows computer near Seattle, WA",
+  );
+  assert.equal(buildOriginSummary(null, null), null);
 });

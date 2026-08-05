@@ -52,7 +52,7 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): Worker
     workerApiUrl: validateWorkerApiUrl(required(environment, "WORKER_API_URL")),
     workerApiKey: required(environment, "WORKER_API_KEY"),
     workerId: environment.WORKER_ID?.trim() || "desktop-printer-nuc",
-    workerVersion: environment.WORKER_VERSION?.trim() || "0.1.0",
+    workerVersion: environment.WORKER_VERSION?.trim() || "0.2.0",
     printerId: environment.PRINTER_ID?.trim() || "desk-rp820",
     printerIp,
     printerPort: positiveInteger(environment, "PRINTER_PORT", 9100, 65535),

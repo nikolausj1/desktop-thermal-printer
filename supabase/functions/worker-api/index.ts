@@ -128,6 +128,8 @@ Deno.serve(async (request) => {
             messageText: row.message_text,
             submittedAt: row.submitted_at,
             expiresAt: row.expires_at,
+            deviceLabel: row.device_label,
+            locationLabel: row.location_label,
           }
         : null,
     });

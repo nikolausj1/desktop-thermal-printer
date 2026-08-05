@@ -8,6 +8,8 @@ export interface PrintJob {
   messageText: string;
   submittedAt: string;
   expiresAt: string;
+  deviceLabel: string | null;
+  locationLabel: string | null;
 }
 
 export interface PrinterHealth {

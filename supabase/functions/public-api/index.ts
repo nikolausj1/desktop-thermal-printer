@@ -4,6 +4,10 @@ import {
   normalizeMessage,
   normalizeName,
 } from "../_shared/public-api-helpers.ts";
+import {
+  inferDeviceLabel,
+  lookupApproximateLocation,
+} from "../_shared/origin-metadata.ts";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -188,14 +192,21 @@ Deno.serve(async (request) => {
       return json(request, 400, { ok: false, error: "This message could not be accepted." });
     }
 
-    const ipHash = `ip_${await sha256(`${ipHashSalt}:${requestIp(request)}`)}`;
+    const ipAddress = requestIp(request);
+    const ipHash = `ip_${await sha256(`${ipHashSalt}:${ipAddress}`)}`;
     const userAgent = request.headers.get("user-agent") || "unknown";
     const language = request.headers.get("accept-language") || "unknown";
     const senderFingerprint = `fp_${await sha256(`${ipHash}:${userAgent}:${language}`)}`;
     const contentHash = `content_${await sha256(message.value.toLocaleLowerCase("en-US"))}`;
     const userAgentSummary = `ua_${await sha256(userAgent)}`;
+    const deviceLabel = inferDeviceLabel(
+      userAgent,
+      request.headers.get("sec-ch-ua-platform"),
+      request.headers.get("sec-ch-ua-mobile"),
+    );
+    const location = await lookupApproximateLocation(ipAddress);
 
-    const { data, error } = await supabase.rpc("submit_public_message", {
+    const { data, error } = await supabase.rpc("submit_public_message_v2", {
       p_printer_id: "desk-rp820",
       p_sender_name: name.value || null,
       p_message_text: message.value,
@@ -204,6 +215,12 @@ Deno.serve(async (request) => {
       p_sender_fingerprint: senderFingerprint,
       p_content_hash: contentHash,
       p_user_agent_summary: userAgentSummary,
+      p_device_label: deviceLabel,
+      p_location_city: location?.city || null,
+      p_location_region: location?.region || null,
+      p_location_country: location?.country || null,
+      p_location_country_code: location?.countryCode || null,
+      p_location_label: location?.label || null,
       p_hold_for_review: publicApiMode !== "live",
     });
 

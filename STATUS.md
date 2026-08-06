@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-05
-version: 3.10
+version: 3.11
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -86,6 +86,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - The project-story headline tracking was loosened from `-0.065em` to `-0.035em` for readability. Site commit `63557c8` is deployed, and the live stylesheet matches the committed file.
 - The Open Graph social card subtitle now reads `CONNECTED TO REAL PRINTER`. Site commit `2d56c7e` is deployed with a versioned `og-v2.jpg` URL to bypass stale social-preview caches, and the live image matches the committed file.
 - The intro directions now follow the responsive layout: desktop says `to the right` while the form is beside the copy, and stacked layouts say `below`. Site commit `9996ed6` is deployed and verified live at desktop and mobile widths.
+- A custom receipt-paper favicon now mirrors the site's cream paper, dark desk palette, and torn edges. SVG, 32-pixel PNG, ICO, and 180-pixel Apple Touch Icon formats are live from site commit `e3be7ff` and verified against their committed files.
 
 ## Lessons
 

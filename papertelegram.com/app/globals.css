@@ -884,39 +884,27 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   will-change: transform, filter;
 }
 
-/* The finished plane leans like the logo: a shorter far wing behind,
-   a longer near wing toward the viewer, and a slim keel below. */
-.plane-final { transform: rotate(-9deg); }
-
-/* Far wing, in shade behind the spine. */
-.plane-wing-far {
-  clip-path: polygon(50% 3%, 20% 74%, 50% 62%);
-  background: linear-gradient(160deg, #e9e2d0 0%, #d8cfb8 100%);
-  filter: drop-shadow(-2px 3px 4px rgba(4, 12, 26, 0.3));
+/* The finished plane is a real folded dart, revealed as the folded
+   sliver's wings snap open. It starts nose-up to match the sliver, and
+   the launch banks it to flight attitude. */
+.plane-final img {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 92%;
+  transform: translate(-50%, -50%) rotate(105deg);
+  filter: drop-shadow(0 18px 30px rgba(4, 12, 26, 0.5));
 }
 
-/* Body keel hanging under the wings. */
-.plane-keel {
-  clip-path: polygon(50% 10%, 61% 98%, 50% 84%);
-  background: linear-gradient(120deg, #efe8d6 0%, #e0d7c0 100%);
-  filter: drop-shadow(2px 4px 5px rgba(4, 12, 26, 0.35));
+[data-concept="plane"][data-step="6"] .plane-final img {
+  animation: wing-open 0.5s cubic-bezier(0.4, 0.05, 0.3, 1.1) forwards;
 }
 
-/* Near wing drops open toward the viewer. */
-.plane-wing-near {
-  clip-path: polygon(50% 0, 91% 86%, 50% 68%);
-  background: linear-gradient(120deg, #ffffff 0%, #f6f0e2 60%, #ece5d3 100%);
-  transform-origin: 50% 34%;
-  transform: rotate3d(0.16, 1, 0, -84deg);
-}
-[data-concept="plane"][data-step="6"] .plane-wing-near {
-  animation: wing-drop 0.45s cubic-bezier(0.5, 0.05, 0.3, 1.15) forwards;
-}
-
-@keyframes wing-drop {
-  0% { transform: rotate3d(0.16, 1, 0, -84deg); filter: brightness(0.85) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
-  55% { transform: rotate3d(0.16, 1, 0, -38deg); filter: brightness(0.92) drop-shadow(-12px 10px 16px rgba(4, 12, 26, 0.45)); }
-  100% { transform: rotate3d(0.16, 1, 0, 0deg); filter: brightness(1) drop-shadow(-3px 4px 5px rgba(4, 12, 26, 0.3)); }
+@keyframes wing-open {
+  0% { transform: translate(-50%, -50%) scale(0.3, 0.92) rotate(105deg); opacity: 0.6; }
+  35% { opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1.06, 1) rotate(105deg); }
+  100% { transform: translate(-50%, -50%) scale(1, 1) rotate(105deg); }
 }
 
 /* Launch: the finished paper plane banks to the logo's flight attitude
@@ -1074,27 +1062,32 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   transform: rotate(-4deg);
 }
 
-/* Hogwarts: the back of an aged parchment envelope, like the real one.
-   Mottled paper, the V flaps meeting at a point, a small printed crest,
-   and the wax seal pressed at the point of the V. */
-.env-face.hogwarts {
+/* Hogwarts: the parchment IS the back of the paper. Both fold flaps
+   carry the aged mottled parchment, and the top flap carries the V
+   creases, the crest, and the hand-written line, so the envelope back
+   is assembled by the folding itself. Only the wax seal arrives after,
+   because sealing is its own step in real life too. */
+[data-concept="hogwarts"] .env-bottom,
+[data-concept="hogwarts"] .env-top {
   background:
-    radial-gradient(ellipse 30% 40% at 20% 30%, rgba(150, 106, 38, 0.12), transparent),
-    radial-gradient(ellipse 26% 36% at 78% 64%, rgba(150, 106, 38, 0.1), transparent),
-    radial-gradient(ellipse 20% 30% at 55% 15%, rgba(150, 106, 38, 0.08), transparent),
+    radial-gradient(ellipse 26% 22% at 22% 44%, rgba(150, 106, 38, 0.13), transparent),
+    radial-gradient(ellipse 22% 18% at 76% 56%, rgba(150, 106, 38, 0.11), transparent),
+    radial-gradient(ellipse 18% 15% at 54% 40%, rgba(150, 106, 38, 0.08), transparent),
     linear-gradient(140deg, #efe0bd, #e6d2a4);
-  box-shadow: inset 0 0 26px rgba(120, 84, 30, 0.28);
 }
 
+[data-concept="hogwarts"] .env-face { opacity: 1; transition: none; background: none; box-shadow: none; }
+
 /* The envelope flaps: side flaps shaded, top flap descending to the
-   seal point at (50%, 64%). */
+   seal point. Drawn on the top flap's back, inside the band region. */
 .env-flap-creases {
   position: absolute;
-  inset: 0;
+  inset: 33% 0 34% 0;
   background:
     linear-gradient(to bottom right, rgba(120, 84, 30, 0.14) 0%, transparent 34%),
     linear-gradient(to bottom left, rgba(120, 84, 30, 0.14) 0%, transparent 34%),
     linear-gradient(to top, rgba(120, 84, 30, 0.1) 0%, transparent 30%);
+  box-shadow: inset 0 0 26px rgba(120, 84, 30, 0.25);
 }
 
 .env-flap-creases::before,
@@ -1120,7 +1113,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 
 .env-for {
   position: absolute;
-  top: 8px;
+  top: calc(33% + 8px);
   left: 12px;
   margin: 0;
   font-family: var(--serif);
@@ -1133,7 +1126,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 .env-crest {
   position: absolute;
   left: 50%;
-  top: 26%;
+  top: 41%;
   width: 30px;
   height: 30px;
   transform: translateX(-50%);
@@ -1178,9 +1171,9 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(120vw, 1100px);
+  width: min(170vw, 1600px);
   transform: translate(-50%, -50%);
-  filter: drop-shadow(0 30px 44px rgba(4, 12, 26, 0.5));
+  filter: drop-shadow(0 34px 52px rgba(4, 12, 26, 0.55));
 }
 
 @keyframes owl-sweep {

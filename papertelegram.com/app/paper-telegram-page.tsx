@@ -113,14 +113,13 @@ export function PaperTelegramPage() {
       at(3150, () => setFlight("flying")); // and off it goes
       at(4250, () => setFlight("gone"));
     } else {
-      at(350, () => setFoldStep(1)); // bottom third folds up
+      at(350, () => setFoldStep(1)); // bottom third folds up, parchment out
       at(1050, () => setFoldStep(2)); // top third folds down over it
       at(1750, () => setFoldStep(3)); // the folded letter settles
-      at(2250, () => setFoldStep(4)); // parchment address appears
-      at(2950, () => setFoldStep(5)); // the wax seal is pressed on
-      at(3650, () => setFoldStep(6)); // an owl swoops in
-      at(4550, () => setFlight("flying")); // and carries it away
-      at(5750, () => setFlight("gone"));
+      at(2350, () => setFoldStep(5)); // the wax seal is pressed on
+      at(3050, () => setFoldStep(6)); // Hedwig sweeps across
+      at(3950, () => setFlight("flying")); // and carries it away
+      at(5150, () => setFlight("gone"));
     }
   }, [clearFlightTimers, concept]);
 
@@ -574,9 +573,8 @@ export function PaperTelegramPage() {
                 <div className="fold-flap flap-r2" />
                 <div className="fold-half" />
                 <div className="plane-final" aria-hidden="true">
-                  <div className="plane-wing-far" />
-                  <div className="plane-keel" />
-                  <div className="plane-wing-near" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/plane-dart.png" alt="" />
                 </div>
               </div>
             ) : null}
@@ -584,7 +582,16 @@ export function PaperTelegramPage() {
             {(flight === "folding" || flight === "flying") && concept !== "plane" ? (
               <div className="fold-theater" aria-hidden="true">
                 <div className="fold-flap env-bottom" />
-                <div className="fold-flap env-top" />
+                <div className="fold-flap env-top">
+                  {concept === "hogwarts" ? (
+                    <>
+                      <div className="env-flap-creases" />
+                      <p className="env-for">For {recipient || "Vinny & Chase"}</p>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className="env-crest" src="/logo-plane.png" alt="" />
+                    </>
+                  ) : null}
+                </div>
                 <div className={`env-face${concept === "hogwarts" ? " hogwarts" : ""}`}>
                   {concept === "airmail" ? (
                     <>
@@ -599,14 +606,8 @@ export function PaperTelegramPage() {
                       <span className="env-par-avion">Par Avion</span>
                     </>
                   ) : (
-                    <>
-                      <div className="env-flap-creases" />
-                      <p className="env-for">For {recipient || "Vinny & Chase"}</p>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="env-crest" src="/logo-plane.png" alt="" />
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="wax-seal" src="/wax-seal.png" alt="" />
-                    </>
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img className="wax-seal" src="/wax-seal.png" alt="" />
                   )}
                 </div>
               </div>

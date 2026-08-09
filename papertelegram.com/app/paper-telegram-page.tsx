@@ -478,6 +478,16 @@ export function PaperTelegramPage() {
 
   return (
     <div className="page-shell">
+      {concept === "hogwarts" &&
+      ((flight === "folding" && foldStep >= 6) || flight === "flying") ? (
+        <div className="owl-flyover" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="owl-f1" src="/owl-top-1.png" alt="" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="owl-f2" src="/owl-top-2.png" alt="" />
+        </div>
+      ) : null}
+
       {demoAvailable ? (
         <>
           <div className="concept-switch" role="group" aria-label="Delighter concept">
@@ -578,37 +588,27 @@ export function PaperTelegramPage() {
                 <div className={`env-face${concept === "hogwarts" ? " hogwarts" : ""}`}>
                   {concept === "airmail" ? (
                     <>
-                      <div className="env-stripes" />
                       <div className="env-stamp">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src="/logo-plane.png" alt="" />
                       </div>
                       <p className="env-address">
-                        <span>To: Vinny &amp; Chase</span>
+                        <span>To: {recipient || "Vinny & Chase"}</span>
                         <span>A desk in Seattle</span>
                       </p>
                       <span className="env-par-avion">Par Avion</span>
                     </>
                   ) : (
                     <>
-                      <p className="env-address parchment">
-                        <span>Vinny &amp; Chase</span>
-                        <span>The Desk by the Window</span>
-                        <span>Seattle</span>
-                      </p>
+                      <div className="env-flap-creases" />
+                      <p className="env-for">For {recipient || "Vinny & Chase"}</p>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className="env-crest" src="/logo-plane.png" alt="" />
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img className="wax-seal" src="/wax-seal.png" alt="" />
                     </>
                   )}
                 </div>
-                {concept === "hogwarts" ? (
-                  <div className="owl">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img className="owl-f1" src="/owl-flap-1.png" alt="" />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img className="owl-f2" src="/owl-flap-2.png" alt="" />
-                  </div>
-                ) : null}
               </div>
             ) : null}
 

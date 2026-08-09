@@ -706,7 +706,10 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
    paper) land over it along physically correct crease lines. */
 .giant-stamp.origami {
   transform: scale(1.02) rotate(-1deg);
-  transition: transform 0.35s ease-out, clip-path 0.24s ease-in-out;
+  /* The clip snaps away a beat after each flap starts moving, at the
+     moment the flap passes edge-on, so paper reads as folding rather
+     than separating. */
+  transition: transform 0.35s ease-out, clip-path 0.06s linear 0.2s;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.05),
     0 44px 84px -18px rgba(4, 12, 26, 0.65),
@@ -881,25 +884,29 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   will-change: transform, filter;
 }
 
+/* The finished plane leans like the logo: a shorter far wing behind,
+   a longer near wing toward the viewer, and a slim keel below. */
+.plane-final { transform: rotate(-9deg); }
+
 /* Far wing, in shade behind the spine. */
 .plane-wing-far {
-  clip-path: polygon(50% 0, 12% 92%, 50% 76%);
-  background: linear-gradient(160deg, #e9e2d0 0%, #ded5bf 100%);
+  clip-path: polygon(50% 3%, 20% 74%, 50% 62%);
+  background: linear-gradient(160deg, #e9e2d0 0%, #d8cfb8 100%);
   filter: drop-shadow(-2px 3px 4px rgba(4, 12, 26, 0.3));
 }
 
 /* Body keel hanging under the wings. */
 .plane-keel {
-  clip-path: polygon(50% 8%, 66% 100%, 50% 90%);
-  background: linear-gradient(120deg, #f4eede 0%, #e6dec9 100%);
+  clip-path: polygon(50% 10%, 61% 98%, 50% 84%);
+  background: linear-gradient(120deg, #efe8d6 0%, #e0d7c0 100%);
   filter: drop-shadow(2px 4px 5px rgba(4, 12, 26, 0.35));
 }
 
 /* Near wing drops open toward the viewer. */
 .plane-wing-near {
-  clip-path: polygon(50% 0, 88% 92%, 50% 76%);
+  clip-path: polygon(50% 0, 91% 86%, 50% 68%);
   background: linear-gradient(120deg, #ffffff 0%, #f6f0e2 60%, #ece5d3 100%);
-  transform-origin: 50% 38%;
+  transform-origin: 50% 34%;
   transform: rotate3d(0.16, 1, 0, -84deg);
 }
 [data-concept="plane"][data-step="6"] .plane-wing-near {
@@ -998,10 +1005,16 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 [data-concept="airmail"]:is([data-step="4"], [data-step="5"], [data-step="6"]) .env-face,
 [data-concept="hogwarts"]:is([data-step="4"], [data-step="5"], [data-step="6"]) .env-face { opacity: 1; }
 
-.env-stripes {
+/* The airmail border lives on the BACK of the paper, so each folded
+   flap carries its part of the stripes: the bottom flap brings the top
+   run and sides, the top flap brings the bottom run and sides. The
+   border is assembled by the folding itself. */
+[data-concept="airmail"] .env-bottom::after,
+[data-concept="airmail"] .env-top::after {
+  content: "";
   position: absolute;
-  inset: 0;
-  border: 7px solid;
+  inset: 33% 0 34% 0;
+  border-style: solid;
   border-image: repeating-linear-gradient(
     45deg,
     var(--red) 0px, var(--red) 5px,
@@ -1010,6 +1023,9 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
     #ffffff 13px, #ffffff 16px
   ) 7;
 }
+
+[data-concept="airmail"] .env-bottom::after { border-width: 7px 7px 0 7px; }
+[data-concept="airmail"] .env-top::after { border-width: 0 7px 7px 7px; }
 
 .env-stamp {
   position: absolute;
@@ -1058,81 +1074,125 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   transform: rotate(-4deg);
 }
 
-/* Hogwarts: parchment, a hand-addressed face, and a pressed wax seal. */
+/* Hogwarts: the back of an aged parchment envelope, like the real one.
+   Mottled paper, the V flaps meeting at a point, a small printed crest,
+   and the wax seal pressed at the point of the V. */
 .env-face.hogwarts {
-  background: linear-gradient(140deg, rgba(240, 224, 185, 0.95), rgba(230, 209, 160, 0.95));
-  box-shadow: inset 0 0 26px rgba(120, 84, 30, 0.25);
+  background:
+    radial-gradient(ellipse 30% 40% at 20% 30%, rgba(150, 106, 38, 0.12), transparent),
+    radial-gradient(ellipse 26% 36% at 78% 64%, rgba(150, 106, 38, 0.1), transparent),
+    radial-gradient(ellipse 20% 30% at 55% 15%, rgba(150, 106, 38, 0.08), transparent),
+    linear-gradient(140deg, #efe0bd, #e6d2a4);
+  box-shadow: inset 0 0 26px rgba(120, 84, 30, 0.28);
 }
 
-.env-address.parchment {
+/* The envelope flaps: side flaps shaded, top flap descending to the
+   seal point at (50%, 64%). */
+.env-flap-creases {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom right, rgba(120, 84, 30, 0.14) 0%, transparent 34%),
+    linear-gradient(to bottom left, rgba(120, 84, 30, 0.14) 0%, transparent 34%),
+    linear-gradient(to top, rgba(120, 84, 30, 0.1) 0%, transparent 30%);
+}
+
+.env-flap-creases::before,
+.env-flap-creases::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 58%;
+  height: 64%;
+  background: linear-gradient(to bottom, rgba(90, 62, 20, 0.0), rgba(90, 62, 20, 0.35));
+  -webkit-mask: linear-gradient(#000, #000);
+}
+
+.env-flap-creases::before {
+  left: 0;
+  clip-path: polygon(0 0, 100% 98%, calc(100% - 2px) 100%, 0 2.5px);
+}
+
+.env-flap-creases::after {
+  right: 0;
+  clip-path: polygon(100% 0, 0 98%, 2px 100%, 100% 2.5px);
+}
+
+.env-for {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  margin: 0;
   font-family: var(--serif);
   font-style: italic;
   font-weight: 500;
-  text-transform: none;
-  letter-spacing: 0.02em;
-  font-size: 14px;
+  font-size: 13px;
   color: #4a3413;
-  align-items: flex-start;
-  padding-left: 12%;
-  justify-content: center;
+}
+
+.env-crest {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  width: 30px;
+  height: 30px;
+  transform: translateX(-50%);
+  object-fit: contain;
+  opacity: 0.55;
+  filter: sepia(1) saturate(0.6) brightness(0.55);
 }
 
 .wax-seal {
   position: absolute;
-  right: 9%;
-  top: 50%;
-  width: 64px;
-  height: 64px;
+  left: 50%;
+  top: 64%;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
-  transform: translateY(-50%) scale(2) rotate(-14deg);
+  transform: translate(-50%, -50%) scale(2) rotate(-14deg);
   opacity: 0;
   z-index: 4;
+  filter: drop-shadow(0 4px 8px rgba(60, 30, 10, 0.4));
 }
 [data-concept="hogwarts"]:is([data-step="5"], [data-step="6"]) .wax-seal {
   animation: seal-press 0.42s cubic-bezier(0.3, 1.2, 0.4, 1) forwards;
 }
 
 @keyframes seal-press {
-  0% { opacity: 0; transform: translateY(-50%) scale(2) rotate(-14deg); }
-  60% { opacity: 1; transform: translateY(-50%) scale(0.92) rotate(2deg); }
-  100% { opacity: 1; transform: translateY(-50%) scale(1) rotate(0deg); }
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(2) rotate(-14deg); }
+  60% { opacity: 1; transform: translate(-50%, -50%) scale(0.92) rotate(2deg); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
 }
 
-/* The owl swoops in from off screen and hovers over the letter. */
-.owl {
-  position: absolute;
-  width: 68%;
-  aspect-ratio: 1;
-  left: 20%;
-  top: -7%;
-  z-index: 6;
-  opacity: 0;
-  pointer-events: none;
-  filter: drop-shadow(0 18px 26px rgba(4, 12, 26, 0.45));
-}
-[data-concept="hogwarts"][data-step="6"] .owl,
-[data-concept="hogwarts"][data-flight="flying"] .owl {
-  opacity: 1;
-  animation: owl-in 0.85s cubic-bezier(0.3, 0.6, 0.3, 1) forwards;
-}
-
-@keyframes owl-in {
-  0% { transform: translate(-60vw, -45vh) rotate(-10deg) scale(0.7); }
-  70% { transform: translate(2%, 4%) rotate(3deg) scale(1.02); }
-  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-}
-
-.owl img {
-  position: absolute;
+/* Hedwig passes between the viewer and the page: a huge top-down pair
+   of wings sweeping across the whole viewport to snatch the letter. */
+.owl-flyover {
+  position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  z-index: 60;
+  pointer-events: none;
+  animation: owl-sweep 2s cubic-bezier(0.42, 0, 0.58, 1) forwards;
 }
 
-.owl .owl-f2 { opacity: 0; }
-.owl .owl-f1 { animation: owl-flap-a 0.36s steps(1) infinite; }
-.owl .owl-f2 { animation: owl-flap-b 0.36s steps(1) infinite; }
+.owl-flyover img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(120vw, 1100px);
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 30px 44px rgba(4, 12, 26, 0.5));
+}
+
+@keyframes owl-sweep {
+  0% { transform: translate(-105vw, 95vh) rotate(-6deg); }
+  46% { transform: translate(6vw, -4vh) rotate(0deg); }
+  58% { transform: translate(14vw, -14vh) rotate(1deg); }
+  100% { transform: translate(115vw, -115vh) rotate(4deg); }
+}
+
+.owl-flyover .owl-f2 { opacity: 0; }
+.owl-flyover .owl-f1 { animation: owl-flap-a 0.32s steps(1) infinite; }
+.owl-flyover .owl-f2 { animation: owl-flap-b 0.32s steps(1) infinite; }
 
 @keyframes owl-flap-a { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 @keyframes owl-flap-b { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }

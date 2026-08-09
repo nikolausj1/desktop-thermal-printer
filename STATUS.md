@@ -2,8 +2,8 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-09
-version: 3.18
-author: OpenAI Codex (GPT-5)
+version: 4.0
+author: Claude Fable 5 (claude-fable-5)
 tags:
 ---
 
@@ -19,28 +19,23 @@ MVP / Paper Telegram redesign
 
 ## Health
 
-🟢 On-track - The original public experience remains live and unchanged. A separate Paper Telegram site has been built and privately deployed for review, with broad and airmail-focused visual studies available locally. Production and the Windows worker remain unchanged.
+🟢 On-track - Paper Telegram is LIVE at `https://papertelegram.com` with the approved Combo Stamp design, deployed on Vercel with GitHub auto-deploys and Porkbun DNS. The original `justinnikolaus.com/printer` experience and the Windows worker remain unchanged.
 
 ## Waiting on Me
 
-- [ ] **Review the round-3 airmail concepts and choose the final direction**
-      - Codex round-3 gallery: `_review/paper-telegram-airmail-round3/index.html`
-      - Claude round-3 gallery: `_review/paper-telegram-airmail-r3/index.html`
-      - round-2 galleries for reference: `_review/paper-telegram-airmail-concepts/index.html` (Codex), `_review/paper-telegram-airmail-concepts/index-claude.html` (Claude)
-      - round-1 galleries for reference: `_review/paper-telegram-concepts/index.html` (Codex), `_review/paper-telegram-concepts-claude/index.html` (Claude)
-      - current private preview: `https://paper-telegram.just-aspen-8969.chatgpt.site`
-- [ ] **Purchase `papertelegram.com` when ready**
-      - unblocks: custom-domain connection and public launch
+- [ ] **Visit `https://papertelegram.com` and send the first real telegram to the kids** (5 min)
+      - unblocks: confirming the full public path end to end on the new domain
+- [ ] **Decide whether to refresh the social card and favicon to the new navy/plane identity** (S)
+      - unblocks: consistent branding in link previews; the current `og.png` and favicon still show the old dark-desk receipt look
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
       - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
 ## Next Up
 
-1. Review the round-3 concepts and pick the final direction, or request further refinement.
-2. Apply the approved visual direction to the separate Paper Telegram site.
-3. Purchase and connect `papertelegram.com` after the site direction is approved.
-4. Decide whether recipient should become a first-class queue field and a dedicated heading on the physical receipt. Any Windows worker change still requires explicit approval.
-5. Reset the Supabase database password when convenient.
+1. Send a first real telegram through `https://papertelegram.com` and physically confirm the print.
+2. Refresh the social card and favicon to the new navy paper-plane identity.
+3. Decide whether recipient should become a first-class queue field and a dedicated heading on the physical receipt. Any Windows worker change still requires explicit approval.
+4. Reset the Supabase database password when convenient.
 
 ## Biggest Risk
 
@@ -104,6 +99,12 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - A second set of eight disconnected concepts, built by Claude at Justin's request, is available in `_review/paper-telegram-concepts-claude/`: Par Avion, The Wire, Mail Call, Player Two, Ticket Booth, Special Dispatch, Copy Shop, and Little Inventions. Each is a single self-contained HTML file (Google Fonts are the only external resource) sharing one copy deck with a Vinny/Chase/Both recipient selector, verified at 375px and 1440px, preview-only with no printer or API connection. Fresh territory from the Codex set by design, except Airmail, which Justin asked to see reinterpreted (Par Avion). Production code was not changed.
 - Round 2 narrowed to the airmail direction. Justin's locked decisions: the white mail form contrasting against a blue scene (from Codex's Airmail), Vinny and Chase as the only recipient options (no Both), and Codex's form with its heading that changes to "For Vinny" or "For Chase" on selection. Six airmail-family variations are in `_review/paper-telegram-airmail-concepts/`: Blue Skies, Night Flight, Jet Age, Departures (split-flap heading animation), Paper Plane, and First Class. All reproduce Codex's form structure and behaviors faithfully, are self-contained single files, and were verified visually and functionally, including the heading swap. Preview-only, no printer or API connection.
 - Round 3 (Claude) converges further per Justin's feedback on round 2: every concept now uses a deep blue textured background with the white form as the brightest object (the First Class contrast he liked), the paper plane as the project's brand mark, and no preselected recipient (both chips start unselected, heading stays "Special delivery" until a click, matching Codex's original behavior; round 2 had incorrectly preselected Vinny). Eight variations in `_review/paper-telegram-airmail-r3/`: Par Avion Trim (accurate striped border), First Class Redux (accurate perforations), Torn Receipt, Night Gliders (slow clouds on dark blue, requested), Flight Path, Boarding Pass, Envelope, and Composite (a deliberate synthesis and launch candidate). All verified visually and functionally. Preview-only, no printer or API connection. Codex's separate round-2 airmail studies share `_review/paper-telegram-airmail-concepts/` (its gallery at `index.html`, Claude's at `index-claude.html`); the two sets have no filename collisions.
+- Round 4 (Claude) applies Justin's round-3 feedback as universal rules: every concept uses the round-3 concept 01 navy linen background, a two-column desktop layout (copy left, form right, matching the live printer page) stacking on mobile, no preselected recipient, and four AI-generated paper plane logo marks paired with the wordmark (files `logo-plane-*.png`, contact sheet at `logos.html`, generated with the OpenAI image API per Justin's go-ahead). Six concepts in `_review/paper-telegram-airmail-r4/`: three combine the stripe trim with the perforated edge (Combo Classic, Combo Stamp, Combo Band) and three are single-treatment controls (Stripe Classic, Stamp Classic, Receipt). All verified at 375px and 1440px. Preview-only, no printer or API connection.
+- Justin picked logo marks 01 Minimal fold, 02 Postmark ring, and 03 Loop trail (now starred on the contact sheet) and round-4 concepts 05, 01, and 02. The logo set grew to 12 marks, and blue-on-white variants of the postmark ring and loop trail were generated for paper surfaces per his note.
+- Round 5 (Claude) refines the three picked concepts in `_review/paper-telegram-airmail-r5/`: Stamp Classic, Combo Classic, and Combo Stamp, each with the chosen marks integrated (white postmark ring on navy, blue-line marks on paper), Codex's two-line status chip ("Message machine online" / "Ready for a new telegram."), the two-column layout, and no preselected recipient. All three verified visually and by code checks. Preview-only, no printer or API connection.
+- At Justin's request the logo marks were enlarged (the identity carries the page along with the form) and each round-5 finalist gained a segmented control in the review toolbar to switch the identity live between 01 Minimal fold, 02 Postmark ring, and 03 Loop trail. Every mark on the page swaps together, respecting its surface (white-line variants on navy, blue-line variants on paper; white versions of the fold and trail marks were generated to complete the set), and the choice persists across the three concepts via localStorage.
+- LAUNCH (2026-08-09): Justin chose the 01 Minimal fold logo and the Combo Stamp concept. The production site was rebuilt on that design (navy linen, two-column layout, giant perforated stamp form with the engraved stripe frame, fold logo white on navy and navy on paper, "Harry Potter" name placeholder, the idea and how-it-was-made story sections, live two-line status chip) while keeping every behavior from v1: status polling, idempotent submit, print-status polling, honeypot, and validation. The `papertelegram.com/` folder was converted from the vinext/Cloudflare scaffold to standard Next.js 16 (vinext, wrangler, drizzle, and the d1 example were removed; the API proxy route ported unchanged). Deployed to Vercel project `papertelegram` (auto-deploys from `nikolausj1/desktop-thermal-printer` main with root directory `papertelegram.com`), Porkbun DNS switched from parking to the Vercel A and www CNAME records (MX and SPF for email forwarding untouched), and `https://papertelegram.com` plus `www` verified live serving the new site with the printer status API returning online.
+- Launch leftovers, deliberately deferred: `og.png`, the favicon set, and the apple-touch icon still carry the old dark-desk receipt look; the chatgpt.site private preview of v1 still exists and can be retired.
 - Codex added eight more focused airmail derivatives in `_review/paper-telegram-airmail-concepts/index.html`: Blue Horizon, Airmail Envelope, Paper Flight, Dusk Delivery, Junior Airmail, Route Map, First Class, and Folded Sky. Every direction increases contrast between the scene and receipt, retains Chase and Vinny as the only recipient choices, works at desktop and phone widths, and remains disconnected from the printer. Paper Flight and Junior Airmail make the paper plane a prominent project metaphor.
 - Codex's focused round-3 gallery is in `_review/paper-telegram-airmail-round3/`: Postal Wing, Folded Signal, Flight Path, Night Airmail, Air Post Badge, and Tiny Flight Club. All six use a textured dark-blue background, keep text left and receipt right on desktop, stack text above the receipt on mobile, and include a distinct code-native paper-plane wordmark. Postal Wing, Night Airmail, and Tiny Flight Club use red, white, and blue airmail borders around the torn receipt. The forms are preview-only and cannot reach the printer.
 

@@ -751,22 +751,34 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
     linear-gradient(155deg, #ffffff 0%, #fbf8f0 45%, #efe9da 100%);
   backface-visibility: visible;
   opacity: 0;
-  transition: transform 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99), opacity 0.05s linear;
-  will-change: transform;
+  transition: opacity 0.05s linear;
+  will-change: transform, filter;
 }
 
-/* Top-left corner folds to the center line. Crease: (50%,0) to (0,36%),
-   which is roughly a 45 degree diagonal in rendered pixels. */
+/* Each fold is a keyframed animation so the paper casts a soft moving
+   shadow while it is in the air and darkens as it turns away from the
+   light, then settles with a tight crease shadow when it lands. */
+
+/* Top-left corner folds to the center line. Crease: (50%,0) to (0,36%). */
 .flap-tl {
   clip-path: polygon(50% 0, 0 36%, 50% 36%);
   transform-origin: 25% 18%;
   transform: rotate3d(-1, 1, 0, 179deg);
 }
 [data-step="1"] .flap-tl,
-[data-step="2"] .flap-tl { opacity: 1; transform: rotate3d(-1, 1, 0, 0deg); }
+[data-step="2"] .flap-tl {
+  opacity: 1;
+  animation: fold-tl 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
 [data-step="3"] .flap-tl,
 [data-step="4"] .flap-tl,
-[data-step="5"] .flap-tl { transform: rotate3d(-1, 1, 0, 0deg); opacity: 0; }
+[data-step="5"] .flap-tl { opacity: 0; transform: rotate3d(-1, 1, 0, 0deg); }
+
+@keyframes fold-tl {
+  0% { transform: rotate3d(-1, 1, 0, 179deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
+  45% { transform: rotate3d(-1, 1, 0, 92deg); filter: brightness(0.84) drop-shadow(10px 16px 18px rgba(4, 12, 26, 0.45)); }
+  100% { transform: rotate3d(-1, 1, 0, 0deg); filter: brightness(1) drop-shadow(2px 3px 3px rgba(4, 12, 26, 0.28)); }
+}
 
 /* Top-right corner mirrors it. Crease: (50%,0) to (100%,36%). */
 .flap-tr {
@@ -775,9 +787,18 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   transform: rotate3d(1, 1, 0, -179deg);
 }
 [data-step="2"] .flap-tr,
-[data-step="3"] .flap-tr { opacity: 1; transform: rotate3d(1, 1, 0, 0deg); }
+[data-step="3"] .flap-tr {
+  opacity: 1;
+  animation: fold-tr 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
 [data-step="4"] .flap-tr,
-[data-step="5"] .flap-tr { transform: rotate3d(1, 1, 0, 0deg); opacity: 0; }
+[data-step="5"] .flap-tr { opacity: 0; transform: rotate3d(1, 1, 0, 0deg); }
+
+@keyframes fold-tr {
+  0% { transform: rotate3d(1, 1, 0, -179deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
+  45% { transform: rotate3d(1, 1, 0, -92deg); filter: brightness(0.84) drop-shadow(-10px 16px 18px rgba(4, 12, 26, 0.45)); }
+  100% { transform: rotate3d(1, 1, 0, 0deg); filter: brightness(1) drop-shadow(-2px 3px 3px rgba(4, 12, 26, 0.28)); }
+}
 
 /* Second fold, left angled edge to the center. Crease: (50%,0) to (10%,100%). */
 .flap-l2 {
@@ -788,8 +809,17 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
     linear-gradient(120deg, #ffffff 0%, #f6f1e4 55%, #eae3d2 100%);
 }
 [data-step="3"] .flap-l2,
-[data-step="4"] .flap-l2 { opacity: 1; transform: rotate3d(-0.28, 1, 0, 0deg); }
+[data-step="4"] .flap-l2 {
+  opacity: 1;
+  animation: fold-l2 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
 [data-step="5"] .flap-l2 { opacity: 0; transform: rotate3d(-0.28, 1, 0, 0deg); }
+
+@keyframes fold-l2 {
+  0% { transform: rotate3d(-0.28, 1, 0, 179deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
+  45% { transform: rotate3d(-0.28, 1, 0, 92deg); filter: brightness(0.82) drop-shadow(16px 10px 20px rgba(4, 12, 26, 0.5)); }
+  100% { transform: rotate3d(-0.28, 1, 0, 0deg); filter: brightness(1) drop-shadow(3px 2px 4px rgba(4, 12, 26, 0.3)); }
+}
 
 /* Second fold, right angled edge. Crease: (50%,0) to (90%,100%). */
 .flap-r2 {
@@ -800,9 +830,18 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
     linear-gradient(-120deg, #ffffff 0%, #f6f1e4 55%, #eae3d2 100%);
 }
 [data-step="4"] .flap-r2,
-[data-step="5"] .flap-r2 { opacity: 1; transform: rotate3d(0.28, 1, 0, 0deg); }
+[data-step="5"] .flap-r2 {
+  opacity: 1;
+  animation: fold-r2 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
 
-/* The dart folds in half along its spine. */
+@keyframes fold-r2 {
+  0% { transform: rotate3d(0.28, 1, 0, -179deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
+  45% { transform: rotate3d(0.28, 1, 0, -92deg); filter: brightness(0.82) drop-shadow(-16px 10px 20px rgba(4, 12, 26, 0.5)); }
+  100% { transform: rotate3d(0.28, 1, 0, 0deg); filter: brightness(1) drop-shadow(-3px 2px 4px rgba(4, 12, 26, 0.3)); }
+}
+
+/* The dart folds in half along its spine, the biggest shadow of all. */
 .fold-half {
   clip-path: polygon(50% 0, 50% 100%, 10% 100%);
   transform-origin: 50% 50%;
@@ -811,7 +850,86 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
     linear-gradient(100deg, #ffffff 0%, #f3edde 60%, #e6decb 100%);
 }
 [data-step="4"] .fold-half { opacity: 1; }
-[data-step="5"] .fold-half { opacity: 1; transform: rotate3d(0, 1, 0, -178deg); }
+[data-step="5"] .fold-half {
+  opacity: 1;
+  animation: fold-half 0.55s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
+
+@keyframes fold-half {
+  0% { transform: rotate3d(0, 1, 0, 0deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
+  45% { transform: rotate3d(0, 1, 0, -90deg); filter: brightness(0.8) drop-shadow(22px 14px 26px rgba(4, 12, 26, 0.55)); }
+  100% { transform: rotate3d(0, 1, 0, -178deg); filter: brightness(0.96) drop-shadow(-3px 3px 5px rgba(4, 12, 26, 0.32)); }
+}
+
+/* Final step: the wings drop open, the real last step of folding a
+   paper plane, ending in the same three-facet silhouette as the logo. */
+[data-step="6"] .giant-stamp.origami,
+[data-step="6"] .flap-r2,
+[data-step="6"] .fold-half { opacity: 0; transition: opacity 0.12s linear; }
+
+.plane-final {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  perspective: 1100px;
+}
+[data-step="6"] .plane-final { opacity: 1; transition: opacity 0.08s linear; }
+
+.plane-final > div {
+  position: absolute;
+  inset: 0;
+  will-change: transform, filter;
+}
+
+/* Far wing, in shade behind the spine. */
+.plane-wing-far {
+  clip-path: polygon(50% 0, 12% 92%, 50% 76%);
+  background: linear-gradient(160deg, #e9e2d0 0%, #ded5bf 100%);
+  filter: drop-shadow(-2px 3px 4px rgba(4, 12, 26, 0.3));
+}
+
+/* Body keel hanging under the wings. */
+.plane-keel {
+  clip-path: polygon(50% 8%, 66% 100%, 50% 90%);
+  background: linear-gradient(120deg, #f4eede 0%, #e6dec9 100%);
+  filter: drop-shadow(2px 4px 5px rgba(4, 12, 26, 0.35));
+}
+
+/* Near wing drops open toward the viewer. */
+.plane-wing-near {
+  clip-path: polygon(50% 0, 88% 92%, 50% 76%);
+  background: linear-gradient(120deg, #ffffff 0%, #f6f0e2 60%, #ece5d3 100%);
+  transform-origin: 50% 38%;
+  transform: rotate3d(0.16, 1, 0, -84deg);
+}
+[data-step="6"] .plane-wing-near {
+  animation: wing-drop 0.45s cubic-bezier(0.5, 0.05, 0.3, 1.15) forwards;
+}
+
+@keyframes wing-drop {
+  0% { transform: rotate3d(0.16, 1, 0, -84deg); filter: brightness(0.85) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
+  55% { transform: rotate3d(0.16, 1, 0, -38deg); filter: brightness(0.92) drop-shadow(-12px 10px 16px rgba(4, 12, 26, 0.45)); }
+  100% { transform: rotate3d(0.16, 1, 0, 0deg); filter: brightness(1) drop-shadow(-3px 4px 5px rgba(4, 12, 26, 0.3)); }
+}
+
+/* Launch: the finished paper plane banks to the logo's flight attitude
+   and leaves the screen. */
+.stamp-stage[data-flight="flying"] {
+  animation: dart-launch 1.05s cubic-bezier(0.5, -0.05, 0.72, 0.3) forwards;
+  transform-origin: 50% 42%;
+}
+
+.stamp-stage[data-flight="flying"] .plane-final { opacity: 1; }
+.stamp-stage[data-flight="flying"] .giant-stamp.origami,
+.stamp-stage[data-flight="flying"] .flap-r2,
+.stamp-stage[data-flight="flying"] .fold-half { opacity: 0; }
+
+@keyframes dart-launch {
+  0% { transform: none; }
+  28% { transform: translate(-2%, 2%) rotate(20deg) scale(0.88); }
+  48% { transform: translate(-4%, 4%) rotate(48deg) scale(0.76); }
+  100% { transform: translate(64vw, -105vh) rotate(56deg) scale(0.4); }
+}
 
 .contrail {
   position: absolute;
@@ -935,6 +1053,9 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   .giant-stamp.unfolding,
   .flight-plane,
   .contrail path,
+  .fold-flap,
+  .fold-half,
+  .stamp-stage[data-flight="flying"],
   .flight-card { animation: none; }
   .fold-flap,
   .fold-half,

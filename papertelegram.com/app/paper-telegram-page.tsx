@@ -90,8 +90,9 @@ export function PaperTelegramPage() {
     at(1350, () => setFoldStep(3)); // left angled edge folds in again
     at(1850, () => setFoldStep(4)); // right angled edge folds in again
     at(2400, () => setFoldStep(5)); // the dart folds in half
-    at(2980, () => setFlight("flying")); // and takes off
-    at(4050, () => setFlight("gone"));
+    at(3000, () => setFoldStep(6)); // the wings drop open
+    at(3560, () => setFlight("flying")); // and it takes off
+    at(4650, () => setFlight("gone"));
   }, [clearFlightTimers]);
 
   const bringFormBack = useCallback(() => {
@@ -476,32 +477,33 @@ export function PaperTelegramPage() {
         </section>
 
         <section className="stamp-col" aria-labelledby="form-title">
+          {flight === "flying" ? (
+            <svg className="contrail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <path
+                d="M50,46 Q60,28 86,4 T160,-70"
+                pathLength={100}
+                fill="none"
+                stroke="rgba(248, 245, 236, 0.55)"
+                strokeWidth="0.7"
+                strokeDasharray="2.6 3.4"
+              />
+            </svg>
+          ) : null}
+
           <div className="stamp-stage" data-flight={flight} data-step={foldStep}>
-            {flight === "folding" ? (
+            {flight === "folding" || flight === "flying" ? (
               <div className="fold-theater" aria-hidden="true">
                 <div className="fold-flap flap-tl" />
                 <div className="fold-flap flap-tr" />
                 <div className="fold-flap flap-l2" />
                 <div className="fold-flap flap-r2" />
                 <div className="fold-half" />
+                <div className="plane-final" aria-hidden="true">
+                  <div className="plane-wing-far" />
+                  <div className="plane-keel" />
+                  <div className="plane-wing-near" />
+                </div>
               </div>
-            ) : null}
-
-            {flight === "flying" ? (
-              <>
-                <svg className="contrail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                  <path
-                    d="M50,46 Q60,28 86,4 T160,-70"
-                    pathLength={100}
-                    fill="none"
-                    stroke="rgba(248, 245, 236, 0.55)"
-                    strokeWidth="0.7"
-                    strokeDasharray="2.6 3.4"
-                  />
-                </svg>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="flight-plane" src="/logo-plane-white.png" alt="" aria-hidden="true" />
-              </>
             ) : null}
 
             {flight === "gone" ? (
@@ -572,9 +574,9 @@ export function PaperTelegramPage() {
             ) : null}
 
             <div
-              className={`giant-stamp${flight === "folding" ? " origami" : ""}${
-                flight === "flying" || flight === "gone" ? " folded" : ""
-              }${returning ? " unfolding" : ""}`}
+              className={`giant-stamp${
+                flight === "folding" || flight === "flying" ? " origami" : ""
+              }${flight === "gone" ? " folded" : ""}${returning ? " unfolding" : ""}`}
             >
               <div className="stamp-surface" ref={stampSurfaceRef}>
                 <span className="stamp-corner tl" aria-hidden="true">

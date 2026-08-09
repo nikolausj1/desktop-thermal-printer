@@ -54,12 +54,16 @@ export function PaperTelegramPage() {
   const [message, setMessage] = useState("");
   const [website, setWebsite] = useState("");
   const [receiptDate, setReceiptDate] = useState("");
+  const [stampYear, setStampYear] = useState("");
   const [printerStatus, setPrinterStatus] = useState<PrinterStatus>(initialStatus);
   const [submitting, setSubmitting] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Send this telegram");
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [showErrors, setShowErrors] = useState(false);
   const idempotencyKey = useRef<string | null>(null);
+  const stampSurfaceRef = useRef<HTMLDivElement>(null);
+  const perfMaskRectRef = useRef<SVGRectElement>(null);
+  const perfHolesRef = useRef<SVGGElement>(null);
 
   const nameValid = visibleLength(name.trim()) <= 30;
   const messageValid =
@@ -74,6 +78,63 @@ export function PaperTelegramPage() {
     messageValid &&
     !submitting;
 
+  // Real stamp perforations: evenly spaced semicircular bites, uniform
+  // diameter and pitch, a punched hole shared at every corner. Recompute
+  // from the rendered box on every resize so spacing stays regular.
+  useEffect(() => {
+    const surface = stampSurfaceRef.current;
+    const maskRect = perfMaskRectRef.current;
+    const holes = perfHolesRef.current;
+    if (!surface || !maskRect || !holes) return;
+
+    function buildPerforationMask() {
+      if (!surface || !maskRect || !holes) return;
+      const w = Math.round(surface.clientWidth);
+      const h = Math.round(surface.clientHeight);
+      if (!w || !h) return;
+
+      maskRect.setAttribute("width", String(w));
+      maskRect.setAttribute("height", String(h));
+
+      const targetSpacing = 19;
+      let hScallops = Math.max(4, Math.round(w / targetSpacing));
+      if (hScallops % 2 !== 0) hScallops += 1;
+      let vScallops = Math.max(4, Math.round(h / targetSpacing));
+      if (vScallops % 2 !== 0) vScallops += 1;
+
+      const hPitch = w / hScallops;
+      const vPitch = h / vScallops;
+      let radius = Math.min(hPitch, vPitch) * 0.34;
+      radius = Math.max(4, Math.min(8, radius));
+
+      const ns = "http://www.w3.org/2000/svg";
+      holes.replaceChildren();
+      const addHole = (cx: number, cy: number) => {
+        const circle = document.createElementNS(ns, "circle");
+        circle.setAttribute("cx", String(cx));
+        circle.setAttribute("cy", String(cy));
+        circle.setAttribute("r", String(radius));
+        holes.appendChild(circle);
+      };
+      for (let i = 0; i <= hScallops; i += 1) {
+        addHole(i * hPitch, 0);
+        addHole(i * hPitch, h);
+      }
+      for (let j = 1; j < vScallops; j += 1) {
+        addHole(0, j * vPitch);
+        addHole(w, j * vPitch);
+      }
+    }
+
+    buildPerforationMask();
+    if (document.fonts?.ready) {
+      void document.fonts.ready.then(buildPerforationMask);
+    }
+    const observer = new ResizeObserver(buildPerforationMask);
+    observer.observe(surface);
+    return () => observer.disconnect();
+  }, []);
+
   const refreshPrinterStatus = useCallback(async () => {
     try {
       const response = await fetch("/api/printer/status", {
@@ -86,7 +147,7 @@ export function PaperTelegramPage() {
       const accepting = payload.acceptingMessages === true;
       const online = payload.status === "online" && accepting;
       const nextStatus: PrinterStatus = {
-        state: payload.status || "offline",
+        state: online ? "online" : payload.status || "offline",
         acceptingMessages: accepting,
         label: online ? "Message machine online" : payload.label || "Message machine unavailable",
         message: online
@@ -108,15 +169,17 @@ export function PaperTelegramPage() {
   }, []);
 
   useEffect(() => {
+    const now = new Date();
     setReceiptDate(
       new Intl.DateTimeFormat("en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
       })
-        .format(new Date())
+        .format(now)
         .toUpperCase(),
     );
+    setStampYear(String(now.getFullYear()));
     void refreshPrinterStatus();
     const timer = window.setInterval(() => {
       if (!submitting) void refreshPrinterStatus();
@@ -203,9 +266,9 @@ export function PaperTelegramPage() {
   async function submitTelegram(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setShowErrors(true);
-    if (!canSubmit || recipient === "") return;
+    if (!canSubmit) return;
 
-    const telegramRecipient = recipient;
+    const telegramRecipient = recipient as Exclude<Recipient, "">;
     setSubmitting(true);
     setButtonLabel("Checking the machine...");
     setFeedback({
@@ -276,7 +339,7 @@ export function PaperTelegramPage() {
     }
   }
 
-  const recipientError = showErrors && !recipientValid ? "Choose Chase or Vinny." : "";
+  const recipientError = showErrors && !recipientValid ? "Choose Vinny or Chase." : "";
   const nameError = showErrors && !nameValid ? "Use 30 characters or fewer." : "";
   const messageError =
     showErrors && !message.trim()
@@ -289,154 +352,245 @@ export function PaperTelegramPage() {
 
   return (
     <div className="page-shell">
+      <svg aria-hidden="true" style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}>
+        <defs>
+          <mask id="perfMask" maskUnits="objectBoundingBox" maskContentUnits="userSpaceOnUse">
+            <rect ref={perfMaskRectRef} x="0" y="0" width="1000" height="1400" fill="#ffffff" />
+            <g ref={perfHolesRef} fill="#000000" />
+          </mask>
+        </defs>
+      </svg>
+
       <main className="main-layout">
-        <section className="intro" aria-labelledby="page-title">
-          <p className="eyebrow">Papertelegram.com</p>
-          <h1 id="page-title">Send Chase or Vinny a paper telegram.</h1>
+        <section className="hero-col" aria-labelledby="page-title">
+          <p className="brandline">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-plane-white.png" alt="" />
+            Paper Telegram
+          </p>
+          <p className="eyebrow">A real message, on real paper</p>
+          <h1 id="page-title">Send Vinny &amp; Chase a paper telegram.</h1>
           <p className="lede">
-            Write them a quick hello, joke, riddle, or note in the receipt{" "}
-            <span className="lede-direction-wide">to the right</span>
-            <span className="lede-direction-stacked">below</span>. It will travel across the
-            internet and come out of their little message machine as a real piece of paper.
+            Type a note here and a tiny printer in their house wakes up and prints it on real
+            paper. No screens on their end, no accounts, no apps. Just a message they can hold.
+          </p>
+          <p className="nostalgia">
+            For everyone who remembers when getting mail was the best part of the day.
           </p>
 
-          <div
-            className="printer-status"
-            data-state={printerStatus.state}
-            role="status"
-            aria-live="polite"
-          >
-            <span className="status-light" aria-hidden="true" />
-            <span>
+          <p className="status-chip" data-state={printerStatus.state} role="status" aria-live="polite">
+            <span className="status-dot" aria-hidden="true" />
+            <span className="status-text">
               <strong>{printerStatus.label}</strong>
               <small>{printerStatus.message}</small>
             </span>
-          </div>
+          </p>
         </section>
 
-        <section className="receipt-wrap" aria-labelledby="form-title">
-          <div className="receipt">
-            <div className="receipt-meta" aria-hidden="true">
-              <span>PT / MESSAGE 01</span>
-              <span>48 COL</span>
-            </div>
+        <section className="stamp-col" aria-labelledby="form-title">
+          <div className="stamp-stage">
+            <div className="giant-stamp">
+              <div className="stamp-surface" ref={stampSurfaceRef}>
+                <span className="stamp-corner tl" aria-hidden="true">
+                  1<small>Smile</small>
+                </span>
+                <span className="stamp-corner tr" aria-hidden="true">
+                  {stampYear}
+                </span>
 
-            <div className="receipt-heading">
-              <p>Paper Telegram</p>
-              <h2 id="form-title">{recipient ? `For ${recipient}` : "Special delivery"}</h2>
-            </div>
+                <div className="stripe-frame">
+                  <div className="stripe-edge stripe-top" aria-hidden="true" />
+                  <div className="stripe-edge stripe-bottom" aria-hidden="true" />
+                  <div className="stripe-edge stripe-left" aria-hidden="true" />
+                  <div className="stripe-edge stripe-right" aria-hidden="true" />
 
-            <form onSubmit={submitTelegram} noValidate>
-              <fieldset className="recipient-fieldset" aria-describedby="recipient-error">
-                <legend>Who gets this telegram?</legend>
-                <div className="recipient-options">
-                  {(["Chase", "Vinny"] as const).map((child) => (
-                    <label key={child} className={recipient === child ? "is-selected" : ""}>
-                      <input
-                        type="radio"
-                        name="recipient"
-                        value={child}
-                        checked={recipient === child}
-                        onChange={() => setRecipient(child)}
-                      />
-                      <span>{child}</span>
-                    </label>
-                  ))}
-                </div>
-                <small className="field-error" id="recipient-error" aria-live="polite">
-                  {recipientError}
-                </small>
-              </fieldset>
+                  <div className="frame-content">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img className="watermark-plane" src="/logo-plane.png" alt="" aria-hidden="true" />
 
-              <div className="field-group">
-                <div className="label-row">
-                  <label htmlFor="sender-name">Your name</label>
-                  <span>Optional</span>
-                </div>
-                <input
-                  id="sender-name"
-                  name="name"
-                  type="text"
-                  maxLength={30}
-                  autoComplete="name"
-                  placeholder="Aunt Jane"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  aria-describedby="name-help name-error"
-                />
-                <small id="name-help">So they know who sent it.</small>
-                <small className="field-error" id="name-error" aria-live="polite">
-                  {nameError}
-                </small>
-              </div>
+                    <form className="telegram" onSubmit={submitTelegram} noValidate>
+                      <div className="meta-row" aria-hidden="true">
+                        <span>PT / MESSAGE 01</span>
+                        <span>48 COL</span>
+                      </div>
 
-              <div className="field-group">
-                <div className="label-row">
-                  <label htmlFor="message-text">Your message</label>
-                  <span data-warning={visibleLength(message) >= 250}>
-                    {visibleLength(message)} / {MAX_MESSAGE_LENGTH}
-                  </span>
-                </div>
-                <textarea
-                  id="message-text"
-                  name="message"
-                  maxLength={MAX_MESSAGE_LENGTH}
-                  rows={7}
-                  required
-                  placeholder="A joke, a hello, or something worth keeping..."
-                  value={message}
-                  onChange={(event) => setMessage(event.target.value)}
-                  aria-describedby="message-help message-error"
-                />
-                <small id="message-help">Plain text only. Up to 6 line breaks.</small>
-                <small className="field-error" id="message-error" aria-live="polite">
-                  {messageError}
-                </small>
-              </div>
+                      <div className="heading-block">
+                        <span className="kicker">Paper Telegram</span>
+                        <h2 id="form-title">{recipient ? `For ${recipient}` : "Special delivery"}</h2>
+                      </div>
 
-              <div className="trap-field" aria-hidden="true">
-                <label htmlFor="website">Website</label>
-                <input
-                  id="website"
-                  name="website"
-                  type="text"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={website}
-                  onChange={(event) => setWebsite(event.target.value)}
-                />
-              </div>
+                      <fieldset aria-describedby="recipient-error">
+                        <legend>Who gets this telegram?</legend>
+                        <div className="recipient-grid">
+                          {(["Vinny", "Chase"] as const).map((child) => (
+                            <label key={child} className="chip">
+                              <input
+                                className="sr-only"
+                                type="radio"
+                                name="recipient"
+                                value={child}
+                                checked={recipient === child}
+                                onChange={() => setRecipient(child)}
+                              />
+                              <span>{child}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <small className="field-error" id="recipient-error" aria-live="polite">
+                          {recipientError}
+                        </small>
+                      </fieldset>
 
-              <button type="submit" disabled={!canSubmit}>
-                <span>{buttonLabel}</span>
-                <span className="button-arrow" aria-hidden="true">→</span>
-              </button>
+                      <div className="field">
+                        <div className="field-label-row">
+                          <label htmlFor="sender-name">Your name</label>
+                          <span className="field-tag">Optional</span>
+                        </div>
+                        <input
+                          id="sender-name"
+                          name="name"
+                          type="text"
+                          maxLength={30}
+                          autoComplete="name"
+                          placeholder="Harry Potter"
+                          value={name}
+                          onChange={(event) => setName(event.target.value)}
+                          aria-describedby="name-help name-error"
+                        />
+                        <small className="field-helper" id="name-help">
+                          So they know who sent it.
+                        </small>
+                        <small className="field-error" id="name-error" aria-live="polite">
+                          {nameError}
+                        </small>
+                      </div>
 
-              {feedback ? (
-                <div
-                  className="submission-feedback"
-                  data-state={feedback.state}
-                  role="status"
-                  aria-live="polite"
-                >
-                  <span className="feedback-mark" aria-hidden="true">{feedback.mark}</span>
-                  <div>
-                    <strong>{feedback.label}</strong>
-                    <p>{feedback.message}</p>
+                      <div className="field">
+                        <div className="field-label-row">
+                          <label htmlFor="message-text">Your message</label>
+                          <span className="field-counter" data-warning={visibleLength(message) >= 250}>
+                            {visibleLength(message)} / {MAX_MESSAGE_LENGTH}
+                          </span>
+                        </div>
+                        <textarea
+                          id="message-text"
+                          name="message"
+                          maxLength={MAX_MESSAGE_LENGTH}
+                          rows={6}
+                          required
+                          placeholder="A joke, a hello, or something worth keeping..."
+                          value={message}
+                          onChange={(event) => setMessage(event.target.value)}
+                          aria-describedby="message-help message-error"
+                        />
+                        <small className="field-helper" id="message-help">
+                          Plain text only. Up to 6 line breaks.
+                        </small>
+                        <small className="field-error" id="message-error" aria-live="polite">
+                          {messageError}
+                        </small>
+                      </div>
+
+                      <div className="trap-field" aria-hidden="true">
+                        <label htmlFor="website">Website</label>
+                        <input
+                          id="website"
+                          name="website"
+                          type="text"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={website}
+                          onChange={(event) => setWebsite(event.target.value)}
+                        />
+                      </div>
+
+                      <button type="submit" className="send-btn" disabled={!canSubmit}>
+                        <span>{buttonLabel}</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path
+                            d="M4 12H20M20 12L14 6M20 12L14 18"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+
+                      {feedback ? (
+                        <div
+                          className="submission-feedback"
+                          data-state={feedback.state}
+                          role="status"
+                          aria-live="polite"
+                        >
+                          <span className="feedback-mark" aria-hidden="true">
+                            {feedback.mark}
+                          </span>
+                          <div>
+                            <strong>{feedback.label}</strong>
+                            <p>{feedback.message}</p>
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <div className="form-footer" aria-hidden="true">
+                        <span className="footer-brand">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src="/logo-plane.png" alt="" />
+                          PAPERTELEGRAM.COM
+                        </span>
+                        <span>{receiptDate}</span>
+                      </div>
+                    </form>
+
+                    <p className="frame-caption">Paper Telegram &middot; Par Avion</p>
                   </div>
                 </div>
-              ) : null}
-            </form>
 
-            <div className="receipt-footer" aria-hidden="true">
-              <span>PAPERTELEGRAM.COM</span>
-              <span>{receiptDate}</span>
+                <svg
+                  className={`postmark-fresh${feedback?.state === "success" ? " stamped" : ""}`}
+                  aria-hidden="true"
+                  viewBox="0 0 200 200"
+                >
+                  <defs>
+                    <path id="pmPath" d="M100,39 A61,61 0 1,1 99.9,39" fill="none" />
+                  </defs>
+                  <circle cx="100" cy="100" r="72" fill="none" stroke="var(--navy-ink)" strokeWidth="2.5" />
+                  <circle cx="100" cy="100" r="61" fill="none" stroke="var(--navy-ink)" strokeWidth="1.2" />
+                  <text fontFamily="var(--mono)" fontSize="10.5" letterSpacing="2.5" fill="var(--navy-ink)">
+                    <textPath href="#pmPath" startOffset="1">
+                      PAPER TELEGRAM &middot; DELIVERED &middot; PAPER TELEGRAM &middot; DELIVERED
+                    </textPath>
+                  </text>
+                  <path
+                    className="wave"
+                    d="M18,96 q7,-11 14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0"
+                    fill="none"
+                    stroke="var(--navy-ink)"
+                    strokeWidth="1.6"
+                    opacity="0.85"
+                  />
+                  <path
+                    className="wave"
+                    d="M14,109 q7,-11 14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0"
+                    fill="none"
+                    stroke="var(--navy-ink)"
+                    strokeWidth="1.6"
+                    opacity="0.7"
+                  />
+                  <path
+                    className="wave"
+                    d="M22,123 q7,-11 14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0"
+                    fill="none"
+                    stroke="var(--navy-ink)"
+                    strokeWidth="1.4"
+                    opacity="0.55"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
-
-          <aside className="desk-note">
-            <p>A real printer. A real piece of paper. A message just for them.</p>
-          </aside>
         </section>
       </main>
 
@@ -444,11 +598,11 @@ export function PaperTelegramPage() {
         <div className="story-intro">
           <div>
             <p className="story-eyebrow">The idea</p>
-            <h2 id="story-title">A little message machine for Chase and Vinny</h2>
+            <h2 id="story-title">A little message machine for Vinny and Chase</h2>
           </div>
           <p className="story-lede">
             Most messages disappear into an inbox. Paper Telegram turns a few words from someone
-            they know into something Chase or Vinny can pick up, read, and keep.
+            they know into something Vinny or Chase can pick up, read, and keep.
           </p>
         </div>
 
@@ -456,7 +610,7 @@ export function PaperTelegramPage() {
           <li>
             <span className="flow-number">01</span>
             <h3>Pick who gets it</h3>
-            <p>Choose Chase or Vinny so the message machine knows who the telegram belongs to.</p>
+            <p>Choose Vinny or Chase so the message machine knows who the telegram belongs to.</p>
             <span className="flow-tech">Address it</span>
           </li>
           <li>
@@ -490,8 +644,8 @@ export function PaperTelegramPage() {
               commands, and sends it across our home network.
             </p>
             <p>
-              The result is deliberately simple: family and friends write on a screen, while Chase
-              and Vinny receive a real piece of paper.
+              The result is deliberately simple: family and friends write on a screen, while Vinny
+              and Chase receive a real piece of paper.
             </p>
           </div>
 
@@ -499,10 +653,22 @@ export function PaperTelegramPage() {
             <p className="technical-label">For the curious</p>
             <h3 id="technical-title">What is under the hood</h3>
             <dl>
-              <div><dt>Website</dt><dd>Next.js and TypeScript</dd></div>
-              <div><dt>Cloud</dt><dd>Supabase Edge Functions and Postgres</dd></div>
-              <div><dt>Home worker</dt><dd>Node.js running as a Windows service</dd></div>
-              <div><dt>Printer link</dt><dd>Raw TCP over Ethernet using ESC/POS</dd></div>
+              <div>
+                <dt>Website</dt>
+                <dd>Next.js and TypeScript</dd>
+              </div>
+              <div>
+                <dt>Cloud</dt>
+                <dd>Supabase Edge Functions and Postgres</dd>
+              </div>
+              <div>
+                <dt>Home worker</dt>
+                <dd>Node.js running as a Windows service</dd>
+              </div>
+              <div>
+                <dt>Printer link</dt>
+                <dd>Raw TCP over Ethernet using ESC/POS</dd>
+              </div>
             </dl>
             <p className="technical-note">
               Each telegram is rate-limited, checked, queued once, and accepted only while the
@@ -513,6 +679,7 @@ export function PaperTelegramPage() {
       </section>
 
       <footer className="site-footer">
+        <p>papertelegram.com &middot; a tiny press for two kids</p>
         <p>Built by their dad, with an unreasonable amount of infrastructure for a tiny printer.</p>
       </footer>
     </div>

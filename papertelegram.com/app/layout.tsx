@@ -1,25 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://papertelegram.com"),
-  title: "Paper Telegram | Send Chase or Vinny a Note",
+  title: "Paper Telegram | Send Vinny & Chase a Paper Telegram",
   description:
-    "Send Chase or Vinny a quick note that travels through the internet and arrives as a real piece of paper.",
+    "Send Vinny or Chase a quick note that travels through the internet and arrives as a real piece of paper.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Send Chase or Vinny a Paper Telegram",
+    title: "Send Vinny & Chase a Paper Telegram",
     description: "A real printer. A real piece of paper. A message just for them.",
     type: "website",
     url: "/",
@@ -28,13 +31,13 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "A thermal printer beside the words Send Chase or Vinny a Paper Telegram",
+        alt: "A thermal printer beside the words Send Vinny & Chase a Paper Telegram",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Send Chase or Vinny a Paper Telegram",
+    title: "Send Vinny & Chase a Paper Telegram",
     description: "A real printer. A real piece of paper. A message just for them.",
     images: ["/og.png"],
   },
@@ -45,14 +48,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#17140f",
+  themeColor: "#1a3a66",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body>
+      <body className={`${fraunces.variable} ${jetbrainsMono.variable}`}>{children}</body>
     </html>
   );
 }

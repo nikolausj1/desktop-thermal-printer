@@ -1,8 +1,8 @@
 ---
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
-modified: 2026-08-05
-version: 3.11
+modified: 2026-08-09
+version: 3.12
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -11,30 +11,35 @@ tags:
 
 ## Project
 
-A public website that lets anyone send a short message to a Rongta RP820 thermal receipt printer on Justin's desk in Seattle: browser to cloud queue to a Windows print worker on the home NUC to the printer over LAN via raw TCP ESC/POS.
+A thermal-printer message system with two separate public experiences: the original desk-printer page at `justinnikolaus.com/printer`, plus the new Paper Telegram site for family and friends to send Chase or Vinny a note that becomes a real piece of paper.
 
 ## Stage
 
-MVP
+MVP / Paper Telegram redesign
 
 ## Health
 
-🟢 On-track - The public end-to-end experience is live and physically verified as an MVP. Automatic broad device and approximate-city metadata is deployed, and the printer is online on worker v0.2.0.
+🟢 On-track - The original public experience remains live and unchanged. A separate Paper Telegram site has been built and privately deployed for review, using the existing protected queue without changing the Windows worker.
 
 ## Waiting on Me
 
+- [ ] **Review and approve the first Paper Telegram site**
+      - preview: `https://paper-telegram.just-aspen-8969.chatgpt.site`
+- [ ] **Purchase `papertelegram.com` when ready**
+      - unblocks: custom-domain connection and public launch
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
       - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
 ## Next Up
 
-1. Reset the Supabase database password when convenient.
-2. When work resumes, scope and approve Phase 3 admin controls, including visual message history.
-3. Monitor the live public queue and printer health.
+1. Review the private Paper Telegram preview, including its Option 1 copy and Chase/Vinny selector.
+2. Purchase and connect `papertelegram.com` after the site direction is approved.
+3. Decide whether recipient should become a first-class queue field and a dedicated heading on the physical receipt. Any Windows worker change still requires explicit approval.
+4. Reset the Supabase database password when convenient.
 
 ## Biggest Risk
 
-The MVP has no owner-facing admin dashboard yet, so responding to abuse, inspecting failures, or using the emergency pause still requires direct Supabase or service access.
+Paper Telegram currently adds `FOR CHASE` or `FOR VINNY` to the beginning of the existing message body so it can use the verified worker unchanged. The physical receipt still uses the original generic layout until a dedicated recipient field and worker format are approved.
 
 ---
 
@@ -45,7 +50,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - **(S) Lifetime printed-message counter on the public page** - small, gives visitors a sense of the thing being real and used.
 - **(S) Receipt preview before sending** - render what the receipt will look like in the browser; cheap and makes the physical outcome tangible.
 - **(M) Twilio SMS as a second input channel** - the PRD was explicitly architected for this, and the Build Guide now carries the hard-won A2P approval lessons from FourSome, so it starts three weeks ahead.
-- **(M) Private trusted-sender links** - a URL that bypasses rate limits for friends and family.
+- **(S) Dedicated Chase/Vinny receipt heading** - promote recipient to a first-class queue field and print it prominently above the telegram.
 - **(L) QR code for Justin to reply** - closes the loop from one-way novelty into an actual exchange.
 
 ## Notes
@@ -87,6 +92,9 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - The Open Graph social card subtitle now reads `CONNECTED TO REAL PRINTER`. Site commit `2d56c7e` is deployed with a versioned `og-v2.jpg` URL to bypass stale social-preview caches, and the live image matches the committed file.
 - The intro directions now follow the responsive layout: desktop says `to the right` while the form is beside the copy, and stacked layouts say `below`. Site commit `9996ed6` is deployed and verified live at desktop and mobile widths.
 - A custom receipt-paper favicon now mirrors the site's cream paper, dark desk palette, and torn edges. SVG, 32-pixel PNG, ICO, and 180-pixel Apple Touch Icon formats are live from site commit `e3be7ff` and verified against their committed files.
+- Justin chose `Paper Telegram` as the new kid-focused concept and selected the clear, warm Option 1 copy direction. The original `justinnikolaus.com/printer` site remains available and was not changed.
+- A separate Next.js and TypeScript site now lives in `papertelegram.com/`. It keeps the dark desk and torn-receipt visual language, adds an explicit Chase/Vinny selector, adapts the story and technical sections, proxies safely to the existing public printer API, and includes a dedicated receipt-printer social card.
+- Paper Telegram version 1 is privately deployed at `https://paper-telegram.just-aspen-8969.chatgpt.site`. The production build and rendered-page checks pass, production dependencies report no known audit vulnerabilities, and `papertelegram.com` has not yet been connected or launched publicly.
 
 ## Lessons
 

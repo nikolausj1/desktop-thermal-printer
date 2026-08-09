@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-09
-version: 4.0
+version: 4.1
 author: Claude Fable 5 (claude-fable-5)
 tags:
 ---
@@ -25,8 +25,8 @@ MVP / Paper Telegram redesign
 
 - [ ] **Visit `https://papertelegram.com` and send the first real telegram to the kids** (5 min)
       - unblocks: confirming the full public path end to end on the new domain
-- [ ] **Decide whether to refresh the social card and favicon to the new navy/plane identity** (S)
-      - unblocks: consistent branding in link previews; the current `og.png` and favicon still show the old dark-desk receipt look
+- [ ] **Confirm on an iPhone that the stamp perforation now renders** (1 min)
+      - unblocks: closing out the Safari mask bug found on mobile
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
       - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
@@ -104,7 +104,10 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - Round 5 (Claude) refines the three picked concepts in `_review/paper-telegram-airmail-r5/`: Stamp Classic, Combo Classic, and Combo Stamp, each with the chosen marks integrated (white postmark ring on navy, blue-line marks on paper), Codex's two-line status chip ("Message machine online" / "Ready for a new telegram."), the two-column layout, and no preselected recipient. All three verified visually and by code checks. Preview-only, no printer or API connection.
 - At Justin's request the logo marks were enlarged (the identity carries the page along with the form) and each round-5 finalist gained a segmented control in the review toolbar to switch the identity live between 01 Minimal fold, 02 Postmark ring, and 03 Loop trail. Every mark on the page swaps together, respecting its surface (white-line variants on navy, blue-line variants on paper; white versions of the fold and trail marks were generated to complete the set), and the choice persists across the three concepts via localStorage.
 - LAUNCH (2026-08-09): Justin chose the 01 Minimal fold logo and the Combo Stamp concept. The production site was rebuilt on that design (navy linen, two-column layout, giant perforated stamp form with the engraved stripe frame, fold logo white on navy and navy on paper, "Harry Potter" name placeholder, the idea and how-it-was-made story sections, live two-line status chip) while keeping every behavior from v1: status polling, idempotent submit, print-status polling, honeypot, and validation. The `papertelegram.com/` folder was converted from the vinext/Cloudflare scaffold to standard Next.js 16 (vinext, wrangler, drizzle, and the d1 example were removed; the API proxy route ported unchanged). Deployed to Vercel project `papertelegram` (auto-deploys from `nikolausj1/desktop-thermal-printer` main with root directory `papertelegram.com`), Porkbun DNS switched from parking to the Vercel A and www CNAME records (MX and SPF for email forwarding untouched), and `https://papertelegram.com` plus `www` verified live serving the new site with the printer status API returning online.
-- Launch leftovers, deliberately deferred: `og.png`, the favicon set, and the apple-touch icon still carry the old dark-desk receipt look; the chatgpt.site private preview of v1 still exists and can be retired.
+- Launch leftovers, deliberately deferred: the chatgpt.site private preview of v1 still exists and can be retired.
+- Post-launch polish (2026-08-09): a fold-and-fly send delighter is live. When the machine accepts a telegram, the stamp folds into the paper plane, flies off screen, and an in-transit delivery slip tracks print status, receives the cancellation postmark on success, and offers "Send another telegram" which unfolds the form back. Skipped under prefers-reduced-motion, where the classic inline feedback remains. A console hook `window.__ptFlightDemo()` exercises the animation without printing.
+- Justin reported the perforated edge missing on iPhone. Root cause: Safari ignores `mask-image` references to inline SVG mask elements. The perforation mask is now generated as a self-contained data-URI SVG and set inline, which renders in Safari, Chrome, and Firefox alike. Verified in Chromium at mobile width; awaiting Justin's iPhone confirmation.
+- The social card (`og.png`), favicons, and apple-touch icon now carry the navy paper-plane identity: the card shows the brandline, headline, and a perforated stamp mock rendered from the real site CSS; the icon is the white fold plane on the navy linen.
 - Codex added eight more focused airmail derivatives in `_review/paper-telegram-airmail-concepts/index.html`: Blue Horizon, Airmail Envelope, Paper Flight, Dusk Delivery, Junior Airmail, Route Map, First Class, and Folded Sky. Every direction increases contrast between the scene and receipt, retains Chase and Vinny as the only recipient choices, works at desktop and phone widths, and remains disconnected from the printer. Paper Flight and Junior Airmail make the paper plane a prominent project metaphor.
 - Codex's focused round-3 gallery is in `_review/paper-telegram-airmail-round3/`: Postal Wing, Folded Signal, Flight Path, Night Airmail, Air Post Badge, and Tiny Flight Club. All six use a textured dark-blue background, keep text left and receipt right on desktop, stack text above the receipt on mobile, and include a distinct code-native paper-plane wordmark. Postal Wing, Night Airmail, and Tiny Flight Club use red, white, and blue airmail borders around the torn receipt. The forms are preview-only and cannot reach the printer.
 

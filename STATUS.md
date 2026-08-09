@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-09
-version: 3.12
+version: 3.13
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -19,12 +19,13 @@ MVP / Paper Telegram redesign
 
 ## Health
 
-🟢 On-track - The original public experience remains live and unchanged. A separate Paper Telegram site has been built and privately deployed for review, using the existing protected queue without changing the Windows worker.
+🟢 On-track - The original public experience remains live and unchanged. A separate Paper Telegram site has been built and privately deployed for review, and eight additional disconnected visual directions are ready for comparison without changing production or the Windows worker.
 
 ## Waiting on Me
 
-- [ ] **Review and approve the first Paper Telegram site**
-      - preview: `https://paper-telegram.just-aspen-8969.chatgpt.site`
+- [ ] **Review the eight Paper Telegram visual concepts and choose a direction**
+      - local gallery: `_review/paper-telegram-concepts/index.html`
+      - current private preview: `https://paper-telegram.just-aspen-8969.chatgpt.site`
 - [ ] **Purchase `papertelegram.com` when ready**
       - unblocks: custom-domain connection and public launch
 - [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
@@ -32,10 +33,11 @@ MVP / Paper Telegram redesign
 
 ## Next Up
 
-1. Review the private Paper Telegram preview, including its Option 1 copy and Chase/Vinny selector.
-2. Purchase and connect `papertelegram.com` after the site direction is approved.
-3. Decide whether recipient should become a first-class queue field and a dedicated heading on the physical receipt. Any Windows worker change still requires explicit approval.
-4. Reset the Supabase database password when convenient.
+1. Compare the eight local visual concepts and choose one to refine or combine with another.
+2. Apply the approved visual direction to the separate Paper Telegram site.
+3. Purchase and connect `papertelegram.com` after the site direction is approved.
+4. Decide whether recipient should become a first-class queue field and a dedicated heading on the physical receipt. Any Windows worker change still requires explicit approval.
+5. Reset the Supabase database password when convenient.
 
 ## Biggest Risk
 
@@ -95,6 +97,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - Justin chose `Paper Telegram` as the new kid-focused concept and selected the clear, warm Option 1 copy direction. The original `justinnikolaus.com/printer` site remains available and was not changed.
 - A separate Next.js and TypeScript site now lives in `papertelegram.com/`. It keeps the dark desk and torn-receipt visual language, adds an explicit Chase/Vinny selector, adapts the story and technical sections, proxies safely to the existing public printer API, and includes a dedicated receipt-printer social card.
 - Paper Telegram version 1 is privately deployed at `https://paper-telegram.just-aspen-8969.chatgpt.site`. The production build and rendered-page checks pass, production dependencies report no known audit vulnerabilities, and `papertelegram.com` has not yet been connected or launched publicly.
+- Eight disconnected Paper Telegram visual concepts are available in `_review/paper-telegram-concepts/`: After Dark, Post Office, Operator Console, Airmail, Sunday Paper, Kitchen Table, Playroom Modern, and Pocket Telegram. Every direction keeps the torn receipt as the form, works at desktop and phone widths, and has no printer or cloud API connection. Production code was not changed.
 
 ## Lessons
 

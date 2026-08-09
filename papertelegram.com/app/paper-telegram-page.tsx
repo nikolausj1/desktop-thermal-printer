@@ -10,6 +10,7 @@ const MAX_MESSAGE_LINE_BREAKS = 6;
 
 type Recipient = "" | "Chase" | "Vinny";
 type FeedbackState = "progress" | "success" | "error";
+type FlightPhase = "idle" | "folding" | "flying" | "gone";
 
 type PrinterStatus = {
   state: string;
@@ -60,10 +61,60 @@ export function PaperTelegramPage() {
   const [buttonLabel, setButtonLabel] = useState("Send this telegram");
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [showErrors, setShowErrors] = useState(false);
+  const [flight, setFlight] = useState<FlightPhase>("idle");
+  const [returning, setReturning] = useState(false);
   const idempotencyKey = useRef<string | null>(null);
   const stampSurfaceRef = useRef<HTMLDivElement>(null);
-  const perfMaskRectRef = useRef<SVGRectElement>(null);
-  const perfHolesRef = useRef<SVGGElement>(null);
+  const flightTimers = useRef<number[]>([]);
+
+  const clearFlightTimers = useCallback(() => {
+    flightTimers.current.forEach((id) => window.clearTimeout(id));
+    flightTimers.current = [];
+  }, []);
+
+  // Fold the stamp into a paper plane and send it off the screen. Skipped
+  // for prefers-reduced-motion, where the classic inline feedback remains.
+  const launchFlight = useCallback(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    clearFlightTimers();
+    setFlight("folding");
+    flightTimers.current.push(window.setTimeout(() => setFlight("flying"), 620));
+    flightTimers.current.push(window.setTimeout(() => setFlight("gone"), 1650));
+  }, [clearFlightTimers]);
+
+  const bringFormBack = useCallback(() => {
+    clearFlightTimers();
+    setFeedback(null);
+    setFlight("idle");
+    setReturning(true);
+    flightTimers.current.push(window.setTimeout(() => setReturning(false), 700));
+  }, [clearFlightTimers]);
+
+  useEffect(() => clearFlightTimers, [clearFlightTimers]);
+
+  // Review hook: lets the flight sequence be exercised from the console
+  // without sending a real telegram to the printer.
+  useEffect(() => {
+    const w = window as typeof window & { __ptFlightDemo?: (fail?: boolean) => void };
+    w.__ptFlightDemo = (fail = false) => {
+      launchFlight();
+      window.setTimeout(() => {
+        setFeedback(
+          fail
+            ? { state: "error", mark: "!", label: "Telegram not printed", message: "Demo failure state." }
+            : {
+                state: "success",
+                mark: "✓",
+                label: "Your paper telegram printed",
+                message: "Their message is now a real piece of paper.",
+              },
+        );
+      }, 2600);
+    };
+    return () => {
+      delete w.__ptFlightDemo;
+    };
+  }, [launchFlight]);
 
   const nameValid = visibleLength(name.trim()) <= 30;
   const messageValid =
@@ -81,20 +132,19 @@ export function PaperTelegramPage() {
   // Real stamp perforations: evenly spaced semicircular bites, uniform
   // diameter and pitch, a punched hole shared at every corner. Recompute
   // from the rendered box on every resize so spacing stays regular.
+  //
+  // The mask is emitted as a data-URI SVG (an even-odd path with the holes
+  // as subpaths) rather than a reference to an inline <mask> element,
+  // because Safari, including every iPhone, ignores mask-image: url(#id).
   useEffect(() => {
     const surface = stampSurfaceRef.current;
-    const maskRect = perfMaskRectRef.current;
-    const holes = perfHolesRef.current;
-    if (!surface || !maskRect || !holes) return;
+    if (!surface) return;
 
     function buildPerforationMask() {
-      if (!surface || !maskRect || !holes) return;
+      if (!surface) return;
       const w = Math.round(surface.clientWidth);
       const h = Math.round(surface.clientHeight);
       if (!w || !h) return;
-
-      maskRect.setAttribute("width", String(w));
-      maskRect.setAttribute("height", String(h));
 
       const targetSpacing = 19;
       let hScallops = Math.max(4, Math.round(w / targetSpacing));
@@ -106,24 +156,29 @@ export function PaperTelegramPage() {
       const vPitch = h / vScallops;
       let radius = Math.min(hPitch, vPitch) * 0.34;
       radius = Math.max(4, Math.min(8, radius));
+      const r = radius.toFixed(2);
 
-      const ns = "http://www.w3.org/2000/svg";
-      holes.replaceChildren();
-      const addHole = (cx: number, cy: number) => {
-        const circle = document.createElementNS(ns, "circle");
-        circle.setAttribute("cx", String(cx));
-        circle.setAttribute("cy", String(cy));
-        circle.setAttribute("r", String(radius));
-        holes.appendChild(circle);
+      const circle = (cx: number, cy: number) => {
+        const x = (cx - radius).toFixed(2);
+        return `M${x},${cy.toFixed(2)} a${r},${r} 0 1,0 ${(radius * 2).toFixed(2)},0 a${r},${r} 0 1,0 ${(-radius * 2).toFixed(2)},0 z`;
       };
+
+      let d = `M0,0 H${w} V${h} H0 z`;
       for (let i = 0; i <= hScallops; i += 1) {
-        addHole(i * hPitch, 0);
-        addHole(i * hPitch, h);
+        d += circle(i * hPitch, 0);
+        d += circle(i * hPitch, h);
       }
       for (let j = 1; j < vScallops; j += 1) {
-        addHole(0, j * vPitch);
-        addHole(w, j * vPitch);
+        d += circle(0, j * vPitch);
+        d += circle(w, j * vPitch);
       }
+
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${d}" fill="#000" fill-rule="evenodd"/></svg>`;
+      const uri = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+      surface.style.webkitMaskImage = uri;
+      surface.style.maskImage = uri;
+      surface.style.webkitMaskSize = "100% 100%";
+      surface.style.maskSize = "100% 100%";
     }
 
     buildPerforationMask();
@@ -327,6 +382,7 @@ export function PaperTelegramPage() {
         label: "Telegram received",
         message: "Waiting for the message machine.",
       });
+      launchFlight();
       await pollMessageStatus(payload.messageId, telegramRecipient);
     } catch {
       setFeedback({
@@ -352,15 +408,6 @@ export function PaperTelegramPage() {
 
   return (
     <div className="page-shell">
-      <svg aria-hidden="true" style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}>
-        <defs>
-          <mask id="perfMask" maskUnits="objectBoundingBox" maskContentUnits="userSpaceOnUse">
-            <rect ref={perfMaskRectRef} x="0" y="0" width="1000" height="1400" fill="#ffffff" />
-            <g ref={perfHolesRef} fill="#000000" />
-          </mask>
-        </defs>
-      </svg>
-
       <main className="main-layout">
         <section className="hero-col" aria-labelledby="page-title">
           <p className="brandline">
@@ -388,8 +435,84 @@ export function PaperTelegramPage() {
         </section>
 
         <section className="stamp-col" aria-labelledby="form-title">
-          <div className="stamp-stage">
-            <div className="giant-stamp">
+          <div className="stamp-stage" data-flight={flight}>
+            {flight === "flying" ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="flight-plane" src="/logo-plane-white.png" alt="" aria-hidden="true" />
+            ) : null}
+
+            {flight === "gone" ? (
+              <div className="flight-card" role="status" aria-live="polite">
+                <p className="flight-kicker">Paper Telegram &middot; In transit</p>
+                <div className="flight-line" data-state={feedback?.state || "progress"}>
+                  <span className="feedback-mark" aria-hidden="true">
+                    {feedback?.mark || "01"}
+                  </span>
+                  <div>
+                    <strong>{feedback?.label || "Telegram received"}</strong>
+                    <p>{feedback?.message || "Waiting for the message machine."}</p>
+                  </div>
+                </div>
+                {feedback?.state === "success" ? (
+                  <button type="button" className="send-btn flight-again" onClick={bringFormBack}>
+                    <span>Send another telegram</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M4 12H20M20 12L14 6M20 12L14 18"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                ) : null}
+                {feedback?.state === "error" ? (
+                  <button type="button" className="send-btn flight-again" onClick={bringFormBack}>
+                    <span>Bring the form back</span>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M20 12H4M4 12L10 6M4 12L10 18"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                ) : null}
+                <svg
+                  className={`postmark-fresh card-postmark${feedback?.state === "success" ? " stamped" : ""}`}
+                  aria-hidden="true"
+                  viewBox="0 0 200 200"
+                >
+                  <circle cx="100" cy="100" r="72" fill="none" stroke="var(--navy-ink)" strokeWidth="2.5" />
+                  <circle cx="100" cy="100" r="61" fill="none" stroke="var(--navy-ink)" strokeWidth="1.2" />
+                  <path
+                    className="wave"
+                    d="M18,96 q7,-11 14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0"
+                    fill="none"
+                    stroke="var(--navy-ink)"
+                    strokeWidth="1.6"
+                    opacity="0.85"
+                  />
+                  <path
+                    className="wave"
+                    d="M14,109 q7,-11 14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0"
+                    fill="none"
+                    stroke="var(--navy-ink)"
+                    strokeWidth="1.6"
+                    opacity="0.7"
+                  />
+                </svg>
+              </div>
+            ) : null}
+
+            <div
+              className={`giant-stamp${flight === "folding" ? " folding" : ""}${
+                flight === "flying" || flight === "gone" ? " folded" : ""
+              }${returning ? " unfolding" : ""}`}
+            >
               <div className="stamp-surface" ref={stampSurfaceRef}>
                 <span className="stamp-corner tl" aria-hidden="true">
                   1<small>Smile</small>
@@ -517,7 +640,7 @@ export function PaperTelegramPage() {
                         </svg>
                       </button>
 
-                      {feedback ? (
+                      {feedback && flight === "idle" ? (
                         <div
                           className="submission-feedback"
                           data-state={feedback.state}

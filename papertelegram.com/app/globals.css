@@ -235,8 +235,9 @@ h1 {
   background-color: var(--paper);
   color: var(--ink);
   padding: 42px 14px 14px;
-  -webkit-mask-image: url(#perfMask);
-  mask-image: url(#perfMask);
+  /* The perforation mask itself is set inline as a data-URI SVG by the
+     page script, because Safari ignores mask-image references to inline
+     SVG mask elements. */
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 }
@@ -669,6 +670,147 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 @media (min-width: 600px) {
   .stamp-surface { padding: 46px 16px 16px; }
   .frame-content { padding: 22px 18px 16px; }
+}
+
+/* ---------- Fold-and-fly delighter ---------- */
+.stamp-stage { position: relative; perspective: 1200px; }
+
+.giant-stamp {
+  transform-origin: 50% 62%;
+  will-change: transform, opacity;
+}
+
+.giant-stamp.folding {
+  animation: fold-up 0.62s cubic-bezier(0.55, 0.05, 0.7, 0.4) forwards;
+}
+
+.giant-stamp.folded {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.giant-stamp.unfolding {
+  animation: unfold 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+@keyframes fold-up {
+  0% { transform: none; opacity: 1; }
+  38% { transform: rotateX(48deg) scale(0.92); opacity: 1; }
+  72% { transform: rotateX(78deg) scaleY(0.32) scale(0.74); opacity: 1; }
+  100% { transform: rotateX(89deg) scaleY(0.08) scaleX(0.42) scale(0.6); opacity: 0; }
+}
+
+@keyframes unfold {
+  0% { transform: rotateX(70deg) scaleY(0.2) scale(0.7); opacity: 0; }
+  60% { transform: rotateX(-6deg) scale(1.02); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+
+.flight-plane {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  width: 132px;
+  height: 132px;
+  object-fit: contain;
+  z-index: 6;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 22px rgba(4, 12, 26, 0.5));
+  animation: fly-off 1.05s cubic-bezier(0.5, -0.05, 0.75, 0.35) forwards;
+}
+
+@keyframes fly-off {
+  0% { transform: translate(-50%, -50%) scale(0.55) rotate(-4deg); opacity: 0; }
+  16% { transform: translate(-50%, -52%) scale(1) rotate(0deg); opacity: 1; }
+  38% { transform: translate(-34%, -78%) scale(1.02) rotate(-8deg); opacity: 1; }
+  100% { transform: translate(46vw, -95vh) scale(0.5) rotate(14deg); opacity: 1; }
+}
+
+.flight-card {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  z-index: 5;
+  width: 100%;
+  max-width: 440px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 22px 20px 20px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.05),
+    0 24px 52px -16px rgba(4, 12, 26, 0.55);
+  animation: card-in 0.45s ease-out;
+}
+
+@keyframes card-in {
+  0% { transform: translateY(14px); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+
+.flight-kicker {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  opacity: 0.7;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(21, 49, 90, 0.3);
+  text-align: center;
+}
+
+.flight-line {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.flight-line strong {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+
+.flight-line p {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.flight-line[data-state="success"] .feedback-mark {
+  color: #2f854a;
+  border-color: rgba(47, 133, 74, 0.6);
+}
+
+.flight-line[data-state="error"] .feedback-mark {
+  color: var(--red);
+  border-color: rgba(217, 67, 57, 0.6);
+}
+
+.flight-again { margin-top: 18px; }
+
+.card-postmark {
+  bottom: -14%;
+  left: auto;
+  right: -8%;
+  width: 52%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .giant-stamp.folding,
+  .giant-stamp.unfolding,
+  .flight-plane,
+  .flight-card { animation: none; }
 }
 
 /* ---------- Project story ---------- */

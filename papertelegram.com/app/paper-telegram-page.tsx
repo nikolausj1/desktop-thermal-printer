@@ -11,6 +11,7 @@ const MAX_MESSAGE_LINE_BREAKS = 6;
 type Recipient = "" | "Chase" | "Vinny";
 type FeedbackState = "progress" | "success" | "error";
 type FlightPhase = "idle" | "folding" | "flying" | "gone";
+type DelighterConcept = "plane" | "airmail" | "hogwarts";
 
 type PrinterStatus = {
   state: string;
@@ -65,6 +66,16 @@ export function PaperTelegramPage() {
   const [foldStep, setFoldStep] = useState(0);
   const [returning, setReturning] = useState(false);
   const [demoAvailable, setDemoAvailable] = useState(false);
+  const [concept, setConcept] = useState<DelighterConcept>("plane");
+
+  const pickConcept = useCallback((next: DelighterConcept) => {
+    setConcept(next);
+    try {
+      localStorage.setItem("pt-delighter-concept", next);
+    } catch {
+      /* private browsing */
+    }
+  }, []);
   const idempotencyKey = useRef<string | null>(null);
   const stampSurfaceRef = useRef<HTMLDivElement>(null);
   const flightTimers = useRef<number[]>([]);
@@ -85,15 +96,33 @@ export function PaperTelegramPage() {
     setFlight("folding");
     const at = (ms: number, fn: () => void) =>
       flightTimers.current.push(window.setTimeout(fn, ms));
-    at(350, () => setFoldStep(1)); // top-left corner to the center line
-    at(850, () => setFoldStep(2)); // top-right corner to the center line
-    at(1350, () => setFoldStep(3)); // left angled edge folds in again
-    at(1850, () => setFoldStep(4)); // right angled edge folds in again
-    at(2400, () => setFoldStep(5)); // the dart folds in half
-    at(3000, () => setFoldStep(6)); // the wings drop open
-    at(3560, () => setFlight("flying")); // and it takes off
-    at(4650, () => setFlight("gone"));
-  }, [clearFlightTimers]);
+    if (concept === "plane") {
+      at(350, () => setFoldStep(1)); // top-left corner to the center line
+      at(850, () => setFoldStep(2)); // top-right corner to the center line
+      at(1350, () => setFoldStep(3)); // left angled edge folds in again
+      at(1850, () => setFoldStep(4)); // right angled edge folds in again
+      at(2400, () => setFoldStep(5)); // the dart folds in half
+      at(3000, () => setFoldStep(6)); // the wings drop open
+      at(3560, () => setFlight("flying")); // and it takes off
+      at(4650, () => setFlight("gone"));
+    } else if (concept === "airmail") {
+      at(350, () => setFoldStep(1)); // bottom third folds up
+      at(1050, () => setFoldStep(2)); // top third folds down over it
+      at(1750, () => setFoldStep(3)); // the folded letter settles
+      at(2250, () => setFoldStep(4)); // airmail markings press on
+      at(3150, () => setFlight("flying")); // and off it goes
+      at(4250, () => setFlight("gone"));
+    } else {
+      at(350, () => setFoldStep(1)); // bottom third folds up
+      at(1050, () => setFoldStep(2)); // top third folds down over it
+      at(1750, () => setFoldStep(3)); // the folded letter settles
+      at(2250, () => setFoldStep(4)); // parchment address appears
+      at(2950, () => setFoldStep(5)); // the wax seal is pressed on
+      at(3650, () => setFoldStep(6)); // an owl swoops in
+      at(4550, () => setFlight("flying")); // and carries it away
+      at(5750, () => setFlight("gone"));
+    }
+  }, [clearFlightTimers, concept]);
 
   const bringFormBack = useCallback(() => {
     clearFlightTimers();
@@ -119,9 +148,17 @@ export function PaperTelegramPage() {
       setFlight("folding");
       setFoldStep(step);
     };
-    // The on-page demo button appears only during local review.
+    // The on-page demo controls appear only during local review.
     if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
       setDemoAvailable(true);
+      try {
+        const saved = localStorage.getItem("pt-delighter-concept");
+        if (saved === "plane" || saved === "airmail" || saved === "hogwarts") {
+          setConcept(saved);
+        }
+      } catch {
+        /* private browsing */
+      }
     }
     w.__ptFlightDemo = (fail = false) => {
       launchFlight();
@@ -437,17 +474,40 @@ export function PaperTelegramPage() {
   return (
     <div className="page-shell">
       {demoAvailable ? (
-        <button
-          type="button"
-          className="demo-button"
-          onClick={() => {
-            const w = window as typeof window & { __ptFlightDemo?: () => void };
-            bringFormBack();
-            window.setTimeout(() => w.__ptFlightDemo?.(), 750);
-          }}
-        >
-          ▶ Preview the send animation
-        </button>
+        <>
+          <div className="concept-switch" role="group" aria-label="Delighter concept">
+            {(
+              [
+                ["plane", "✈ Plane"],
+                ["airmail", "✉ Airmail"],
+                ["hogwarts", "🦉 Hogwarts"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={concept === key}
+                onClick={() => {
+                  pickConcept(key);
+                  bringFormBack();
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            className="demo-button"
+            onClick={() => {
+              const w = window as typeof window & { __ptFlightDemo?: () => void };
+              bringFormBack();
+              window.setTimeout(() => w.__ptFlightDemo?.(), 750);
+            }}
+          >
+            ▶ Preview the send animation
+          </button>
+        </>
       ) : null}
 
       <main className="main-layout">
@@ -490,8 +550,8 @@ export function PaperTelegramPage() {
             </svg>
           ) : null}
 
-          <div className="stamp-stage" data-flight={flight} data-step={foldStep}>
-            {flight === "folding" || flight === "flying" ? (
+          <div className="stamp-stage" data-flight={flight} data-step={foldStep} data-concept={concept}>
+            {(flight === "folding" || flight === "flying") && concept === "plane" ? (
               <div className="fold-theater" aria-hidden="true">
                 <div className="fold-flap flap-tl" />
                 <div className="fold-flap flap-tr" />
@@ -503,6 +563,47 @@ export function PaperTelegramPage() {
                   <div className="plane-keel" />
                   <div className="plane-wing-near" />
                 </div>
+              </div>
+            ) : null}
+
+            {(flight === "folding" || flight === "flying") && concept !== "plane" ? (
+              <div className="fold-theater" aria-hidden="true">
+                <div className="fold-flap env-bottom" />
+                <div className="fold-flap env-top" />
+                <div className={`env-face${concept === "hogwarts" ? " hogwarts" : ""}`}>
+                  {concept === "airmail" ? (
+                    <>
+                      <div className="env-stripes" />
+                      <div className="env-stamp">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/logo-plane.png" alt="" />
+                      </div>
+                      <p className="env-address">
+                        <span>To: Vinny &amp; Chase</span>
+                        <span>A desk in Seattle</span>
+                      </p>
+                      <span className="env-par-avion">Par Avion</span>
+                    </>
+                  ) : (
+                    <>
+                      <p className="env-address parchment">
+                        <span>Vinny &amp; Chase</span>
+                        <span>The Desk by the Window</span>
+                        <span>Seattle</span>
+                      </p>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className="wax-seal" src="/wax-seal.png" alt="" />
+                    </>
+                  )}
+                </div>
+                {concept === "hogwarts" ? (
+                  <div className="owl">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img className="owl-f1" src="/owl-flap-1.png" alt="" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img className="owl-f2" src="/owl-flap-2.png" alt="" />
+                  </div>
+                ) : null}
               </div>
             ) : null}
 

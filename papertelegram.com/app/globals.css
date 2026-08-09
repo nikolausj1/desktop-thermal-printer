@@ -713,11 +713,11 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
     0 16px 34px -12px rgba(4, 12, 26, 0.45);
 }
 
-[data-step="1"] .giant-stamp.origami { clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%, 0 36%); }
-[data-step="2"] .giant-stamp.origami { clip-path: polygon(50% 0, 100% 36%, 100% 100%, 0 100%, 0 36%); }
-[data-step="3"] .giant-stamp.origami { clip-path: polygon(50% 0, 100% 36%, 100% 100%, 10% 100%); }
-[data-step="4"] .giant-stamp.origami { clip-path: polygon(50% 0, 90% 100%, 10% 100%); }
-[data-step="5"] .giant-stamp.origami { clip-path: polygon(50% 0, 90% 100%, 50% 100%); }
+[data-concept="plane"][data-step="1"] .giant-stamp.origami { clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%, 0 36%); }
+[data-concept="plane"][data-step="2"] .giant-stamp.origami { clip-path: polygon(50% 0, 100% 36%, 100% 100%, 0 100%, 0 36%); }
+[data-concept="plane"][data-step="3"] .giant-stamp.origami { clip-path: polygon(50% 0, 100% 36%, 100% 100%, 10% 100%); }
+[data-concept="plane"][data-step="4"] .giant-stamp.origami { clip-path: polygon(50% 0, 90% 100%, 10% 100%); }
+[data-concept="plane"][data-step="5"] .giant-stamp.origami { clip-path: polygon(50% 0, 90% 100%, 50% 100%); }
 
 .giant-stamp.folded {
   opacity: 0;
@@ -765,14 +765,14 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   transform-origin: 25% 18%;
   transform: rotate3d(-1, 1, 0, 179deg);
 }
-[data-step="1"] .flap-tl,
-[data-step="2"] .flap-tl {
+[data-concept="plane"][data-step="1"] .flap-tl,
+[data-concept="plane"][data-step="2"] .flap-tl {
   opacity: 1;
   animation: fold-tl 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
 }
-[data-step="3"] .flap-tl,
-[data-step="4"] .flap-tl,
-[data-step="5"] .flap-tl { opacity: 0; transform: rotate3d(-1, 1, 0, 0deg); }
+[data-concept="plane"][data-step="3"] .flap-tl,
+[data-concept="plane"][data-step="4"] .flap-tl,
+[data-concept="plane"][data-step="5"] .flap-tl { opacity: 0; transform: rotate3d(-1, 1, 0, 0deg); }
 
 @keyframes fold-tl {
   0% { transform: rotate3d(-1, 1, 0, 179deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
@@ -786,13 +786,13 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   transform-origin: 75% 18%;
   transform: rotate3d(1, 1, 0, -179deg);
 }
-[data-step="2"] .flap-tr,
-[data-step="3"] .flap-tr {
+[data-concept="plane"][data-step="2"] .flap-tr,
+[data-concept="plane"][data-step="3"] .flap-tr {
   opacity: 1;
   animation: fold-tr 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
 }
-[data-step="4"] .flap-tr,
-[data-step="5"] .flap-tr { opacity: 0; transform: rotate3d(1, 1, 0, 0deg); }
+[data-concept="plane"][data-step="4"] .flap-tr,
+[data-concept="plane"][data-step="5"] .flap-tr { opacity: 0; transform: rotate3d(1, 1, 0, 0deg); }
 
 @keyframes fold-tr {
   0% { transform: rotate3d(1, 1, 0, -179deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
@@ -808,12 +808,12 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   background:
     linear-gradient(120deg, #ffffff 0%, #f6f1e4 55%, #eae3d2 100%);
 }
-[data-step="3"] .flap-l2,
-[data-step="4"] .flap-l2 {
+[data-concept="plane"][data-step="3"] .flap-l2,
+[data-concept="plane"][data-step="4"] .flap-l2 {
   opacity: 1;
   animation: fold-l2 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
 }
-[data-step="5"] .flap-l2 { opacity: 0; transform: rotate3d(-0.28, 1, 0, 0deg); }
+[data-concept="plane"][data-step="5"] .flap-l2 { opacity: 0; transform: rotate3d(-0.28, 1, 0, 0deg); }
 
 @keyframes fold-l2 {
   0% { transform: rotate3d(-0.28, 1, 0, 179deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
@@ -829,8 +829,8 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   background:
     linear-gradient(-120deg, #ffffff 0%, #f6f1e4 55%, #eae3d2 100%);
 }
-[data-step="4"] .flap-r2,
-[data-step="5"] .flap-r2 {
+[data-concept="plane"][data-step="4"] .flap-r2,
+[data-concept="plane"][data-step="5"] .flap-r2 {
   opacity: 1;
   animation: fold-r2 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
 }
@@ -849,8 +849,8 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   background:
     linear-gradient(100deg, #ffffff 0%, #f3edde 60%, #e6decb 100%);
 }
-[data-step="4"] .fold-half { opacity: 1; }
-[data-step="5"] .fold-half {
+[data-concept="plane"][data-step="4"] .fold-half { opacity: 1; }
+[data-concept="plane"][data-step="5"] .fold-half {
   opacity: 1;
   animation: fold-half 0.55s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
 }
@@ -864,8 +864,8 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 /* Final step: the wings drop open, the real last step of folding a
    paper plane, ending in the same three-facet silhouette as the logo. */
 [data-step="6"] .giant-stamp.origami,
-[data-step="6"] .flap-r2,
-[data-step="6"] .fold-half { opacity: 0; transition: opacity 0.12s linear; }
+[data-concept="plane"][data-step="6"] .flap-r2,
+[data-concept="plane"][data-step="6"] .fold-half { opacity: 0; transition: opacity 0.12s linear; }
 
 .plane-final {
   position: absolute;
@@ -873,7 +873,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   opacity: 0;
   perspective: 1100px;
 }
-[data-step="6"] .plane-final { opacity: 1; transition: opacity 0.08s linear; }
+[data-concept="plane"][data-step="6"] .plane-final { opacity: 1; transition: opacity 0.08s linear; }
 
 .plane-final > div {
   position: absolute;
@@ -902,7 +902,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   transform-origin: 50% 38%;
   transform: rotate3d(0.16, 1, 0, -84deg);
 }
-[data-step="6"] .plane-wing-near {
+[data-concept="plane"][data-step="6"] .plane-wing-near {
   animation: wing-drop 0.45s cubic-bezier(0.5, 0.05, 0.3, 1.15) forwards;
 }
 
@@ -914,21 +914,285 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 
 /* Launch: the finished paper plane banks to the logo's flight attitude
    and leaves the screen. */
-.stamp-stage[data-flight="flying"] {
+.stamp-stage[data-flight="flying"][data-concept="plane"] {
   animation: dart-launch 1.05s cubic-bezier(0.5, -0.05, 0.72, 0.3) forwards;
   transform-origin: 50% 42%;
 }
 
-.stamp-stage[data-flight="flying"] .plane-final { opacity: 1; }
-.stamp-stage[data-flight="flying"] .giant-stamp.origami,
-.stamp-stage[data-flight="flying"] .flap-r2,
-.stamp-stage[data-flight="flying"] .fold-half { opacity: 0; }
+.stamp-stage[data-flight="flying"][data-concept="plane"] .plane-final { opacity: 1; }
+.stamp-stage[data-flight="flying"][data-concept="plane"] .giant-stamp.origami,
+.stamp-stage[data-flight="flying"][data-concept="plane"] .flap-r2,
+.stamp-stage[data-flight="flying"][data-concept="plane"] .fold-half { opacity: 0; }
 
 @keyframes dart-launch {
   0% { transform: none; }
   28% { transform: translate(-2%, 2%) rotate(20deg) scale(0.88); }
   48% { transform: translate(-4%, 4%) rotate(48deg) scale(0.76); }
   100% { transform: translate(64vw, -105vh) rotate(56deg) scale(0.4); }
+}
+
+/* ---------- Envelope concepts: airmail and Hogwarts ---------- */
+/* The letter folds in thirds: bottom third up, top third down, leaving
+   a landscape band that becomes the envelope face. */
+[data-concept="airmail"][data-step="1"] .giant-stamp.origami,
+[data-concept="hogwarts"][data-step="1"] .giant-stamp.origami {
+  clip-path: polygon(0 0, 100% 0, 100% 66%, 0 66%);
+}
+[data-concept="airmail"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .giant-stamp.origami,
+[data-concept="hogwarts"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .giant-stamp.origami {
+  clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%);
+}
+
+/* Bottom third folds up over the middle. Crease: y = 66%. */
+.env-bottom {
+  clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%);
+  transform-origin: 50% 66%;
+  transform: rotate3d(1, 0, 0, -179deg);
+}
+[data-concept="airmail"]:is([data-step="1"], [data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .env-bottom,
+[data-concept="hogwarts"]:is([data-step="1"], [data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .env-bottom {
+  opacity: 1;
+  animation: env-fold-up 0.55s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
+
+@keyframes env-fold-up {
+  0% { transform: rotate3d(1, 0, 0, -179deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
+  45% { transform: rotate3d(1, 0, 0, -92deg); filter: brightness(0.84) drop-shadow(0 -18px 20px rgba(4, 12, 26, 0.45)); }
+  100% { transform: rotate3d(1, 0, 0, 0deg); filter: brightness(1) drop-shadow(0 -3px 4px rgba(4, 12, 26, 0.28)); }
+}
+
+/* Top third folds down over it. Crease: y = 33%. */
+.env-top {
+  clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%);
+  transform-origin: 50% 33%;
+  transform: rotate3d(1, 0, 0, 179deg);
+  background: linear-gradient(190deg, #ffffff 0%, #f6f1e4 55%, #eae3d2 100%);
+}
+[data-concept="airmail"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .env-top,
+[data-concept="hogwarts"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .env-top {
+  opacity: 1;
+  animation: env-fold-down 0.55s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
+
+@keyframes env-fold-down {
+  0% { transform: rotate3d(1, 0, 0, 179deg); filter: brightness(1) drop-shadow(0 0 0 rgba(4, 12, 26, 0)); }
+  45% { transform: rotate3d(1, 0, 0, 92deg); filter: brightness(0.84) drop-shadow(0 18px 22px rgba(4, 12, 26, 0.5)); }
+  100% { transform: rotate3d(1, 0, 0, 0deg); filter: brightness(1) drop-shadow(0 3px 5px rgba(4, 12, 26, 0.3)); }
+}
+
+/* The folded letter settles, then its face is addressed. */
+.stamp-stage[data-concept="airmail"],
+.stamp-stage[data-concept="hogwarts"] { transition: transform 0.4s ease-out; }
+[data-concept="airmail"]:is([data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"])[data-flight="folding"],
+[data-concept="hogwarts"]:is([data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"])[data-flight="folding"] {
+  transform: rotate(-1.5deg) scale(1.03);
+}
+
+.env-face {
+  position: absolute;
+  inset: 33% 0 34% 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 3;
+}
+[data-concept="airmail"]:is([data-step="4"], [data-step="5"], [data-step="6"]) .env-face,
+[data-concept="hogwarts"]:is([data-step="4"], [data-step="5"], [data-step="6"]) .env-face { opacity: 1; }
+
+.env-stripes {
+  position: absolute;
+  inset: 0;
+  border: 7px solid;
+  border-image: repeating-linear-gradient(
+    45deg,
+    var(--red) 0px, var(--red) 5px,
+    #ffffff 5px, #ffffff 8px,
+    var(--blue) 8px, var(--blue) 13px,
+    #ffffff 13px, #ffffff 16px
+  ) 7;
+}
+
+.env-stamp {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 46px;
+  height: 52px;
+  border: 1.5px dashed rgba(21, 49, 90, 0.45);
+  background: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.env-stamp img { width: 34px; height: 34px; object-fit: contain; }
+
+.env-address {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.env-par-avion {
+  position: absolute;
+  left: 14px;
+  bottom: 10px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  border: 1.5px solid var(--red);
+  border-radius: 2px;
+  padding: 3px 6px;
+  transform: rotate(-4deg);
+}
+
+/* Hogwarts: parchment, a hand-addressed face, and a pressed wax seal. */
+.env-face.hogwarts {
+  background: linear-gradient(140deg, rgba(240, 224, 185, 0.95), rgba(230, 209, 160, 0.95));
+  box-shadow: inset 0 0 26px rgba(120, 84, 30, 0.25);
+}
+
+.env-address.parchment {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 14px;
+  color: #4a3413;
+  align-items: flex-start;
+  padding-left: 12%;
+  justify-content: center;
+}
+
+.wax-seal {
+  position: absolute;
+  right: 9%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  transform: translateY(-50%) scale(2) rotate(-14deg);
+  opacity: 0;
+  z-index: 4;
+}
+[data-concept="hogwarts"]:is([data-step="5"], [data-step="6"]) .wax-seal {
+  animation: seal-press 0.42s cubic-bezier(0.3, 1.2, 0.4, 1) forwards;
+}
+
+@keyframes seal-press {
+  0% { opacity: 0; transform: translateY(-50%) scale(2) rotate(-14deg); }
+  60% { opacity: 1; transform: translateY(-50%) scale(0.92) rotate(2deg); }
+  100% { opacity: 1; transform: translateY(-50%) scale(1) rotate(0deg); }
+}
+
+/* The owl swoops in from off screen and hovers over the letter. */
+.owl {
+  position: absolute;
+  width: 68%;
+  aspect-ratio: 1;
+  left: 20%;
+  top: -7%;
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 18px 26px rgba(4, 12, 26, 0.45));
+}
+[data-concept="hogwarts"][data-step="6"] .owl,
+[data-concept="hogwarts"][data-flight="flying"] .owl {
+  opacity: 1;
+  animation: owl-in 0.85s cubic-bezier(0.3, 0.6, 0.3, 1) forwards;
+}
+
+@keyframes owl-in {
+  0% { transform: translate(-60vw, -45vh) rotate(-10deg) scale(0.7); }
+  70% { transform: translate(2%, 4%) rotate(3deg) scale(1.02); }
+  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+.owl img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.owl .owl-f2 { opacity: 0; }
+.owl .owl-f1 { animation: owl-flap-a 0.36s steps(1) infinite; }
+.owl .owl-f2 { animation: owl-flap-b 0.36s steps(1) infinite; }
+
+@keyframes owl-flap-a { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes owl-flap-b { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+/* Exits: the airmail envelope zips off; the owl carries the letter away. */
+.stamp-stage[data-flight="flying"][data-concept="airmail"] {
+  animation: env-launch 1s cubic-bezier(0.55, -0.05, 0.75, 0.35) forwards;
+  transform-origin: 50% 50%;
+}
+
+@keyframes env-launch {
+  0% { transform: rotate(-1.5deg) scale(1.03); }
+  30% { transform: translate(-3%, 1%) rotate(-5deg) scale(0.98); }
+  100% { transform: translate(78vw, -46vh) rotate(9deg) scale(0.44); }
+}
+
+.stamp-stage[data-flight="flying"][data-concept="hogwarts"] {
+  animation: owl-exit 1.15s cubic-bezier(0.5, 0, 0.72, 0.4) forwards;
+  transform-origin: 50% 20%;
+}
+
+@keyframes owl-exit {
+  0% { transform: rotate(-1.5deg) scale(1.03); }
+  25% { transform: translate(1%, -4%) rotate(1deg) scale(1); }
+  100% { transform: translate(62vw, -115vh) rotate(5deg) scale(0.6); }
+}
+
+.concept-switch {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  gap: 2px;
+  background: rgba(8, 16, 28, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 3px;
+  backdrop-filter: blur(8px);
+}
+
+.concept-switch button {
+  border: 0;
+  background: transparent;
+  color: #cfe0f2;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.concept-switch button[aria-pressed="true"] {
+  background: #f5f1e6;
+  color: #14304f;
+  font-weight: 700;
 }
 
 .contrail {

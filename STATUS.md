@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-09
-version: 3.13
+version: 3.16
 author: OpenAI Codex (GPT-5)
 tags:
 ---
@@ -19,12 +19,14 @@ MVP / Paper Telegram redesign
 
 ## Health
 
-🟢 On-track - The original public experience remains live and unchanged. A separate Paper Telegram site has been built and privately deployed for review, and eight additional disconnected visual directions are ready for comparison without changing production or the Windows worker.
+🟢 On-track - The original public experience remains live and unchanged. A separate Paper Telegram site has been built and privately deployed for review, with broad and airmail-focused visual studies available locally. Production and the Windows worker remain unchanged.
 
 ## Waiting on Me
 
-- [ ] **Review the eight Paper Telegram visual concepts and choose a direction**
-      - local gallery: `_review/paper-telegram-concepts/index.html`
+- [ ] **Review the round-2 airmail concepts and choose the final direction**
+      - Codex airmail gallery: `_review/paper-telegram-airmail-concepts/index.html`
+      - Claude airmail gallery: `_review/paper-telegram-airmail-concepts/index-claude.html`
+      - round-1 galleries for reference: `_review/paper-telegram-concepts/index.html` (Codex), `_review/paper-telegram-concepts-claude/index.html` (Claude)
       - current private preview: `https://paper-telegram.just-aspen-8969.chatgpt.site`
 - [ ] **Purchase `papertelegram.com` when ready**
       - unblocks: custom-domain connection and public launch
@@ -33,7 +35,7 @@ MVP / Paper Telegram redesign
 
 ## Next Up
 
-1. Compare the eight local visual concepts and choose one to refine or combine with another.
+1. Review the round-2 airmail variations and pick the final direction, or request a round 3 refinement.
 2. Apply the approved visual direction to the separate Paper Telegram site.
 3. Purchase and connect `papertelegram.com` after the site direction is approved.
 4. Decide whether recipient should become a first-class queue field and a dedicated heading on the physical receipt. Any Windows worker change still requires explicit approval.
@@ -98,6 +100,9 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - A separate Next.js and TypeScript site now lives in `papertelegram.com/`. It keeps the dark desk and torn-receipt visual language, adds an explicit Chase/Vinny selector, adapts the story and technical sections, proxies safely to the existing public printer API, and includes a dedicated receipt-printer social card.
 - Paper Telegram version 1 is privately deployed at `https://paper-telegram.just-aspen-8969.chatgpt.site`. The production build and rendered-page checks pass, production dependencies report no known audit vulnerabilities, and `papertelegram.com` has not yet been connected or launched publicly.
 - Eight disconnected Paper Telegram visual concepts are available in `_review/paper-telegram-concepts/`: After Dark, Post Office, Operator Console, Airmail, Sunday Paper, Kitchen Table, Playroom Modern, and Pocket Telegram. Every direction keeps the torn receipt as the form, works at desktop and phone widths, and has no printer or cloud API connection. Production code was not changed.
+- A second set of eight disconnected concepts, built by Claude at Justin's request, is available in `_review/paper-telegram-concepts-claude/`: Par Avion, The Wire, Mail Call, Player Two, Ticket Booth, Special Dispatch, Copy Shop, and Little Inventions. Each is a single self-contained HTML file (Google Fonts are the only external resource) sharing one copy deck with a Vinny/Chase/Both recipient selector, verified at 375px and 1440px, preview-only with no printer or API connection. Fresh territory from the Codex set by design, except Airmail, which Justin asked to see reinterpreted (Par Avion). Production code was not changed.
+- Round 2 narrowed to the airmail direction. Justin's locked decisions: the white mail form contrasting against a blue scene (from Codex's Airmail), Vinny and Chase as the only recipient options (no Both), and Codex's form with its heading that changes to "For Vinny" or "For Chase" on selection. Six airmail-family variations are in `_review/paper-telegram-airmail-concepts/`: Blue Skies, Night Flight, Jet Age, Departures (split-flap heading animation), Paper Plane, and First Class. All reproduce Codex's form structure and behaviors faithfully, are self-contained single files, and were verified visually and functionally, including the heading swap. Preview-only, no printer or API connection.
+- Codex added eight more focused airmail derivatives in `_review/paper-telegram-airmail-concepts/index.html`: Blue Horizon, Airmail Envelope, Paper Flight, Dusk Delivery, Junior Airmail, Route Map, First Class, and Folded Sky. Every direction increases contrast between the scene and receipt, retains Chase and Vinny as the only recipient choices, works at desktop and phone widths, and remains disconnected from the printer. Paper Flight and Junior Airmail make the paper plane a prominent project metaphor.
 
 ## Lessons
 

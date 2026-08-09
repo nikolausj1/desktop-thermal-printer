@@ -76,6 +76,16 @@ export function PaperTelegramPage() {
       /* private browsing */
     }
   }, []);
+
+  // The chosen style also themes the whole page.
+  useEffect(() => {
+    document.body.dataset.theme = concept;
+    return () => {
+      delete document.body.dataset.theme;
+    };
+  }, [concept]);
+
+  const hogwarts = concept === "hogwarts";
   const idempotencyKey = useRef<string | null>(null);
   const stampSurfaceRef = useRef<HTMLDivElement>(null);
   const flightTimers = useRef<number[]>([]);
@@ -116,10 +126,11 @@ export function PaperTelegramPage() {
       at(350, () => setFoldStep(1)); // bottom third folds up, parchment out
       at(1050, () => setFoldStep(2)); // top third folds down over it
       at(1750, () => setFoldStep(3)); // the folded letter settles
-      at(2350, () => setFoldStep(5)); // the wax seal is pressed on
-      at(3050, () => setFoldStep(6)); // Hedwig sweeps across
-      at(3950, () => setFlight("flying")); // and carries it away
-      at(5150, () => setFlight("gone"));
+      at(2350, () => setFoldStep(4)); // an unseen quill writes the address
+      at(3400, () => setFoldStep(5)); // the wax seal is pressed on
+      at(4100, () => setFoldStep(6)); // Hedwig sweeps across
+      at(4950, () => setFlight("flying")); // and the letter is simply gone
+      at(6200, () => setFlight("gone"));
     }
   }, [clearFlightTimers, concept]);
 
@@ -464,6 +475,21 @@ export function PaperTelegramPage() {
     }
   }
 
+  // Renders text as per-character spans so an unseen quill can write it.
+  const quillLine = (text: string, baseDelayMs: number) => (
+    <>
+      {[...text].map((ch, i) => (
+        <span
+          key={`${i}-${ch}`}
+          className="quill-char"
+          style={{ animationDelay: `${baseDelayMs + i * 42}ms` }}
+        >
+          {ch === " " ? " " : ch}
+        </span>
+      ))}
+    </>
+  );
+
   const recipientError = showErrors && !recipientValid ? "Choose Vinny or Chase." : "";
   const nameError = showErrors && !nameValid ? "Use 30 characters or fewer." : "";
   const messageError =
@@ -487,41 +513,49 @@ export function PaperTelegramPage() {
         </div>
       ) : null}
 
-      {demoAvailable ? (
-        <>
-          <div className="concept-switch" role="group" aria-label="Delighter concept">
-            {(
-              [
-                ["plane", "✈ Plane"],
-                ["airmail", "✉ Airmail"],
-                ["hogwarts", "🦉 Hogwarts"],
-              ] as const
-            ).map(([key, label]) => (
-              <button
-                key={key}
-                type="button"
-                aria-pressed={concept === key}
-                onClick={() => {
-                  pickConcept(key);
-                  bringFormBack();
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+      <div className="concept-switch" role="group" aria-label="How your message travels">
+        {(
+          [
+            ["plane", "✈ Plane"],
+            ["airmail", "✉ Airmail"],
+            ["hogwarts", "🦉 Owl post"],
+          ] as const
+        ).map(([key, label]) => (
           <button
+            key={key}
             type="button"
-            className="demo-button"
+            aria-pressed={concept === key}
             onClick={() => {
-              const w = window as typeof window & { __ptFlightDemo?: () => void };
+              pickConcept(key);
               bringFormBack();
-              window.setTimeout(() => w.__ptFlightDemo?.(), 750);
             }}
           >
-            ▶ Preview the send animation
+            {label}
           </button>
-        </>
+        ))}
+      </div>
+
+      {hogwarts ? (
+        <div className="candles" aria-hidden="true">
+          {[0, 1, 2, 3, 4].map((i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={i} src="/candle.png" alt="" className={`candle candle-${i}`} />
+          ))}
+        </div>
+      ) : null}
+
+      {demoAvailable ? (
+        <button
+          type="button"
+          className="demo-button"
+          onClick={() => {
+            const w = window as typeof window & { __ptFlightDemo?: () => void };
+            bringFormBack();
+            window.setTimeout(() => w.__ptFlightDemo?.(), 750);
+          }}
+        >
+          ▶ Preview the send animation
+        </button>
       ) : null}
 
       <main className="main-layout">
@@ -531,21 +565,38 @@ export function PaperTelegramPage() {
             <img src="/logo-plane-white.png" alt="" />
             Paper Telegram
           </p>
-          <p className="eyebrow">A real message, on real paper</p>
-          <h1 id="page-title">Send Vinny &amp; Chase a paper telegram.</h1>
+          <p className="eyebrow">
+            {hogwarts ? "A real letter, by owl post" : "A real message, on real paper"}
+          </p>
+          <h1 id="page-title">
+            {hogwarts ? (
+              <>Send Vinny &amp; Chase a letter by owl.</>
+            ) : (
+              <>Send Vinny &amp; Chase a paper telegram.</>
+            )}
+          </h1>
           <p className="lede">
-            Type a note here and a tiny printer in their house wakes up and prints it on real
-            paper. No screens on their end, no accounts, no apps. Just a message they can hold.
+            {hogwarts
+              ? "Write a few words here and the little owl post office in their house scratches them onto real paper. No screens on their end, no accounts, no apps. Just a letter worth keeping."
+              : "Type a note here and a tiny printer in their house wakes up and prints it on real paper. No screens on their end, no accounts, no apps. Just a message they can hold."}
           </p>
           <p className="nostalgia">
-            For everyone who remembers when getting mail was the best part of the day.
+            {hogwarts
+              ? "For everyone still waiting on their Hogwarts letter."
+              : "For everyone who remembers when getting mail was the best part of the day."}
           </p>
 
           <p className="status-chip" data-state={printerStatus.state} role="status" aria-live="polite">
             <span className="status-dot" aria-hidden="true" />
             <span className="status-text">
-              <strong>{printerStatus.label}</strong>
-              <small>{printerStatus.message}</small>
+              <strong>
+                {hogwarts && printerStatus.state === "online" ? "The owl post is open" : printerStatus.label}
+              </strong>
+              <small>
+                {hogwarts && printerStatus.state === "online"
+                  ? "An owl is standing by."
+                  : printerStatus.message}
+              </small>
             </span>
           </p>
         </section>
@@ -586,7 +637,14 @@ export function PaperTelegramPage() {
                   {concept === "hogwarts" ? (
                     <>
                       <div className="env-flap-creases" />
-                      <p className="env-for">For {recipient || "Vinny & Chase"}</p>
+                      <p className="env-for">
+                        {foldStep >= 4 ? (
+                          <>
+                            <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
+                            <span className="quill-row">{quillLine("The Desk by the Window, Seattle", 620)}</span>
+                          </>
+                        ) : null}
+                      </p>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img className="env-crest" src="/logo-plane.png" alt="" />
                     </>
@@ -613,7 +671,7 @@ export function PaperTelegramPage() {
               </div>
             ) : null}
 
-            {flight === "gone" ? (
+            {flight !== "idle" ? (
               <div className="flight-card" role="status" aria-live="polite">
                 <p className="flight-kicker">Paper Telegram &middot; In transit</p>
                 <div className="flight-line" data-state={feedback?.state || "progress"}>
@@ -687,7 +745,15 @@ export function PaperTelegramPage() {
             >
               <div className="stamp-surface" ref={stampSurfaceRef}>
                 <span className="stamp-corner tl" aria-hidden="true">
-                  1<small>Smile</small>
+                  {hogwarts ? (
+                    <>
+                      9¾<small>Platform</small>
+                    </>
+                  ) : (
+                    <>
+                      1<small>Smile</small>
+                    </>
+                  )}
                 </span>
                 <span className="stamp-corner tr" aria-hidden="true">
                   {stampYear}
@@ -710,8 +776,10 @@ export function PaperTelegramPage() {
                       </div>
 
                       <div className="heading-block">
-                        <span className="kicker">Paper Telegram</span>
-                        <h2 id="form-title">{recipient ? `For ${recipient}` : "Special delivery"}</h2>
+                        <span className="kicker">{hogwarts ? "Owl Post Service" : "Paper Telegram"}</span>
+                        <h2 id="form-title">
+                          {recipient ? `For ${recipient}` : hogwarts ? "By owl post" : "Special delivery"}
+                        </h2>
                       </div>
 
                       <fieldset aria-describedby="recipient-error">
@@ -800,7 +868,9 @@ export function PaperTelegramPage() {
                       </div>
 
                       <button type="submit" className="send-btn" disabled={!canSubmit}>
-                        <span>{buttonLabel}</span>
+                        <span>
+                          {hogwarts && buttonLabel === "Send this telegram" ? "Send it by owl" : buttonLabel}
+                        </span>
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path
                             d="M4 12H20M20 12L14 6M20 12L14 18"

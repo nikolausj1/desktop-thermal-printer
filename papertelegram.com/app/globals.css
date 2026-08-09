@@ -892,7 +892,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   left: 50%;
   top: 45%;
   width: 92%;
-  transform: translate(-50%, -50%) rotate(105deg);
+  transform: translate(-50%, -50%) rotate(138deg);
   filter: drop-shadow(0 18px 30px rgba(4, 12, 26, 0.5));
 }
 
@@ -901,10 +901,10 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 }
 
 @keyframes wing-open {
-  0% { transform: translate(-50%, -50%) scale(0.3, 0.92) rotate(105deg); opacity: 0.6; }
+  0% { transform: translate(-50%, -50%) scale(0.3, 0.92) rotate(138deg); opacity: 0.6; }
   35% { opacity: 1; }
-  70% { transform: translate(-50%, -50%) scale(1.06, 1) rotate(105deg); }
-  100% { transform: translate(-50%, -50%) scale(1, 1) rotate(105deg); }
+  70% { transform: translate(-50%, -50%) scale(1.06, 1) rotate(138deg); }
+  100% { transform: translate(-50%, -50%) scale(1, 1) rotate(138deg); }
 }
 
 /* Launch: the finished paper plane banks to the logo's flight attitude
@@ -921,9 +921,9 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 
 @keyframes dart-launch {
   0% { transform: none; }
-  28% { transform: translate(-2%, 2%) rotate(20deg) scale(0.88); }
-  48% { transform: translate(-4%, 4%) rotate(48deg) scale(0.76); }
-  100% { transform: translate(64vw, -105vh) rotate(56deg) scale(0.4); }
+  28% { transform: translate(-2%, 2%) rotate(3deg) scale(0.94); }
+  48% { transform: translate(-4%, 4%) rotate(7deg) scale(0.86); }
+  100% { transform: translate(64vw, -105vh) rotate(10deg) scale(0.42); }
 }
 
 /* ---------- Envelope concepts: airmail and Hogwarts ---------- */
@@ -1171,7 +1171,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(170vw, 1600px);
+  width: min(195vw, 1950px);
   transform: translate(-50%, -50%);
   filter: drop-shadow(0 34px 52px rgba(4, 12, 26, 0.55));
 }
@@ -1202,15 +1202,12 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   100% { transform: translate(78vw, -46vh) rotate(9deg) scale(0.44); }
 }
 
-.stamp-stage[data-flight="flying"][data-concept="hogwarts"] {
-  animation: owl-exit 1.15s cubic-bezier(0.5, 0, 0.72, 0.4) forwards;
-  transform-origin: 50% 20%;
-}
-
-@keyframes owl-exit {
-  0% { transform: rotate(-1.5deg) scale(1.03); }
-  25% { transform: translate(1%, -4%) rotate(1deg) scale(1); }
-  100% { transform: translate(62vw, -115vh) rotate(5deg) scale(0.6); }
+/* Hedwig obscures the letter as she passes; when she has gone by, the
+   letter has simply gone with her, revealing the slip beneath. */
+.stamp-stage[data-flight="flying"][data-concept="hogwarts"] .giant-stamp.origami,
+.stamp-stage[data-flight="flying"][data-concept="hogwarts"] .fold-theater {
+  opacity: 0;
+  transition: opacity 0.15s linear;
 }
 
 .concept-switch {
@@ -1246,6 +1243,209 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   background: #f5f1e6;
   color: #14304f;
   font-weight: 700;
+}
+
+/* ---------- The quill writes the address ---------- */
+.quill-row { display: block; white-space: nowrap; }
+
+.quill-char {
+  opacity: 0;
+  display: inline;
+  animation: quill-write 0.34s ease-out forwards;
+}
+
+@keyframes quill-write {
+  0% { opacity: 0; filter: blur(3px); }
+  60% { opacity: 0.9; filter: blur(0.5px); }
+  100% { opacity: 1; filter: blur(0); }
+}
+
+/* ---------- The plane folds in the same warm paper as the dart ---------- */
+[data-concept="plane"] .fold-flap,
+[data-concept="plane"] .fold-half {
+  background: linear-gradient(155deg, #f7edd9 0%, #efe2c6 45%, #e2d2af 100%);
+}
+
+/* ---------- Hogwarts: the whole page goes to the castle ---------- */
+body[data-theme="hogwarts"] {
+  --focus: #e8c15a;
+  background-color: #1a1109;
+  background-image:
+    radial-gradient(ellipse 120% 90% at 50% 100%, rgba(214, 148, 40, 0.14), transparent 55%),
+    radial-gradient(ellipse 140% 100% at 50% 50%, transparent 40%, rgba(6, 3, 0, 0.55) 100%),
+    repeating-linear-gradient(90deg, rgba(232, 193, 90, 0.02) 0px, rgba(232, 193, 90, 0.02) 1px, transparent 1px, transparent 5px),
+    repeating-linear-gradient(0deg, rgba(232, 193, 90, 0.02) 0px, rgba(232, 193, 90, 0.02) 1px, transparent 1px, transparent 5px),
+    linear-gradient(165deg, #221507, #1a1109 55%, #140c05);
+}
+
+body[data-theme="hogwarts"] .eyebrow { color: #e8c15a; }
+
+body[data-theme="hogwarts"] h1 {
+  font-family: var(--font-cinzel), var(--serif);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+  line-height: 1.16;
+  color: #f3e3bb;
+  text-shadow: 0 2px 22px rgba(232, 193, 90, 0.25);
+}
+
+body[data-theme="hogwarts"] .brandline { color: #f3e3bb; font-family: var(--font-cinzel), var(--serif); }
+body[data-theme="hogwarts"] .brandline img { filter: sepia(0.7) saturate(0.9) brightness(1.05); }
+
+body[data-theme="hogwarts"] .lede { color: rgba(243, 227, 187, 0.85); }
+
+body[data-theme="hogwarts"] .nostalgia {
+  font-family: var(--font-imfell), var(--serif);
+  font-style: italic;
+  color: #d9b96a;
+  font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+}
+
+body[data-theme="hogwarts"] .status-chip {
+  background: rgba(232, 193, 90, 0.1);
+  border-color: rgba(232, 193, 90, 0.35);
+}
+
+body[data-theme="hogwarts"] .status-chip[data-state="online"] .status-dot {
+  background: #e8c15a;
+  box-shadow: 0 0 0 0 rgba(232, 193, 90, 0.6);
+}
+
+/* The form becomes a parchment letter with a gilded rule. */
+body[data-theme="hogwarts"] .stamp-surface {
+  background:
+    radial-gradient(ellipse 30% 26% at 24% 36%, rgba(150, 106, 38, 0.12), transparent),
+    radial-gradient(ellipse 24% 20% at 74% 70%, rgba(150, 106, 38, 0.1), transparent),
+    linear-gradient(140deg, #f2e4c2, #e9d6a9);
+  color: #3c2a12;
+}
+
+body[data-theme="hogwarts"] .stripe-edge { display: none; }
+
+body[data-theme="hogwarts"] .frame-content {
+  background: transparent;
+  border: 2px double #8a6a2f;
+  border-radius: 2px;
+}
+
+body[data-theme="hogwarts"] .stamp-corner,
+body[data-theme="hogwarts"] .meta-row,
+body[data-theme="hogwarts"] legend,
+body[data-theme="hogwarts"] .field-label-row label,
+body[data-theme="hogwarts"] .field-tag,
+body[data-theme="hogwarts"] .field-counter,
+body[data-theme="hogwarts"] .field-helper,
+body[data-theme="hogwarts"] .heading-block .kicker,
+body[data-theme="hogwarts"] .form-footer { color: #6b4c1c; }
+
+body[data-theme="hogwarts"] .heading-block {
+  border-color: rgba(107, 76, 28, 0.45);
+}
+
+body[data-theme="hogwarts"] .heading-block h2 { color: #3c2a12; font-family: var(--font-imfell), var(--serif); }
+
+body[data-theme="hogwarts"] .watermark-plane { filter: sepia(1) saturate(0.8); opacity: 0.06; }
+
+body[data-theme="hogwarts"] .chip {
+  border-color: #6b4c1c;
+  color: #4a3413;
+}
+
+body[data-theme="hogwarts"] .chip:has(input:checked) {
+  background: #6e1218;
+  border-color: #6e1218;
+  color: #f3e3bb;
+}
+
+body[data-theme="hogwarts"] input[type="text"],
+body[data-theme="hogwarts"] textarea {
+  background: rgba(107, 76, 28, 0.07);
+  border-color: rgba(107, 76, 28, 0.45);
+  color: #3c2a12;
+}
+
+body[data-theme="hogwarts"] input[type="text"]::placeholder,
+body[data-theme="hogwarts"] textarea::placeholder { color: rgba(107, 76, 28, 0.5); }
+
+body[data-theme="hogwarts"] .send-btn {
+  background: #6e1218;
+  color: #f3e3bb;
+}
+
+body[data-theme="hogwarts"] .send-btn:hover:not(:disabled) { background: #57090f; }
+
+body[data-theme="hogwarts"] .flight-card {
+  background: linear-gradient(140deg, #f2e4c2, #e9d6a9);
+  color: #3c2a12;
+}
+
+body[data-theme="hogwarts"] .flight-kicker,
+body[data-theme="hogwarts"] .flight-line p { color: #6b4c1c; }
+body[data-theme="hogwarts"] .flight-line strong { color: #3c2a12; }
+body[data-theme="hogwarts"] .flight-again { background: #6e1218; color: #f3e3bb; }
+
+body[data-theme="hogwarts"] .story-eyebrow,
+body[data-theme="hogwarts"] .flow-tech { color: #e8c15a; }
+
+body[data-theme="hogwarts"] .story-intro h2,
+body[data-theme="hogwarts"] .system-flow h3 { color: #f3e3bb; }
+
+body[data-theme="hogwarts"] .system-flow li {
+  background: rgba(232, 193, 90, 0.06);
+  border-color: rgba(232, 193, 90, 0.2);
+}
+
+body[data-theme="hogwarts"] .technical-card {
+  background: linear-gradient(140deg, #f2e4c2, #e9d6a9);
+  color: #3c2a12;
+}
+
+body[data-theme="hogwarts"] .concept-switch {
+  background: rgba(26, 17, 9, 0.9);
+  border-color: rgba(232, 193, 90, 0.4);
+}
+
+body[data-theme="hogwarts"] .concept-switch button { color: #d9b96a; }
+
+body[data-theme="hogwarts"] .concept-switch button[aria-pressed="true"] {
+  background: #e8c15a;
+  color: #2a1a08;
+}
+
+/* Floating candles drift above the page. */
+.candles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.candle {
+  position: absolute;
+  width: 54px;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 26px rgba(232, 193, 90, 0.45));
+  animation: candle-bob 6s ease-in-out infinite alternate;
+}
+
+.candle-0 { left: 6%; top: 12%; width: 44px; animation-delay: 0s; }
+.candle-1 { left: 30%; top: 5%; width: 34px; animation-delay: -2.2s; }
+.candle-2 { left: 55%; top: 9%; width: 50px; animation-delay: -4s; }
+.candle-3 { left: 76%; top: 4%; width: 38px; animation-delay: -1.2s; }
+.candle-4 { left: 91%; top: 15%; width: 30px; animation-delay: -3.1s; }
+
+@keyframes candle-bob {
+  0% { transform: translateY(0) rotate(-1.5deg); }
+  100% { transform: translateY(-16px) rotate(1.5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .candle { animation: none; }
+  .quill-char { animation-duration: 0.01s; }
+}
+
+@media (max-width: 700px) {
+  .candle-1, .candle-3 { display: none; }
 }
 
 .contrail {
@@ -1287,12 +1487,14 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   100% { transform: translate(46vw, -95vh) scale(0.5) rotate(14deg); opacity: 1; }
 }
 
+/* The delivery slip was under the paper the whole time; folding the
+   sheet away simply reveals it. It never animates in. */
 .flight-card {
   position: absolute;
   inset: 0;
   margin: auto;
   height: fit-content;
-  z-index: 5;
+  z-index: 0;
   width: 100%;
   max-width: 440px;
   background: var(--paper);
@@ -1302,12 +1504,6 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.05),
     0 24px 52px -16px rgba(4, 12, 26, 0.55);
-  animation: card-in 0.45s ease-out;
-}
-
-@keyframes card-in {
-  0% { transform: translateY(14px); opacity: 0; }
-  100% { transform: none; opacity: 1; }
 }
 
 .flight-kicker {

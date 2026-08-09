@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, JetBrains_Mono } from "next/font/google";
+import { Cinzel_Decorative, Fraunces, IM_Fell_English, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -13,6 +13,19 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+});
+
+const cinzel = Cinzel_Decorative({
+  variable: "--font-cinzel",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
+const imFell = IM_Fell_English({
+  variable: "--font-imfell",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -55,7 +68,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${fraunces.variable} ${jetbrainsMono.variable}`}>{children}</body>
+      <body className={`${fraunces.variable} ${jetbrainsMono.variable} ${cinzel.variable} ${imFell.variable}`}>
+        {children}
+      </body>
     </html>
   );
 }

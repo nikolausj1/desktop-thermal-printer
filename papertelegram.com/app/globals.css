@@ -680,9 +680,23 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   will-change: transform, opacity;
 }
 
-.giant-stamp.folding {
-  animation: fold-up 0.62s cubic-bezier(0.55, 0.05, 0.7, 0.4) forwards;
+/* The origami sequence: the stamp is progressively clipped as each region
+   of the sheet is folded away, while white flaps (the blank back of the
+   paper) land over it along physically correct crease lines. */
+.giant-stamp.origami {
+  transform: scale(1.02) rotate(-1deg);
+  transition: transform 0.35s ease-out, clip-path 0.24s ease-in-out;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.05),
+    0 44px 84px -18px rgba(4, 12, 26, 0.65),
+    0 16px 34px -12px rgba(4, 12, 26, 0.45);
 }
+
+[data-step="1"] .giant-stamp.origami { clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%, 0 36%); }
+[data-step="2"] .giant-stamp.origami { clip-path: polygon(50% 0, 100% 36%, 100% 100%, 0 100%, 0 36%); }
+[data-step="3"] .giant-stamp.origami { clip-path: polygon(50% 0, 100% 36%, 100% 100%, 10% 100%); }
+[data-step="4"] .giant-stamp.origami { clip-path: polygon(50% 0, 90% 100%, 10% 100%); }
+[data-step="5"] .giant-stamp.origami { clip-path: polygon(50% 0, 90% 100%, 50% 100%); }
 
 .giant-stamp.folded {
   opacity: 0;
@@ -694,17 +708,107 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   animation: unfold 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1);
 }
 
-@keyframes fold-up {
-  0% { transform: none; opacity: 1; }
-  38% { transform: rotateX(48deg) scale(0.92); opacity: 1; }
-  72% { transform: rotateX(78deg) scaleY(0.32) scale(0.74); opacity: 1; }
-  100% { transform: rotateX(89deg) scaleY(0.08) scaleX(0.42) scale(0.6); opacity: 0; }
-}
-
 @keyframes unfold {
   0% { transform: rotateX(70deg) scaleY(0.2) scale(0.7); opacity: 0; }
   60% { transform: rotateX(-6deg) scale(1.02); opacity: 1; }
   100% { transform: none; opacity: 1; }
+}
+
+.fold-theater {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  perspective: 1400px;
+}
+
+.fold-flap,
+.fold-half {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(155deg, #ffffff 0%, #fbf8f0 45%, #efe9da 100%);
+  backface-visibility: visible;
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99), opacity 0.05s linear;
+  will-change: transform;
+}
+
+/* Top-left corner folds to the center line. Crease: (50%,0) to (0,36%),
+   which is roughly a 45 degree diagonal in rendered pixels. */
+.flap-tl {
+  clip-path: polygon(50% 0, 0 36%, 50% 36%);
+  transform-origin: 25% 18%;
+  transform: rotate3d(-1, 1, 0, 179deg);
+}
+[data-step="1"] .flap-tl,
+[data-step="2"] .flap-tl { opacity: 1; transform: rotate3d(-1, 1, 0, 0deg); }
+[data-step="3"] .flap-tl,
+[data-step="4"] .flap-tl,
+[data-step="5"] .flap-tl { transform: rotate3d(-1, 1, 0, 0deg); opacity: 0; }
+
+/* Top-right corner mirrors it. Crease: (50%,0) to (100%,36%). */
+.flap-tr {
+  clip-path: polygon(50% 0, 100% 36%, 50% 36%);
+  transform-origin: 75% 18%;
+  transform: rotate3d(1, 1, 0, -179deg);
+}
+[data-step="2"] .flap-tr,
+[data-step="3"] .flap-tr { opacity: 1; transform: rotate3d(1, 1, 0, 0deg); }
+[data-step="4"] .flap-tr,
+[data-step="5"] .flap-tr { transform: rotate3d(1, 1, 0, 0deg); opacity: 0; }
+
+/* Second fold, left angled edge to the center. Crease: (50%,0) to (10%,100%). */
+.flap-l2 {
+  clip-path: polygon(50% 0, 50% 100%, 10% 100%);
+  transform-origin: 30% 50%;
+  transform: rotate3d(-0.28, 1, 0, 179deg);
+  background:
+    linear-gradient(120deg, #ffffff 0%, #f6f1e4 55%, #eae3d2 100%);
+}
+[data-step="3"] .flap-l2,
+[data-step="4"] .flap-l2 { opacity: 1; transform: rotate3d(-0.28, 1, 0, 0deg); }
+[data-step="5"] .flap-l2 { opacity: 0; transform: rotate3d(-0.28, 1, 0, 0deg); }
+
+/* Second fold, right angled edge. Crease: (50%,0) to (90%,100%). */
+.flap-r2 {
+  clip-path: polygon(50% 0, 90% 100%, 50% 100%);
+  transform-origin: 70% 50%;
+  transform: rotate3d(0.28, 1, 0, -179deg);
+  background:
+    linear-gradient(-120deg, #ffffff 0%, #f6f1e4 55%, #eae3d2 100%);
+}
+[data-step="4"] .flap-r2,
+[data-step="5"] .flap-r2 { opacity: 1; transform: rotate3d(0.28, 1, 0, 0deg); }
+
+/* The dart folds in half along its spine. */
+.fold-half {
+  clip-path: polygon(50% 0, 50% 100%, 10% 100%);
+  transform-origin: 50% 50%;
+  transform: rotate3d(0, 1, 0, 0deg);
+  background:
+    linear-gradient(100deg, #ffffff 0%, #f3edde 60%, #e6decb 100%);
+}
+[data-step="4"] .fold-half { opacity: 1; }
+[data-step="5"] .fold-half { opacity: 1; transform: rotate3d(0, 1, 0, -178deg); }
+
+.contrail {
+  position: absolute;
+  inset: -60% -60% 0 0;
+  width: 160%;
+  height: 160%;
+  z-index: 5;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.contrail path {
+  stroke-dashoffset: 100;
+  animation: contrail-draw 1s cubic-bezier(0.5, 0, 0.75, 0.4) forwards;
+}
+
+@keyframes contrail-draw {
+  to { stroke-dashoffset: 0; }
 }
 
 .flight-plane {
@@ -807,10 +911,13 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .giant-stamp.folding,
   .giant-stamp.unfolding,
   .flight-plane,
+  .contrail path,
   .flight-card { animation: none; }
+  .fold-flap,
+  .fold-half,
+  .giant-stamp.origami { transition: none; }
 }
 
 /* ---------- Project story ---------- */

@@ -62,6 +62,7 @@ export function PaperTelegramPage() {
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [showErrors, setShowErrors] = useState(false);
   const [flight, setFlight] = useState<FlightPhase>("idle");
+  const [foldStep, setFoldStep] = useState(0);
   const [returning, setReturning] = useState(false);
   const idempotencyKey = useRef<string | null>(null);
   const stampSurfaceRef = useRef<HTMLDivElement>(null);
@@ -72,20 +73,31 @@ export function PaperTelegramPage() {
     flightTimers.current = [];
   }, []);
 
-  // Fold the stamp into a paper plane and send it off the screen. Skipped
-  // for prefers-reduced-motion, where the classic inline feedback remains.
+  // Fold the stamp into a paper plane, step by real step, and send it off
+  // the screen. Each fold shows the blank back of the paper landing over
+  // the form, the way an actual dart is folded. Skipped for
+  // prefers-reduced-motion, where the classic inline feedback remains.
   const launchFlight = useCallback(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     clearFlightTimers();
+    setFoldStep(0);
     setFlight("folding");
-    flightTimers.current.push(window.setTimeout(() => setFlight("flying"), 620));
-    flightTimers.current.push(window.setTimeout(() => setFlight("gone"), 1650));
+    const at = (ms: number, fn: () => void) =>
+      flightTimers.current.push(window.setTimeout(fn, ms));
+    at(350, () => setFoldStep(1)); // top-left corner to the center line
+    at(850, () => setFoldStep(2)); // top-right corner to the center line
+    at(1350, () => setFoldStep(3)); // left angled edge folds in again
+    at(1850, () => setFoldStep(4)); // right angled edge folds in again
+    at(2400, () => setFoldStep(5)); // the dart folds in half
+    at(2980, () => setFlight("flying")); // and takes off
+    at(4050, () => setFlight("gone"));
   }, [clearFlightTimers]);
 
   const bringFormBack = useCallback(() => {
     clearFlightTimers();
     setFeedback(null);
     setFlight("idle");
+    setFoldStep(0);
     setReturning(true);
     flightTimers.current.push(window.setTimeout(() => setReturning(false), 700));
   }, [clearFlightTimers]);
@@ -93,9 +105,18 @@ export function PaperTelegramPage() {
   useEffect(() => clearFlightTimers, [clearFlightTimers]);
 
   // Review hook: lets the flight sequence be exercised from the console
-  // without sending a real telegram to the printer.
+  // without sending a real telegram to the printer. Pass a number to
+  // freeze the origami at that fold step for inspection.
   useEffect(() => {
-    const w = window as typeof window & { __ptFlightDemo?: (fail?: boolean) => void };
+    const w = window as typeof window & {
+      __ptFlightDemo?: (fail?: boolean) => void;
+      __ptFoldFreeze?: (step: number) => void;
+    };
+    w.__ptFoldFreeze = (step: number) => {
+      clearFlightTimers();
+      setFlight("folding");
+      setFoldStep(step);
+    };
     w.__ptFlightDemo = (fail = false) => {
       launchFlight();
       window.setTimeout(() => {
@@ -113,8 +134,9 @@ export function PaperTelegramPage() {
     };
     return () => {
       delete w.__ptFlightDemo;
+      delete w.__ptFoldFreeze;
     };
-  }, [launchFlight]);
+  }, [launchFlight, clearFlightTimers]);
 
   const nameValid = visibleLength(name.trim()) <= 30;
   const messageValid =
@@ -435,10 +457,32 @@ export function PaperTelegramPage() {
         </section>
 
         <section className="stamp-col" aria-labelledby="form-title">
-          <div className="stamp-stage" data-flight={flight}>
+          <div className="stamp-stage" data-flight={flight} data-step={foldStep}>
+            {flight === "folding" ? (
+              <div className="fold-theater" aria-hidden="true">
+                <div className="fold-flap flap-tl" />
+                <div className="fold-flap flap-tr" />
+                <div className="fold-flap flap-l2" />
+                <div className="fold-flap flap-r2" />
+                <div className="fold-half" />
+              </div>
+            ) : null}
+
             {flight === "flying" ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className="flight-plane" src="/logo-plane-white.png" alt="" aria-hidden="true" />
+              <>
+                <svg className="contrail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path
+                    d="M50,46 Q60,28 86,4 T160,-70"
+                    pathLength={100}
+                    fill="none"
+                    stroke="rgba(248, 245, 236, 0.55)"
+                    strokeWidth="0.7"
+                    strokeDasharray="2.6 3.4"
+                  />
+                </svg>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="flight-plane" src="/logo-plane-white.png" alt="" aria-hidden="true" />
+              </>
             ) : null}
 
             {flight === "gone" ? (
@@ -509,7 +553,7 @@ export function PaperTelegramPage() {
             ) : null}
 
             <div
-              className={`giant-stamp${flight === "folding" ? " folding" : ""}${
+              className={`giant-stamp${flight === "folding" ? " origami" : ""}${
                 flight === "flying" || flight === "gone" ? " folded" : ""
               }${returning ? " unfolding" : ""}`}
             >

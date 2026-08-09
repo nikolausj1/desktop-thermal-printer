@@ -148,8 +148,13 @@ export function PaperTelegramPage() {
       setFlight("folding");
       setFoldStep(step);
     };
-    // The on-page demo controls appear only during local review.
-    if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+    // The on-page demo controls appear during local review, or anywhere
+    // with ?review in the URL so concepts can be compared on a phone.
+    // They only ever animate; nothing here can reach the printer.
+    if (
+      ["localhost", "127.0.0.1"].includes(window.location.hostname) ||
+      new URLSearchParams(window.location.search).has("review")
+    ) {
       setDemoAvailable(true);
       try {
         const saved = localStorage.getItem("pt-delighter-concept");

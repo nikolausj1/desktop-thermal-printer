@@ -672,6 +672,27 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   .frame-content { padding: 22px 18px 16px; }
 }
 
+/* Local-review-only demo trigger; never rendered in production. */
+.demo-button {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 50;
+  background: #ff9d86;
+  color: #10253f;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(4, 12, 26, 0.5);
+}
+
+.demo-button:hover { background: #ffb3a0; }
+
 /* ---------- Fold-and-fly delighter ---------- */
 .stamp-stage { position: relative; perspective: 1200px; }
 

@@ -64,6 +64,7 @@ export function PaperTelegramPage() {
   const [flight, setFlight] = useState<FlightPhase>("idle");
   const [foldStep, setFoldStep] = useState(0);
   const [returning, setReturning] = useState(false);
+  const [demoAvailable, setDemoAvailable] = useState(false);
   const idempotencyKey = useRef<string | null>(null);
   const stampSurfaceRef = useRef<HTMLDivElement>(null);
   const flightTimers = useRef<number[]>([]);
@@ -117,6 +118,10 @@ export function PaperTelegramPage() {
       setFlight("folding");
       setFoldStep(step);
     };
+    // The on-page demo button appears only during local review.
+    if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+      setDemoAvailable(true);
+    }
     w.__ptFlightDemo = (fail = false) => {
       launchFlight();
       window.setTimeout(() => {
@@ -430,6 +435,20 @@ export function PaperTelegramPage() {
 
   return (
     <div className="page-shell">
+      {demoAvailable ? (
+        <button
+          type="button"
+          className="demo-button"
+          onClick={() => {
+            const w = window as typeof window & { __ptFlightDemo?: () => void };
+            bringFormBack();
+            window.setTimeout(() => w.__ptFlightDemo?.(), 750);
+          }}
+        >
+          ▶ Preview the send animation
+        </button>
+      ) : null}
+
       <main className="main-layout">
         <section className="hero-col" aria-labelledby="page-title">
           <p className="brandline">

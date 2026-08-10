@@ -538,6 +538,31 @@ export function PaperTelegramPage() {
         </div>
       ) : null}
 
+      {concept === "airmail" ? (
+        <div className="airmail-scene" aria-hidden="true">
+          <svg className="route-map" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M-5,72 Q22,38 48,44 T105,20" fill="none" stroke="rgba(248,245,236,0.05)" strokeWidth="0.18" />
+            <path d="M-5,30 Q30,52 62,40 T105,58" fill="none" stroke="rgba(248,245,236,0.045)" strokeWidth="0.18" />
+            <path d="M10,105 Q35,70 70,66 T105,40" fill="none" stroke="rgba(248,245,236,0.04)" strokeWidth="0.18" />
+            <circle cx="22" cy="47" r="0.45" fill="rgba(248,245,236,0.1)" />
+            <circle cx="48" cy="44" r="0.45" fill="rgba(248,245,236,0.09)" />
+            <circle cx="78" cy="31" r="0.45" fill="rgba(248,245,236,0.1)" />
+            <circle cx="62" cy="40" r="0.4" fill="rgba(248,245,236,0.08)" />
+            <path
+              className="route-live"
+              d="M-2,80 Q28,60 52,50 T104,26"
+              pathLength={100}
+              fill="none"
+              stroke="rgba(248,245,236,0.32)"
+              strokeWidth="0.28"
+              strokeDasharray="1.6 2.2"
+            />
+          </svg>
+          <div className="cloud-layer cloud-a" />
+          <div className="cloud-layer cloud-b" />
+        </div>
+      ) : null}
+
       <div className="concept-switch" role="group" aria-label="How your message travels">
         {(
           [

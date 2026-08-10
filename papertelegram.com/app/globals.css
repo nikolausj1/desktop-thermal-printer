@@ -1311,6 +1311,74 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   color: #4a3413;
 }
 
+/* ---------- Airmail scene: route map and high clouds ---------- */
+.airmail-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.route-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* One route quietly draws itself, holds, and fades, on a slow loop. */
+.route-live {
+  stroke-dashoffset: 100;
+  opacity: 0;
+  animation: route-draw 16s linear infinite;
+}
+
+@keyframes route-draw {
+  0% { stroke-dashoffset: 100; opacity: 0; }
+  8% { opacity: 0.4; }
+  48% { stroke-dashoffset: 0; opacity: 0.4; }
+  62% { stroke-dashoffset: 0; opacity: 0; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Two wisp layers drift at different speeds for gentle parallax. */
+.cloud-layer {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 34%;
+  filter: blur(30px);
+}
+
+.cloud-a {
+  top: 8%;
+  background:
+    radial-gradient(ellipse 22% 42% at 24% 55%, rgba(248, 245, 236, 0.05), transparent 70%),
+    radial-gradient(ellipse 30% 36% at 58% 40%, rgba(248, 245, 236, 0.04), transparent 70%),
+    radial-gradient(ellipse 18% 30% at 82% 62%, rgba(248, 245, 236, 0.045), transparent 70%);
+  animation: cloud-drift 90s ease-in-out infinite alternate;
+}
+
+.cloud-b {
+  top: 52%;
+  background:
+    radial-gradient(ellipse 26% 40% at 34% 50%, rgba(248, 245, 236, 0.035), transparent 70%),
+    radial-gradient(ellipse 20% 32% at 70% 55%, rgba(248, 245, 236, 0.03), transparent 70%);
+  animation: cloud-drift 140s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes cloud-drift {
+  0% { transform: translateX(-4%); }
+  100% { transform: translateX(4%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-live,
+  .cloud-layer { animation: none; }
+  .route-live { stroke-dashoffset: 0; opacity: 0.3; }
+}
+
 /* ---------- The quill writes the address ---------- */
 .quill-row { display: block; white-space: nowrap; }
 

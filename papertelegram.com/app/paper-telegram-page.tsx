@@ -637,25 +637,14 @@ export function PaperTelegramPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/wordmark.png" alt="Paper Telegram" />
           </p>
-          <p className="eyebrow">
-            {hogwarts ? "A real letter, by owl post" : "A real message, on real paper"}
-          </p>
-          <h1 id="page-title">
-            {hogwarts ? (
-              <>Send Vinny &amp; Chase a letter by owl.</>
-            ) : (
-              <>Send Vinny &amp; Chase a paper telegram.</>
-            )}
-          </h1>
+          <p className="eyebrow">A real message, on real paper</p>
+          <h1 id="page-title">Send Vinny &amp; Chase a paper telegram.</h1>
           <p className="lede">
-            {hogwarts
-              ? "Write a few words here and the little owl post office in their house scratches them onto real paper. No screens on their end, no accounts, no apps. Just a letter worth keeping."
-              : "Type a note here and a tiny printer in their house wakes up and prints it on real paper. No screens on their end, no accounts, no apps. Just a message they can hold."}
+            Type a note here and a tiny printer in their house wakes up and prints it on real
+            paper. No screens on their end, no accounts, no apps. Just a message they can hold.
           </p>
           <p className="nostalgia">
-            {hogwarts
-              ? "For everyone still waiting on their Hogwarts letter."
-              : "For everyone who remembers when getting mail was the best part of the day."}
+            For everyone who remembers when getting mail was the best part of the day.
           </p>
 
           <p className="status-chip" data-state={printerStatus.state} role="status" aria-live="polite">
@@ -664,11 +653,7 @@ export function PaperTelegramPage() {
               <strong>
                 {printerStatus.state === "online" ? "Telegram Printer Online" : printerStatus.label}
               </strong>
-              <small>
-                {hogwarts && printerStatus.state === "online"
-                  ? "An owl is standing by."
-                  : printerStatus.message}
-              </small>
+              <small>{printerStatus.message}</small>
             </span>
           </p>
         </section>

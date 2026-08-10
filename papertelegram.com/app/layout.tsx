@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cinzel_Decorative, Fraunces, IM_Fell_English, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -70,6 +71,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body className={`${fraunces.variable} ${jetbrainsMono.variable} ${cinzel.variable} ${imFell.variable}`}>
         {children}
+        {/* Cookie-free visitor counts, referrers, and countries. */}
+        <Analytics />
       </body>
     </html>
   );

@@ -84,8 +84,11 @@ img { max-width: 100%; display: block; }
     align-items: center;
     gap: clamp(32px, 5vw, 64px);
     /* Extra room so the form does not crowd the fixed theme control. */
-    padding-top: clamp(112px, 12vw, 148px);
+    padding-top: clamp(76px, 9vw, 104px);
   }
+
+  /* Only the form drops further from the theme control; the copy stays put. */
+  .stamp-col { transform: translateY(44px); }
 }
 
 /* ---------- Hero copy (left column) ---------- */

@@ -653,6 +653,49 @@ export function PaperTelegramPage() {
             </svg>
           ) : null}
 
+          {flight !== "idle" ? (
+            <div className={`flight-card${flight === "flying" || flight === "gone" ? " revealed" : ""}`} role="status" aria-live="polite">
+              <p className="flight-kicker">Paper Telegram &middot; In transit</p>
+              <div className="flight-line" data-state={feedback?.state || "progress"}>
+                <span className="feedback-mark" aria-hidden="true">
+                  {feedback?.mark || "01"}
+                </span>
+                <div>
+                  <strong>{feedback?.label || "Telegram received"}</strong>
+                  <p>{feedback?.message || "Waiting for the message machine."}</p>
+                </div>
+              </div>
+              {feedback?.state === "success" ? (
+                <button type="button" className="send-btn flight-again" onClick={bringFormBack}>
+                  <span>Send another telegram</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M4 12H20M20 12L14 6M20 12L14 18"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              ) : null}
+              {feedback?.state === "error" ? (
+                <button type="button" className="send-btn flight-again" onClick={bringFormBack}>
+                  <span>Bring the form back</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M20 12H4M4 12L10 6M4 12L10 18"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+
           <div className="stamp-stage" data-flight={flight} data-step={foldStep} data-concept={concept}>
             {(flight === "folding" || flight === "flying") && concept === "plane" ? (
               <div className="fold-theater" aria-hidden="true">
@@ -732,48 +775,6 @@ export function PaperTelegramPage() {
               </div>
             ) : null}
 
-            {flight !== "idle" ? (
-              <div className="flight-card" role="status" aria-live="polite">
-                <p className="flight-kicker">Paper Telegram &middot; In transit</p>
-                <div className="flight-line" data-state={feedback?.state || "progress"}>
-                  <span className="feedback-mark" aria-hidden="true">
-                    {feedback?.mark || "01"}
-                  </span>
-                  <div>
-                    <strong>{feedback?.label || "Telegram received"}</strong>
-                    <p>{feedback?.message || "Waiting for the message machine."}</p>
-                  </div>
-                </div>
-                {feedback?.state === "success" ? (
-                  <button type="button" className="send-btn flight-again" onClick={bringFormBack}>
-                    <span>Send another telegram</span>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M4 12H20M20 12L14 6M20 12L14 18"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                ) : null}
-                {feedback?.state === "error" ? (
-                  <button type="button" className="send-btn flight-again" onClick={bringFormBack}>
-                    <span>Bring the form back</span>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M20 12H4M4 12L10 6M4 12L10 18"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                ) : null}
-              </div>
-            ) : null}
 
             <div
               className={`giant-stamp${

@@ -1822,9 +1822,10 @@ body[data-theme="hogwarts"] .concept-switch button[aria-pressed="true"] {
   padding: 10px;
 }
 
-/* Occluded in principle, hidden in practice: nothing of it shows until
-   the paper is on its way out. */
-.stamp-stage[data-flight="folding"] .flight-card { opacity: 0; }
+/* Hidden until the paper is on its way out, then it simply fades in.
+   It lives outside the stage so launch transforms never move it. */
+.flight-card { opacity: 0; transition: opacity 0.7s ease 0.15s; }
+.flight-card.revealed { opacity: 1; }
 
 .flight-kicker {
   font-family: var(--mono);

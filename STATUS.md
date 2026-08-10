@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-09
-version: 4.8
+version: 4.9
 author: Claude Fable 5 (claude-fable-5)
 tags:
 ---
@@ -120,3 +120,5 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 
 - Supabase CLI `db query --linked` can apply and verify SQL through the authenticated Management API even when direct pooler password authentication fails. This path does not automatically create migration history, so record the applied version deliberately or repair it after database-password access is restored. (promoted to Build Guide v7.0, 2026-08-05)
 - Verify a legacy site's current hosting through DNS, certificate, and network ownership before requesting credentials. Project notes can outlive a hosting migration. (promoted to Build Guide v7.0, 2026-08-05)
+- Do not check mobile layouts with headless Chrome `--screenshot --window-size=<width>` below about 500px. This Chrome build silently clamps the viewport to roughly 500px and then crops the image to the requested width, so a correctly responsive page looks badly clipped. Confirmed twice on 2026-08-09: a review gallery and the live site both appeared broken at 420px, while measuring the real page through browser device emulation showed the form correctly shrinking to 380px with no overflow. Headless screenshots remain excellent for rendering fixed-size assets such as social cards and favicons; for responsive checks use a tool that does proper device-metrics emulation, or read element widths from the DOM.
+- Enabling Vercel Web Analytics is dashboard-only (the Analytics tab, not a settings page), there is no REST endpoint for it, and the collection routes only appear on the deployment *after* the toggle is flipped. So the sequence is always enable, then redeploy, then verify that `/_vercel/insights/script.js` returns 200 and a page view POSTs. Skipping the redeploy leaves the tracking code live but silently collecting nothing.

@@ -125,12 +125,13 @@ export function PaperTelegramPage() {
     } else {
       at(350, () => setFoldStep(1)); // bottom third folds up, parchment out
       at(1050, () => setFoldStep(2)); // top third folds down over it
-      at(1750, () => setFoldStep(3)); // the folded letter settles
-      at(2350, () => setFoldStep(4)); // an unseen quill writes the address
-      at(3400, () => setFoldStep(5)); // the wax seal is pressed on
-      at(4100, () => setFoldStep(6)); // Hedwig sweeps across
-      at(4950, () => setFlight("flying")); // and the letter is simply gone
-      at(6200, () => setFlight("gone"));
+      at(1750, () => setFoldStep(3)); // left corner folds down to the V
+      at(2350, () => setFoldStep(4)); // right corner folds down to the V
+      at(3050, () => setFoldStep(5)); // an unseen quill writes the address
+      at(4900, () => setFoldStep(6)); // the wax seal is pressed on
+      at(5650, () => setFoldStep(7)); // Hedwig sweeps across
+      at(6550, () => setFlight("flying")); // and the letter is simply gone
+      at(7700, () => setFlight("gone"));
     }
   }, [clearFlightTimers, concept]);
 
@@ -220,6 +221,14 @@ export function PaperTelegramPage() {
     const surface = stampSurfaceRef.current;
     if (!surface) return;
 
+    // Old parchment has no perforation: the owl post form is a plain
+    // sheet, so the stamp mask is cleared entirely for that theme.
+    if (concept === "hogwarts") {
+      surface.style.webkitMaskImage = "none";
+      surface.style.maskImage = "none";
+      return;
+    }
+
     function buildPerforationMask() {
       if (!surface) return;
       const w = Math.round(surface.clientWidth);
@@ -268,7 +277,7 @@ export function PaperTelegramPage() {
     const observer = new ResizeObserver(buildPerforationMask);
     observer.observe(surface);
     return () => observer.disconnect();
-  }, []);
+  }, [concept]);
 
   const refreshPrinterStatus = useCallback(async () => {
     try {
@@ -504,7 +513,7 @@ export function PaperTelegramPage() {
   return (
     <div className="page-shell">
       {concept === "hogwarts" &&
-      ((flight === "folding" && foldStep >= 6) || flight === "flying") ? (
+      ((flight === "folding" && foldStep >= 7) || flight === "flying") ? (
         <div className="owl-flyover" aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="owl-f1" src="/owl-top-1.png" alt="" />
@@ -536,11 +545,13 @@ export function PaperTelegramPage() {
       </div>
 
       {hogwarts ? (
-        <div className="candles" aria-hidden="true">
-          {[0, 1, 2, 3, 4].map((i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={i} src="/candle.png" alt="" className={`candle candle-${i}`} />
-          ))}
+        <div className="hogwarts-scene" aria-hidden="true">
+          <div className="night-stars" />
+          <div className="night-mist" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="castle" src="/castle.png" alt="" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="snitch" src="/snitch.png" alt="" />
         </div>
       ) : null}
 
@@ -635,21 +646,22 @@ export function PaperTelegramPage() {
                 <div className="fold-flap env-bottom" />
                 <div className="fold-flap env-top">
                   {concept === "hogwarts" ? (
-                    <>
-                      <div className="env-flap-creases" />
-                      <p className="env-for">
-                        {foldStep >= 4 ? (
-                          <>
-                            <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
-                            <span className="quill-row">{quillLine("The Desk by the Window, Seattle", 620)}</span>
-                          </>
-                        ) : null}
-                      </p>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="env-crest" src="/logo-plane.png" alt="" />
-                    </>
+                    <p className="env-for">
+                      {foldStep >= 5 ? (
+                        <>
+                          <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
+                          <span className="quill-row">{quillLine("The Desk by the Window, Seattle", 620)}</span>
+                        </>
+                      ) : null}
+                    </p>
                   ) : null}
                 </div>
+                {concept === "hogwarts" ? (
+                  <>
+                    <div className="fold-flap env-vl" />
+                    <div className="fold-flap env-vr" />
+                  </>
+                ) : null}
                 <div className={`env-face${concept === "hogwarts" ? " hogwarts" : ""}`}>
                   {concept === "airmail" ? (
                     <>

@@ -1042,7 +1042,7 @@ export function PaperTelegramPage() {
           <li>
             <span className="flow-number">02</span>
             <h3>The cloud holds it</h3>
-            <p>A small database gives each note a place in line and guards against spam or duplicates.</p>
+            <p>A small database gives each note a place in line, guards against spam, and checks the language is kid-friendly.</p>
             <span className="flow-tech">Supabase queue</span>
           </li>
           <li>

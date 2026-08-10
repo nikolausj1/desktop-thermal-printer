@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-09
-version: 4.4
+version: 4.5
 author: Claude Fable 5 (claude-fable-5)
 tags:
 ---
@@ -33,8 +33,8 @@ MVP / Paper Telegram redesign
 ## Next Up
 
 1. Send a first real telegram through `https://papertelegram.com` and physically confirm the print.
-2. Refresh the social card and favicon to the new navy paper-plane identity.
-3. Decide whether recipient should become a first-class queue field and a dedicated heading on the physical receipt. Any Windows worker change still requires explicit approval.
+2. Build the approved receipt upgrade: recipient and theme as first-class queue fields, worker prints "Message For" small over the kid's name big, theme identifiable on the receipt. Justin approved the NUC worker deployment for this on 2026-08-09 (rollout DB then cloud API then worker then site, each step backward compatible).
+3. Build the approved dashboard and notifications: a secret-key /dash page on papertelegram.com listing all messages, plus Supabase webhooks into Home Assistant pushing to Justin's phone on every successful print, failure, and held-for-review.
 4. Reset the Supabase database password when convenient.
 
 ## Biggest Risk

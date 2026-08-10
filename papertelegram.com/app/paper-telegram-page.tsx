@@ -67,6 +67,7 @@ export function PaperTelegramPage() {
   const [returning, setReturning] = useState(false);
   const [demoAvailable, setDemoAvailable] = useState(false);
   const [concept, setConcept] = useState<DelighterConcept>("plane");
+  const [typedCount, setTypedCount] = useState(0);
 
   const pickConcept = useCallback((next: DelighterConcept) => {
     setConcept(next);
@@ -103,6 +104,7 @@ export function PaperTelegramPage() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     clearFlightTimers();
     setFoldStep(0);
+    setTypedCount(0);
     setFlight("folding");
     const at = (ms: number, fn: () => void) =>
       flightTimers.current.push(window.setTimeout(fn, ms));
@@ -144,6 +146,23 @@ export function PaperTelegramPage() {
     setReturning(true);
     flightTimers.current.push(window.setTimeout(() => setReturning(false), 700));
   }, [clearFlightTimers]);
+
+  const typingActive = concept === "airmail" && flight === "folding" && foldStep >= 4;
+  const addressLine1 = `To: ${recipient || "Vinny & Chase"}`;
+  const addressLine2 = "A desk in Seattle";
+
+  useEffect(() => {
+    if (!typingActive) return;
+    // Time-based so throttled background timers still land every letter.
+    const start = performance.now();
+    const total = addressLine1.length + 4 + addressLine2.length;
+    const id = window.setInterval(() => {
+      const n = Math.min(total, Math.floor((performance.now() - start) / 85));
+      setTypedCount(n);
+      if (n >= total) window.clearInterval(id);
+    }, 60);
+    return () => window.clearInterval(id);
+  }, [typingActive, addressLine1, addressLine2]);
 
   useEffect(() => clearFlightTimers, [clearFlightTimers]);
 
@@ -500,20 +519,6 @@ export function PaperTelegramPage() {
     </>
   );
 
-  // And as struck typewriter characters for the airmail envelope.
-  const typeLine = (text: string, baseDelayMs: number) => (
-    <>
-      {[...text].map((ch, i) => (
-        <span
-          key={`${i}-${ch}`}
-          className="type-char"
-          style={{ animationDelay: `${baseDelayMs + i * 85}ms` }}
-        >
-          {ch === " " ? " " : ch}
-        </span>
-      ))}
-    </>
-  );
 
   const recipientError = showErrors && !recipientValid ? "Choose Vinny or Chase." : "";
   const nameError = showErrors && !nameValid ? "Use 30 characters or fewer." : "";
@@ -697,12 +702,10 @@ export function PaperTelegramPage() {
                         <img src="/logo-plane.png" alt="" />
                       </div>
                       <p className="env-address">
-                        {foldStep >= 4 ? (
-                          <>
-                            <span>{typeLine(`To: ${recipient || "Vinny & Chase"}`, 0)}</span>
-                            <span>{typeLine("A desk in Seattle", 1750)}</span>
-                          </>
-                        ) : null}
+                        <span>{addressLine1.slice(0, Math.min(typedCount, addressLine1.length))}</span>
+                        <span>
+                          {addressLine2.slice(0, Math.max(0, typedCount - addressLine1.length - 4))}
+                        </span>
                       </p>
                       <span className="env-rubber-stamp" aria-hidden="true">
                         <svg viewBox="0 0 100 100">

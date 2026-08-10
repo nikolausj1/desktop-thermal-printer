@@ -182,6 +182,11 @@ Deno.serve(async (request) => {
     const message = normalizeMessage(body.message);
     const moderation = message.ok ? moderateMessage(message.value) : message;
     const idempotencyKey = typeof body.idempotencyKey === "string" ? body.idempotencyKey : "";
+    // Optional first-class fields; anything unrecognized is stored as null
+    // rather than rejected so older clients keep working.
+    const recipient =
+      body.recipient === "Vinny" || body.recipient === "Chase" ? body.recipient : null;
+    const theme = body.theme === "airmail" || body.theme === "owl-post" ? body.theme : null;
 
     if (
       !name.ok ||
@@ -206,7 +211,7 @@ Deno.serve(async (request) => {
     );
     const location = await lookupApproximateLocation(ipAddress);
 
-    const { data, error } = await supabase.rpc("submit_public_message_v2", {
+    const { data, error } = await supabase.rpc("submit_public_message_v3", {
       p_printer_id: "desk-rp820",
       p_sender_name: name.value || null,
       p_message_text: message.value,
@@ -222,6 +227,8 @@ Deno.serve(async (request) => {
       p_location_country_code: location?.countryCode || null,
       p_location_label: location?.label || null,
       p_hold_for_review: publicApiMode !== "live",
+      p_recipient: recipient,
+      p_theme: theme,
     });
 
     if (error) {

@@ -1,0 +1,184 @@
+/* Admin dashboard styles. Scoped to /dash — not merged into globals.css. */
+
+.dash-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 48px) 20px clamp(48px, 8vw, 80px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dash-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(248, 245, 236, 0.18);
+}
+
+.dash-header h1 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(24px, 4vw, 32px);
+  margin: 0;
+  color: var(--white-text);
+}
+
+.dash-summary {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--white-text-soft);
+  margin: 0;
+}
+
+.dash-summary strong {
+  color: var(--white-text);
+}
+
+.dash-summary-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 2px 4px 2px 0;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 245, 236, 0.25);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dash-empty {
+  font-family: var(--mono);
+  color: var(--white-text-soft);
+}
+
+.dash-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dash-card {
+  background: rgba(21, 49, 90, 0.55);
+  border: 1px solid rgba(248, 245, 236, 0.14);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--white-text-soft);
+}
+
+.dash-seq {
+  color: var(--white-text-faint);
+}
+
+.dash-time {
+  flex: 1 1 auto;
+}
+
+.dash-status {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.dash-status-printed {
+  color: var(--green);
+  border-color: var(--green);
+  background: rgba(63, 174, 98, 0.12);
+}
+
+.dash-status-failed {
+  color: var(--red);
+  border-color: var(--red);
+  background: rgba(217, 67, 57, 0.12);
+}
+
+.dash-status-held {
+  color: var(--amber);
+  border-color: var(--amber);
+  background: rgba(232, 179, 63, 0.12);
+}
+
+.dash-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--white-text-soft);
+}
+
+.dash-message-text {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--white-text);
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.dash-failure {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--red);
+  margin: 0;
+}
+
+.dash-origin {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--white-text-faint);
+  margin: 0;
+}
+
+/* On wider screens, tighten the card into a table-ish row: the top line
+   (sequence / time / status) and meta line sit side by side instead of
+   stacking, while the message text still gets its own full-width line. */
+@media (min-width: 720px) {
+  .dash-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "top top top"
+      "meta meta meta"
+      "text text text"
+      "extra extra extra";
+    align-items: center;
+  }
+
+  .dash-card-top {
+    grid-area: top;
+  }
+
+  .dash-card-meta {
+    grid-area: meta;
+  }
+
+  .dash-message-text {
+    grid-area: text;
+  }
+
+  .dash-failure,
+  .dash-origin {
+    grid-area: extra;
+  }
+}

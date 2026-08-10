@@ -13,6 +13,12 @@ type FeedbackState = "progress" | "success" | "error";
 type FlightPhase = "idle" | "folding" | "flying" | "gone";
 type DelighterConcept = "plane" | "airmail" | "hogwarts";
 
+// The plane concept's fold never met the bar, so it is not offered.
+const THEME_OPTIONS = [
+  ["airmail", "✉ Airmail"],
+  ["hogwarts", "🦉 Owl post"],
+] as const;
+
 type PrinterStatus = {
   state: string;
   acceptingMessages: boolean;
@@ -56,7 +62,6 @@ export function PaperTelegramPage() {
   const [message, setMessage] = useState("");
   const [website, setWebsite] = useState("");
   const [receiptDate, setReceiptDate] = useState("");
-  const [stampYear, setStampYear] = useState("");
   const [printerStatus, setPrinterStatus] = useState<PrinterStatus>(initialStatus);
   const [submitting, setSubmitting] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Send this telegram");
@@ -66,7 +71,8 @@ export function PaperTelegramPage() {
   const [foldStep, setFoldStep] = useState(0);
   const [returning, setReturning] = useState(false);
   const [demoAvailable, setDemoAvailable] = useState(false);
-  const [concept, setConcept] = useState<DelighterConcept>("plane");
+  const [concept, setConcept] = useState<DelighterConcept>("airmail");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [typedCount, setTypedCount] = useState(0);
 
   const pickConcept = useCallback((next: DelighterConcept) => {
@@ -189,7 +195,7 @@ export function PaperTelegramPage() {
       setDemoAvailable(true);
       try {
         const saved = localStorage.getItem("pt-delighter-concept");
-        if (saved === "plane" || saved === "airmail" || saved === "hogwarts") {
+        if (saved === "airmail" || saved === "hogwarts") {
           setConcept(saved);
         }
       } catch {
@@ -343,7 +349,6 @@ export function PaperTelegramPage() {
         .format(now)
         .toUpperCase(),
     );
-    setStampYear(String(now.getFullYear()));
     void refreshPrinterStatus();
     const timer = window.setInterval(() => {
       if (!submitting) void refreshPrinterStatus();
@@ -559,14 +564,11 @@ export function PaperTelegramPage() {
         </div>
       ) : null}
 
-      <div className="concept-switch" role="group" aria-label="How your message travels">
-        {(
-          [
-            ["plane", "✈ Plane"],
-            ["airmail", "✉ Airmail"],
-            ["hogwarts", "🦉 Owl post"],
-          ] as const
-        ).map(([key, label]) => (
+      <div className="concept-switch" role="group" aria-label="Theme">
+        <span className="switch-label" aria-hidden="true">
+          Theme
+        </span>
+        {THEME_OPTIONS.map(([key, label]) => (
           <button
             key={key}
             type="button"
@@ -579,6 +581,39 @@ export function PaperTelegramPage() {
             {label}
           </button>
         ))}
+      </div>
+
+      <div className="theme-menu">
+        <button
+          type="button"
+          className="theme-menu-toggle"
+          aria-expanded={menuOpen}
+          aria-label="Choose a theme"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          ☰
+        </button>
+        {menuOpen ? (
+          <div className="theme-menu-panel" role="group" aria-label="Theme">
+            <span className="switch-label" aria-hidden="true">
+              Theme
+            </span>
+            {THEME_OPTIONS.map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={concept === key}
+                onClick={() => {
+                  pickConcept(key);
+                  bringFormBack();
+                  setMenuOpen(false);
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
 
@@ -600,8 +635,7 @@ export function PaperTelegramPage() {
         <section className="hero-col" aria-labelledby="page-title">
           <p className="brandline">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-plane-white.png" alt="" />
-            Paper Telegram
+            <img src="/wordmark.png" alt="Paper Telegram" />
           </p>
           <p className="eyebrow">
             {hogwarts ? "A real letter, by owl post" : "A real message, on real paper"}
@@ -628,7 +662,7 @@ export function PaperTelegramPage() {
             <span className="status-dot" aria-hidden="true" />
             <span className="status-text">
               <strong>
-                {hogwarts && printerStatus.state === "online" ? "The owl post is open" : printerStatus.label}
+                {printerStatus.state === "online" ? "Telegram Printer Online" : printerStatus.label}
               </strong>
               <small>
                 {hogwarts && printerStatus.state === "online"
@@ -782,21 +816,6 @@ export function PaperTelegramPage() {
               }${flight === "gone" ? " folded" : ""}${returning ? " unfolding" : ""}`}
             >
               <div className="stamp-surface" ref={stampSurfaceRef}>
-                <span className="stamp-corner tl" aria-hidden="true">
-                  {hogwarts ? (
-                    <>
-                      9¾<small>Platform</small>
-                    </>
-                  ) : (
-                    <>
-                      1<small>Smile</small>
-                    </>
-                  )}
-                </span>
-                <span className="stamp-corner tr" aria-hidden="true">
-                  {stampYear}
-                </span>
-
                 <div className="stripe-frame">
                   <div className="stripe-edge stripe-top" aria-hidden="true" />
                   <div className="stripe-edge stripe-bottom" aria-hidden="true" />
@@ -988,6 +1007,11 @@ export function PaperTelegramPage() {
               </div>
             </div>
           </div>
+
+          <p className="made-by">
+            Built by their dad.
+            <br />A fun nostalgic printer for two wonderful kids.
+          </p>
         </section>
       </main>
 
@@ -995,38 +1019,39 @@ export function PaperTelegramPage() {
         <div className="story-intro">
           <div>
             <p className="story-eyebrow">The idea</p>
-            <h2 id="story-title">A little message machine for Vinny and Chase</h2>
+            <h2 id="story-title">Turning an old printer into a fun weekend project</h2>
           </div>
           <p className="story-lede">
-            Most messages disappear into an inbox. Paper Telegram turns a few words from someone
-            they know into something Vinny or Chase can pick up, read, and keep.
+            I found an old thermal printer that had an Ethernet port, so I wondered if I could hook
+            it up to the internet so my kids could receive printed messages from their friends and
+            family.
           </p>
         </div>
 
         <ol className="system-flow" aria-label="How a paper telegram reaches the printer">
           <li>
             <span className="flow-number">01</span>
-            <h3>Pick who gets it</h3>
-            <p>Choose Vinny or Chase so the message machine knows who the telegram belongs to.</p>
-            <span className="flow-tech">Address it</span>
+            <h3>The page checks in</h3>
+            <p>Before accepting a note, the site confirms that the printer is online and ready.</p>
+            <span className="flow-tech">Browser</span>
           </li>
           <li>
             <span className="flow-number">02</span>
-            <h3>Write a quick note</h3>
-            <p>Send a hello, a joke, a riddle, or a few words you want them to remember.</p>
-            <span className="flow-tech">Type it</span>
+            <h3>The cloud holds it</h3>
+            <p>A small database gives each note a place in line and guards against spam or duplicates.</p>
+            <span className="flow-tech">Supabase queue</span>
           </li>
           <li>
             <span className="flow-number">03</span>
-            <h3>The internet carries it</h3>
-            <p>The telegram waits safely in the cloud until the printer at our house is ready.</p>
-            <span className="flow-tech">Deliver it</span>
+            <h3>My server picks it up</h3>
+            <p>An always-on computer in my house securely asks the cloud for the next message.</p>
+            <span className="flow-tech">Node.js worker</span>
           </li>
           <li>
             <span className="flow-number">04</span>
-            <h3>The machine makes it real</h3>
-            <p>A small printer wakes up, puts the message on paper, and cuts the telegram.</p>
-            <span className="flow-tech">Keep it</span>
+            <h3>The printer makes it real</h3>
+            <p>The computer sends printer commands across my home network, then cuts the receipt.</p>
+            <span className="flow-tech">ESC/POS + Ethernet</span>
           </li>
         </ol>
 
@@ -1076,8 +1101,8 @@ export function PaperTelegramPage() {
       </section>
 
       <footer className="site-footer">
-        <p>papertelegram.com &middot; a tiny press for two kids</p>
-        <p>Built by their dad, with an unreasonable amount of infrastructure for a tiny printer.</p>
+        <p>A weekend project with an unreasonable amount of infrastructure for a tiny printer.</p>
+        <p>papertelegram.com</p>
       </footer>
     </div>
   );

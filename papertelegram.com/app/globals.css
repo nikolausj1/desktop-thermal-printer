@@ -83,7 +83,8 @@ img { max-width: 100%; display: block; }
     grid-template-columns: minmax(0, 1fr) minmax(380px, 480px);
     align-items: center;
     gap: clamp(32px, 5vw, 64px);
-    padding-top: clamp(48px, 7vw, 72px);
+    /* Extra room so the form does not crowd the fixed theme control. */
+    padding-top: clamp(76px, 9vw, 104px);
   }
 }
 
@@ -102,7 +103,7 @@ img { max-width: 100%; display: block; }
   margin: 0 0 22px;
 }
 
-.brandline img { width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; }
+.brandline img { width: min(240px, 62vw); height: auto; }
 
 .eyebrow {
   font-family: var(--mono);
@@ -216,7 +217,18 @@ h1 {
   position: relative;
   z-index: 2;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.made-by {
+  margin: 24px 0 0;
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--white-text-soft);
 }
 
 .stamp-stage { width: 100%; max-width: 440px; }
@@ -234,45 +246,12 @@ h1 {
   position: relative;
   background-color: var(--paper);
   color: var(--ink);
-  padding: 42px 14px 14px;
+  padding: 18px 14px 14px;
   /* The perforation mask itself is set inline as a data-URI SVG by the
      page script, because Safari ignores mask-image references to inline
      SVG mask elements. */
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-}
-
-.stamp-corner {
-  position: absolute;
-  top: 14px;
-  z-index: 3;
-  font-family: var(--mono);
-  line-height: 1.05;
-  color: var(--ink-soft);
-}
-
-.stamp-corner.tl {
-  left: 16px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.stamp-corner.tl small {
-  display: block;
-  font-size: 8px;
-  letter-spacing: 0.16em;
-  font-weight: 700;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
-.stamp-corner.tr {
-  right: 16px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  opacity: 0.85;
 }
 
 /* ---------- Striped engraved frame, mitered corners ---------- */
@@ -668,7 +647,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 }
 
 @media (min-width: 600px) {
-  .stamp-surface { padding: 46px 16px 16px; }
+  .stamp-surface { padding: 18px 16px 16px; }
   .frame-content { padding: 22px 18px 16px; }
 }
 
@@ -1210,6 +1189,86 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   font-weight: 700;
 }
 
+.switch-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  align-self: center;
+  padding: 0 6px 0 12px;
+  white-space: nowrap;
+}
+
+/* ---------- Mobile theme menu (hamburger, scrolls with the page) ---------- */
+.theme-menu {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 60;
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.theme-menu-toggle {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(8, 16, 28, 0.88);
+  color: #cfe0f2;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.theme-menu-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(8, 16, 28, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 13px;
+  padding: 10px;
+  min-width: 156px;
+  backdrop-filter: blur(8px);
+}
+
+.theme-menu-panel .switch-label {
+  align-self: flex-start;
+  padding: 2px 6px 6px;
+}
+
+.theme-menu-panel button {
+  border: 0;
+  background: transparent;
+  color: #cfe0f2;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.theme-menu-panel button[aria-pressed="true"] {
+  background: #f5f1e6;
+  color: #14304f;
+  font-weight: 700;
+}
+
+@media (max-width: 719px) {
+  .concept-switch { display: none; }
+  .theme-menu { display: flex; }
+}
+
 /* ---------- Owl post: the true envelope fold ---------- */
 /* Corners fold in toward the screen first, the bottom folds up over the
    middle, and the pointed top closes the envelope last. */
@@ -1487,11 +1546,6 @@ body[data-theme="hogwarts"] .status-chip {
   border-color: rgba(232, 193, 90, 0.35);
 }
 
-body[data-theme="hogwarts"] .status-chip[data-state="online"] .status-dot {
-  background: #e8c15a;
-  box-shadow: 0 0 0 0 rgba(232, 193, 90, 0.6);
-}
-
 /* The form becomes a parchment letter with a gilded rule. */
 body[data-theme="hogwarts"] .stamp-surface {
   background:
@@ -1509,7 +1563,6 @@ body[data-theme="hogwarts"] .frame-content {
   border-radius: 2px;
 }
 
-body[data-theme="hogwarts"] .stamp-corner,
 body[data-theme="hogwarts"] .meta-row,
 body[data-theme="hogwarts"] legend,
 body[data-theme="hogwarts"] .field-label-row label,
@@ -1599,6 +1652,24 @@ body[data-theme="hogwarts"] .concept-switch button[aria-pressed="true"] {
   background: #e8c15a;
   color: #2a1a08;
 }
+
+body[data-theme="hogwarts"] .switch-label { color: rgba(232, 193, 90, 0.65); }
+
+body[data-theme="hogwarts"] .theme-menu-toggle,
+body[data-theme="hogwarts"] .theme-menu-panel {
+  background: rgba(26, 17, 9, 0.92);
+  border-color: rgba(232, 193, 90, 0.4);
+  color: #d9b96a;
+}
+
+body[data-theme="hogwarts"] .theme-menu-panel button { color: #d9b96a; }
+
+body[data-theme="hogwarts"] .theme-menu-panel button[aria-pressed="true"] {
+  background: #e8c15a;
+  color: #2a1a08;
+}
+
+body[data-theme="hogwarts"] .made-by { color: #d9c9a1; }
 
 /* Floating candles drift above the page. */
 .candles {

@@ -674,7 +674,7 @@ export function PaperTelegramPage() {
           </p>
           <p className="eyebrow">A real message, on real paper</p>
           <h1 id="page-title">
-            Send Vinny &amp; Chase <span className="h1-line2">a paper telegram.</span>
+            Send Vinny &amp; Chase <span className="h1-line2">a Paper Telegram.</span>
           </h1>
           <p className="lede">
             Type a note here and a tiny printer in their house wakes up and prints it on real

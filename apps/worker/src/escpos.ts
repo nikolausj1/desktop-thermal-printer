@@ -87,9 +87,42 @@ export function buildOriginSummary(
   return `Sent from ${article} ${device}${location ? ` near ${location}` : ""}`;
 }
 
+const RECIPIENT_PREFIX = /^FOR (VINNY|CHASE)\n+/u;
+
+// Messages sent before recipient became a first-class field carry a
+// "FOR CHASE" first line instead. Either way the receipt gets the
+// dedicated header and the prefix never prints twice.
+export function resolveRecipient(job: PrintJob): {
+  recipient: string | null;
+  messageText: string;
+} {
+  if (job.recipient) {
+    return { recipient: job.recipient, messageText: job.messageText };
+  }
+  const match = job.messageText.match(RECIPIENT_PREFIX);
+  const name = match?.[1];
+  if (match && name) {
+    return {
+      recipient: name.charAt(0) + name.slice(1).toLowerCase(),
+      messageText: job.messageText.slice(match[0].length),
+    };
+  }
+  return { recipient: null, messageText: job.messageText };
+}
+
+function footerLabel(theme: string | null | undefined): string {
+  if (theme === "owl-post") return "SENT BY OWL POST";
+  if (theme === "airmail") return "SENT BY AIRMAIL";
+  return "SENT FROM THE INTERNET";
+}
+
 export function buildMessageReceipt(job: PrintJob, timezone: string): Buffer {
   const sender = sanitizeReceiptText(job.senderName || "ANONYMOUS").slice(0, 30);
-  const message = sanitizeReceiptText(job.messageText);
+  const resolved = resolveRecipient(job);
+  const recipient = resolved.recipient
+    ? sanitizeReceiptText(resolved.recipient).slice(0, 10).toUpperCase()
+    : null;
+  const message = sanitizeReceiptText(resolved.messageText);
   const originSummary = buildOriginSummary(job.deviceLabel, job.locationLabel);
   if (!message) {
     throw new Error("Message is empty after receipt sanitization.");
@@ -101,10 +134,26 @@ export function buildMessageReceipt(job: PrintJob, timezone: string): Buffer {
     command(ESC, 0x4d, 0x00),
     command(ESC, 0x61, 0x01),
     command(ESC, 0x45, 0x01),
-    command(GS, 0x21, 0x11),
-    line("MESSAGE"),
-    command(GS, 0x21, 0x00),
-    line("FROM THE INTERNET"),
+  ];
+
+  if (recipient) {
+    // Small line over the big name, so the kids see whose it is first.
+    chunks.push(
+      line("MESSAGE FOR"),
+      command(GS, 0x21, 0x11),
+      line(recipient),
+      command(GS, 0x21, 0x00),
+    );
+  } else {
+    chunks.push(
+      command(GS, 0x21, 0x11),
+      line("MESSAGE"),
+      command(GS, 0x21, 0x00),
+      line("FROM THE INTERNET"),
+    );
+  }
+
+  chunks.push(
     command(ESC, 0x45, 0x00),
     line(),
     command(ESC, 0x61, 0x00),
@@ -112,7 +161,7 @@ export function buildMessageReceipt(job: PrintJob, timezone: string): Buffer {
     command(ESC, 0x45, 0x01),
     line(`FROM: ${sender}`),
     command(ESC, 0x45, 0x00),
-  ];
+  );
 
   if (originSummary) {
     for (const wrappedLine of wrapReceiptText(originSummary)) {
@@ -134,7 +183,7 @@ export function buildMessageReceipt(job: PrintJob, timezone: string): Buffer {
     line(),
     command(ESC, 0x61, 0x01),
     command(ESC, 0x45, 0x01),
-    line("SENT FROM THE INTERNET"),
+    line(footerLabel(job.theme)),
     command(ESC, 0x45, 0x00),
     command(ESC, 0x64, 0x05),
     command(GS, 0x56, 0x00),

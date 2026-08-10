@@ -10,6 +10,8 @@ export interface PrintJob {
   expiresAt: string;
   deviceLabel: string | null;
   locationLabel: string | null;
+  recipient?: string | null;
+  theme?: string | null;
 }
 
 export interface PrinterHealth {

@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-09
-version: 4.6
+version: 4.7
 author: Claude Fable 5 (claude-fable-5)
 tags:
 ---
@@ -29,6 +29,8 @@ MVP / Paper Telegram redesign
       - unblocks: trusting the printed/failed/held pushes going forward; a test notification for Vinny from "Notification Test" was sent 2026-08-09 evening
 - [ ] **Confirm on an iPhone that the stamp perforation now renders** (1 min)
       - unblocks: closing out the Safari mask bug found on mobile
+- [ ] **Flip the Web Analytics toggle on in the Vercel dashboard** (30 sec)
+      - unblocks: visitor, referrer, and country data starting to collect; the tracking code is already deployed and waiting, and there is no API to enable it, so this is dashboard-only: `https://vercel.com/justins-projects-a7ab9790/papertelegram/settings/analytics`
 
 ## Next Up
 
@@ -51,6 +53,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - **(M) Twilio SMS as a second input channel** - the PRD was explicitly architected for this, and the Build Guide now carries the hard-won A2P approval lessons from FourSome, so it starts three weeks ahead.
 - **(S) Dedicated Chase/Vinny receipt heading** - promote recipient to a first-class queue field and print it prominently above the telegram.
 - **(L) QR code for Justin to reply** - closes the loop from one-way novelty into an actual exchange.
+- **(M) Cross-project traffic dashboard** - one page showing visitors, referrers, and countries for every site in the portfolio side by side, so Paper Telegram's traffic sits next to Practical AI and Seattle Patio Vibes instead of living in separate Vercel tabs. Vercel exposes per-project Web Analytics through its API, so this could be a single page (or an Oracle dashboard panel) that polls each project and renders one table plus sparklines. Worth raising with Oracle, since the natural home may be the portfolio dashboard rather than this project.
 
 ## Notes
 

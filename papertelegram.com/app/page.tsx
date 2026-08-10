@@ -12,8 +12,8 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   if (!owl) return {};
   return {
     openGraph: {
-      title: "Send Vinny & Chase a letter by owl",
-      description: "A real printer. A real piece of paper. A letter delivered by owl.",
+      title: "Send Vinny & Chase a Paper Telegram",
+      description: "A real printer. A real piece of paper. A message just for them.",
       type: "website",
       url: "/?theme=owl-post",
       images: [
@@ -27,8 +27,8 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     },
     twitter: {
       card: "summary_large_image",
-      title: "Send Vinny & Chase a letter by owl",
-      description: "A real printer. A real piece of paper. A letter delivered by owl.",
+      title: "Send Vinny & Chase a Paper Telegram",
+      description: "A real printer. A real piece of paper. A message just for them.",
       images: ["/og-owl.png"],
     },
   };

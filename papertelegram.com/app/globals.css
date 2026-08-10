@@ -1315,7 +1315,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 [data-concept="hogwarts"] .wax-seal { top: 49%; width: 76px; height: 76px; }
 
 [data-concept="hogwarts"] .env-for {
-  top: 20.5%;
+  top: 23.5%;
   left: 0;
   right: 0;
   text-align: center;
@@ -1330,7 +1330,15 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   margin-bottom: 2px;
 }
 
-[data-concept="hogwarts"] .env-for .quill-row:last-child { font-size: 14px; }
+[data-concept="hogwarts"] .env-for-addr {
+  top: 45%;
+  font-size: 14px;
+}
+
+[data-concept="hogwarts"] .env-for-addr .quill-row:first-child {
+  font-size: 14px;
+  margin-bottom: 0;
+}
 
 .env-for { position: absolute; z-index: 3; margin: 0; }
 

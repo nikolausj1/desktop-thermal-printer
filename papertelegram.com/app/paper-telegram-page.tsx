@@ -679,10 +679,12 @@ export function PaperTelegramPage() {
                     <div className="fold-flap hw-point" />
                     <p className="env-for">
                       {foldStep >= 5 ? (
-                        <>
-                          <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
-                          <span className="quill-row">{quillLine("The Desk by the Window, Seattle", 620)}</span>
-                        </>
+                        <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
+                      ) : null}
+                    </p>
+                    <p className="env-for env-for-addr">
+                      {foldStep >= 5 ? (
+                        <span className="quill-row">{quillLine("The Desk by the Window, Seattle", 620)}</span>
                       ) : null}
                     </p>
                   </>

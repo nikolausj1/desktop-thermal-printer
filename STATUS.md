@@ -29,8 +29,8 @@ MVP / Paper Telegram redesign
       - unblocks: trusting the printed/failed/held pushes going forward; a test notification for Vinny from "Notification Test" was sent 2026-08-09 evening
 - [ ] **Confirm on an iPhone that the stamp perforation now renders** (1 min)
       - unblocks: closing out the Safari mask bug found on mobile
-- [ ] **Flip the Web Analytics toggle on in the Vercel dashboard** (30 sec)
-      - unblocks: visitor, referrer, and country data starting to collect; the tracking code is already deployed and waiting, and there is no API to enable it, so this is dashboard-only: `https://vercel.com/justins-projects-a7ab9790/papertelegram/settings/analytics`
+- [ ] **Click Enable on the Vercel Analytics tab, then tell Claude to redeploy** (1 min)
+      - unblocks: visitor, referrer, and country data starting to collect; the tracking code is already deployed, but Vercel only adds the collection routes on the deployment *after* enabling. Enable at `https://vercel.com/justins-projects-a7ab9790/papertelegram/analytics` (Analytics in the sidebar, Enable button in the header). There is no API for this, so it is dashboard-only.
 
 ## Next Up
 

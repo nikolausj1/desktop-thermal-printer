@@ -674,18 +674,17 @@ export function PaperTelegramPage() {
                   <>
                     <div className="fold-flap hw-c1" />
                     <div className="fold-flap hw-c2" />
-                    <div className="fold-flap hw-bottom">
-                      <p className="env-for">
-                        {foldStep >= 5 ? (
-                          <>
-                            <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
-                            <span className="quill-row">{quillLine("The Desk by the Window, Seattle", 620)}</span>
-                          </>
-                        ) : null}
-                      </p>
-                    </div>
+                    <div className="fold-flap hw-bottom" />
                     <div className="hw-vshadow" />
                     <div className="fold-flap hw-point" />
+                    <p className="env-for">
+                      {foldStep >= 5 ? (
+                        <>
+                          <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
+                          <span className="quill-row">{quillLine("The Desk by the Window, Seattle", 620)}</span>
+                        </>
+                      ) : null}
+                    </p>
                   </>
                 )}
                 <div className={`env-face${concept === "hogwarts" ? " hogwarts" : ""}`}>
@@ -703,7 +702,22 @@ export function PaperTelegramPage() {
                           </>
                         ) : null}
                       </p>
-                      <span className="env-rubber-stamp"><span>Paper</span><span>Telegram</span></span>
+                      <span className="env-rubber-stamp" aria-hidden="true">
+                        <svg viewBox="0 0 100 100">
+                          <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" strokeWidth="2.6" />
+                          <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                          <defs>
+                            <path id="pmTopArc" d="M9,50 A41,41 0 1,1 91,50" fill="none" />
+                          </defs>
+                          <text fontSize="10" fontWeight="800" letterSpacing="2.4" fill="currentColor">
+                            <textPath href="#pmTopArc" startOffset="50%" textAnchor="middle">PAPER TELEGRAM</textPath>
+                          </text>
+                          <text x="7" y="54" fontSize="9" fill="currentColor">★</text>
+                          <text x="86" y="54" fontSize="9" fill="currentColor">★</text>
+                          <text x="50" y="48" textAnchor="middle" fontSize="8" fontWeight="700" letterSpacing="1.2" fill="currentColor">SEATTLE WA</text>
+                          <text x="50" y="61" textAnchor="middle" fontSize="9.5" fontWeight="800" letterSpacing="0.6" fill="currentColor">{receiptDate}</text>
+                        </svg>
+                      </span>
                     </>
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element

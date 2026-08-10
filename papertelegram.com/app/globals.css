@@ -91,6 +91,17 @@ img { max-width: 100%; display: block; }
 /* ---------- Hero copy (left column) ---------- */
 .hero-col { position: relative; z-index: 2; text-align: left; }
 
+/* When the layout stacks, the copy centers to match the centered form. */
+@media (max-width: 959px) {
+  .hero-col { text-align: center; }
+  .hero-col h1,
+  .hero-col .lede,
+  .hero-col .nostalgia {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 .brandline {
   display: inline-flex;
   align-items: center;

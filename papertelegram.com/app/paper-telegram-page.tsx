@@ -774,7 +774,7 @@ export function PaperTelegramPage() {
                     </p>
                     <p className="env-for env-for-addr">
                       {foldStep >= 5 ? (
-                        <span className="quill-row">{quillLine("Their house in Seattle", 620)}</span>
+                        <span className="quill-row">{quillLine("The printer under the stairs", 620)}</span>
                       ) : null}
                     </p>
                   </>

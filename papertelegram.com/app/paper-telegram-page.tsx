@@ -868,7 +868,7 @@ export function PaperTelegramPage() {
                           type="text"
                           maxLength={30}
                           autoComplete="name"
-                          placeholder="Harry Potter"
+                          placeholder={hogwarts ? "Harry Potter" : "Amelia Earhart"}
                           value={name}
                           onChange={(event) => setName(event.target.value)}
                           aria-describedby="name-help name-error"
@@ -1008,12 +1008,13 @@ export function PaperTelegramPage() {
             </div>
           </div>
 
-          <p className="made-by">
-            Built by their dad.
-            <br />A fun nostalgic printer for two wonderful kids.
-          </p>
         </section>
       </main>
+
+      <p className="made-by">
+        Built by their dad.
+        <br />A fun nostalgic printer for two wonderful kids.
+      </p>
 
       <section className="project-story" aria-labelledby="story-title">
         <div className="story-intro">

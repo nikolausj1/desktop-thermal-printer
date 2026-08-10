@@ -91,12 +91,12 @@ img { max-width: 100%; display: block; }
 /* ---------- Hero copy (left column) ---------- */
 .hero-col { position: relative; z-index: 2; text-align: left; }
 
-/* When the layout stacks, the copy centers to match the centered form. */
+/* When the layout stacks, the copy stays left-aligned but its left edge
+   lines up with the centered form's left edge. */
 @media (max-width: 959px) {
-  .hero-col { text-align: center; }
-  .hero-col h1,
-  .hero-col .lede,
-  .hero-col .nostalgia {
+  .hero-col {
+    width: 100%;
+    max-width: 440px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -122,7 +122,7 @@ img { max-width: 100%; display: block; }
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #ff9d86;
+  color: var(--amber);
   margin: 0 0 14px;
 }
 
@@ -232,8 +232,12 @@ h1 {
   align-items: center;
 }
 
+/* Centered on the full page width, with room before the story rule. */
 .made-by {
-  margin: 24px 0 0;
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  padding: 0 20px clamp(44px, 7vw, 64px);
   text-align: center;
   font-family: var(--serif);
   font-style: italic;
@@ -668,7 +672,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   bottom: 16px;
   right: 16px;
   z-index: 50;
-  background: #ff9d86;
+  background: var(--amber);
   color: #10253f;
   border: none;
   border-radius: 999px;
@@ -681,7 +685,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   box-shadow: 0 10px 26px rgba(4, 12, 26, 0.5);
 }
 
-.demo-button:hover { background: #ffb3a0; }
+.demo-button:hover { background: #f0c766; }
 
 /* ---------- Fold-and-fly delighter ---------- */
 .stamp-stage { position: relative; perspective: 1200px; }
@@ -2037,7 +2041,7 @@ body[data-theme="hogwarts"] .made-by { color: #d9c9a1; }
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #ff9d86;
+  color: var(--amber);
   margin: 0 0 10px;
 }
 
@@ -2114,7 +2118,7 @@ body[data-theme="hogwarts"] .made-by { color: #d9c9a1; }
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #ff9d86;
+  color: var(--amber);
 }
 
 .build-story {

@@ -120,9 +120,9 @@ export function PaperTelegramPage() {
       at(1050, () => setFoldStep(2)); // top third folds down over it
       at(1750, () => setFoldStep(3)); // the folded letter settles
       at(2350, () => setFoldStep(4)); // the address types on
-      at(4200, () => setFoldStep(5)); // the rubber stamp slams down
-      at(5000, () => setFlight("flying")); // and off it goes
-      at(6100, () => setFlight("gone"));
+      at(5900, () => setFoldStep(5)); // the rubber stamp slams down
+      at(6750, () => setFlight("flying")); // and off it goes
+      at(7850, () => setFlight("gone"));
     } else {
       at(350, () => setFoldStep(1)); // top-left corner folds in
       at(950, () => setFoldStep(2)); // top-right corner folds in
@@ -507,7 +507,7 @@ export function PaperTelegramPage() {
         <span
           key={`${i}-${ch}`}
           className="type-char"
-          style={{ animationDelay: `${baseDelayMs + i * 52}ms` }}
+          style={{ animationDelay: `${baseDelayMs + i * 85}ms` }}
         >
           {ch === " " ? " " : ch}
         </span>
@@ -548,15 +548,6 @@ export function PaperTelegramPage() {
             <circle cx="48" cy="44" r="0.45" fill="rgba(248,245,236,0.09)" />
             <circle cx="78" cy="31" r="0.45" fill="rgba(248,245,236,0.1)" />
             <circle cx="62" cy="40" r="0.4" fill="rgba(248,245,236,0.08)" />
-            <path
-              className="route-live"
-              d="M-2,80 Q28,60 52,50 T104,26"
-              pathLength={100}
-              fill="none"
-              stroke="rgba(248,245,236,0.32)"
-              strokeWidth="0.28"
-              strokeDasharray="1.6 2.2"
-            />
           </svg>
           <div className="cloud-layer cloud-a" />
           <div className="cloud-layer cloud-b" />
@@ -693,6 +684,7 @@ export function PaperTelegramPage() {
                         ) : null}
                       </p>
                     </div>
+                    <div className="hw-vshadow" />
                     <div className="fold-flap hw-point" />
                   </>
                 )}
@@ -707,11 +699,11 @@ export function PaperTelegramPage() {
                         {foldStep >= 4 ? (
                           <>
                             <span>{typeLine(`To: ${recipient || "Vinny & Chase"}`, 0)}</span>
-                            <span>{typeLine("A desk in Seattle", 950)}</span>
+                            <span>{typeLine("A desk in Seattle", 1750)}</span>
                           </>
                         ) : null}
                       </p>
-                      <span className="env-rubber-stamp">Paper Telegram</span>
+                      <span className="env-rubber-stamp"><span>Paper</span><span>Telegram</span></span>
                     </>
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -796,10 +788,6 @@ export function PaperTelegramPage() {
                     <img className="watermark-plane" src="/logo-plane.png" alt="" aria-hidden="true" />
 
                     <form className="telegram" onSubmit={submitTelegram} noValidate>
-                      <div className="meta-row" aria-hidden="true">
-                        <span>PT / MESSAGE 01</span>
-                        <span>48 COL</span>
-                      </div>
 
                       <div className="heading-block">
                         <span className="kicker">{hogwarts ? "Owl Post Service" : "Paper Telegram"}</span>
@@ -934,8 +922,6 @@ export function PaperTelegramPage() {
                         <span>{receiptDate}</span>
                       </div>
                     </form>
-
-                    <p className="frame-caption">Paper Telegram &middot; Par Avion</p>
                   </div>
                 </div>
 

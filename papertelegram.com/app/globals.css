@@ -103,6 +103,10 @@ img { max-width: 100%; display: block; }
     margin-left: auto;
     margin-right: auto;
   }
+
+  /* The headline breaks as "Send Vinny & Chase" / "a paper telegram." */
+  .hero-col h1 { max-width: none; }
+  .h1-line2 { display: block; }
 }
 
 .brandline {
@@ -1550,6 +1554,12 @@ body[data-theme="hogwarts"] h1 {
   line-height: 1.16;
   color: #f3e3bb;
   text-shadow: 0 2px 22px rgba(232, 193, 90, 0.25);
+}
+
+/* Cinzel runs wide; shrink it when stacked so "Send Vinny & Chase"
+   holds one line above "a paper telegram." */
+@media (max-width: 959px) {
+  body[data-theme="hogwarts"] h1 { font-size: clamp(1.45rem, 5.6vw, 2.2rem); }
 }
 
 body[data-theme="hogwarts"] .brandline { color: #f3e3bb; font-family: var(--font-cinzel), var(--serif); }

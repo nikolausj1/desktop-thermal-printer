@@ -658,7 +658,9 @@ export function PaperTelegramPage() {
             <img src="/wordmark.png" alt="Paper Telegram" />
           </p>
           <p className="eyebrow">A real message, on real paper</p>
-          <h1 id="page-title">Send Vinny &amp; Chase a paper telegram.</h1>
+          <h1 id="page-title">
+            Send Vinny &amp; Chase <span className="h1-line2">a paper telegram.</span>
+          </h1>
           <p className="lede">
             Type a note here and a tiny printer in their house wakes up and prints it on real
             paper. Make plans, tell a joke, or just say hi. It comes out as a real piece of paper
@@ -928,7 +930,7 @@ export function PaperTelegramPage() {
 
                       <button type="submit" className="send-btn" disabled={!canSubmit}>
                         <span>
-                          {hogwarts && buttonLabel === "Send this telegram" ? "Send it by owl" : buttonLabel}
+                          {buttonLabel}
                         </span>
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path

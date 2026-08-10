@@ -263,11 +263,26 @@ export function PaperTelegramPage() {
     const surface = stampSurfaceRef.current;
     if (!surface) return;
 
-    // Old parchment has no perforation: the owl post form is a plain
-    // sheet, so the stamp mask is cleared entirely for that theme.
+    // Owl post has no perforation. Instead the sheet is hand-torn: the
+    // mask displaces a rectangle with fractal noise, so every edge is
+    // irregular the way deckled parchment is. It scales with the sheet,
+    // so unlike the perforation it never needs rebuilding on resize.
     if (concept === "hogwarts") {
-      surface.style.webkitMaskImage = "none";
-      surface.style.maskImage = "none";
+      const torn =
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">` +
+        `<filter id="torn" x="-30%" y="-30%" width="160%" height="160%">` +
+        `<feTurbulence type="fractalNoise" baseFrequency="0.05 0.032" numOctaves="3" seed="11" result="n"/>` +
+        `<feDisplacementMap in="SourceGraphic" in2="n" scale="6.5" xChannelSelector="R" yChannelSelector="G"/>` +
+        `</filter>` +
+        `<rect x="2.5" y="2.5" width="95" height="95" fill="#fff" filter="url(#torn)"/>` +
+        `</svg>`;
+      const tornUri = `url("data:image/svg+xml,${encodeURIComponent(torn)}")`;
+      surface.style.webkitMaskImage = tornUri;
+      surface.style.maskImage = tornUri;
+      surface.style.webkitMaskSize = "100% 100%";
+      surface.style.maskSize = "100% 100%";
+      surface.style.webkitMaskRepeat = "no-repeat";
+      surface.style.maskRepeat = "no-repeat";
       return;
     }
 

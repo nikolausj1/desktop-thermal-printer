@@ -1579,13 +1579,57 @@ body[data-theme="hogwarts"] .status-chip {
   border-color: rgba(232, 193, 90, 0.35);
 }
 
-/* The form becomes a parchment letter with a gilded rule. */
+/* The form becomes a parchment letter with a gilded rule. The sheet is
+   "flecked bone": a pale, faintly cool linen-rag parchment carrying two
+   layers of fibre, soft mottling, and a whisper of a rim. The hand-torn
+   outline is a mask applied inline by the page script. */
 body[data-theme="hogwarts"] .stamp-surface {
-  background:
-    radial-gradient(ellipse 30% 26% at 24% 36%, rgba(150, 106, 38, 0.12), transparent),
-    radial-gradient(ellipse 24% 20% at 74% 70%, rgba(150, 106, 38, 0.1), transparent),
-    linear-gradient(140deg, #f2e4c2, #e9d6a9);
+  background: linear-gradient(136deg, #faf5e8 0%, #f0e8d6 100%);
   color: #3c2a12;
+}
+
+body[data-theme="hogwarts"] .stamp-surface::before,
+body[data-theme="hogwarts"] .stamp-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Soft irregular mottling, the way old paper discolours unevenly. */
+body[data-theme="hogwarts"] .stamp-surface::before {
+  background-image:
+    radial-gradient(ellipse 26% 20% at 20% 22%, rgba(120, 112, 96, 0.05), transparent 70%),
+    radial-gradient(ellipse 22% 26% at 82% 16%, rgba(110, 102, 88, 0.045), transparent 70%),
+    radial-gradient(ellipse 30% 24% at 70% 78%, rgba(120, 112, 96, 0.045), transparent 70%),
+    radial-gradient(ellipse 18% 16% at 12% 82%, rgba(110, 102, 88, 0.04), transparent 70%);
+}
+
+/* Fine grain, sparse coarser flecks, then the faint edge rim. */
+body[data-theme="hogwarts"] .stamp-surface::after {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='gC1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch' result='t'/%3E%3CfeColorMatrix in='t' type='matrix' values='0 0 0 0 0.6 0 0 0 0 0.58 0 0 0 0 0.52 0.26 0.26 0.26 0 0'/%3E%3C/filter%3E%3Crect width='60' height='60' filter='url(%23gC1)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='gC2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.22' numOctaves='2' stitchTiles='stitch' result='t'/%3E%3CfeColorMatrix in='t' type='matrix' values='0 0 0 0 0.5 0 0 0 0 0.47 0 0 0 0 0.4 0.4 0.4 0.4 0 -0.12'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23gC2)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 116% 110% at 50% 48%, transparent 58%, rgba(110, 100, 90, 0.08) 82%, rgba(110, 100, 90, 0.16) 100%);
+  background-size: 60px 60px, 140px 140px, 100% 100%;
+  background-repeat: repeat, repeat, no-repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.48;
+}
+
+/* The form has to sit above the fibre layers, which multiply. */
+body[data-theme="hogwarts"] .stripe-frame {
+  position: relative;
+  z-index: 1;
+}
+
+/* The default hairline ring would draw a crisp rectangle around a sheet
+   whose edges are torn, so the parchment keeps only soft shadows. */
+body[data-theme="hogwarts"] .giant-stamp {
+  box-shadow:
+    0 30px 64px -16px rgba(4, 4, 2, 0.6),
+    0 10px 26px -12px rgba(4, 4, 2, 0.45);
 }
 
 body[data-theme="hogwarts"] .stripe-edge { display: none; }

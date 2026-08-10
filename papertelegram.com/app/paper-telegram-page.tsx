@@ -659,7 +659,8 @@ export function PaperTelegramPage() {
           <h1 id="page-title">Send Vinny &amp; Chase a paper telegram.</h1>
           <p className="lede">
             Type a note here and a tiny printer in their house wakes up and prints it on real
-            paper. No screens on their end, no accounts, no apps. Just a message they can hold.
+            paper. Make plans, tell a joke, or just say hi. It comes out as a real piece of paper
+            they can keep.
           </p>
           <p className="nostalgia">
             For everyone who remembers when getting mail was the best part of the day.

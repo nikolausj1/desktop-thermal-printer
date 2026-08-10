@@ -929,12 +929,10 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 /* ---------- Envelope concepts: airmail and Hogwarts ---------- */
 /* The letter folds in thirds: bottom third up, top third down, leaving
    a landscape band that becomes the envelope face. */
-[data-concept="airmail"][data-step="1"] .giant-stamp.origami,
-[data-concept="hogwarts"][data-step="1"] .giant-stamp.origami {
+[data-concept="airmail"][data-step="1"] .giant-stamp.origami {
   clip-path: polygon(0 0, 100% 0, 100% 66%, 0 66%);
 }
-[data-concept="airmail"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .giant-stamp.origami,
-[data-concept="hogwarts"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"], [data-step="7"]) .giant-stamp.origami {
+[data-concept="airmail"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .giant-stamp.origami {
   clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%);
 }
 
@@ -944,8 +942,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   transform-origin: 50% 66%;
   transform: rotate3d(1, 0, 0, -179deg);
 }
-[data-concept="airmail"]:is([data-step="1"], [data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .env-bottom,
-[data-concept="hogwarts"]:is([data-step="1"], [data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"], [data-step="7"]) .env-bottom {
+[data-concept="airmail"]:is([data-step="1"], [data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .env-bottom {
   opacity: 1;
   animation: env-fold-up 0.55s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
 }
@@ -963,8 +960,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   transform: rotate3d(1, 0, 0, 179deg);
   background: linear-gradient(190deg, #ffffff 0%, #f6f1e4 55%, #eae3d2 100%);
 }
-[data-concept="airmail"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .env-top,
-[data-concept="hogwarts"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"], [data-step="7"]) .env-top {
+[data-concept="airmail"]:is([data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"]) .env-top {
   opacity: 1;
   animation: env-fold-down 0.55s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
 }
@@ -1046,20 +1042,46 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   color: var(--ink);
 }
 
-.env-par-avion {
+/* Typewriter strike: each character lands instantly, with the faint
+   heavy-ink thunk of a struck key. */
+.type-char {
+  opacity: 0;
+  display: inline;
+  animation: type-strike 0.05s steps(1) forwards;
+}
+
+@keyframes type-strike {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* The rubber stamp slams down lower-left once the address is typed. */
+.env-rubber-stamp {
   position: absolute;
-  left: 14px;
-  bottom: 10px;
+  left: 12px;
+  bottom: 9px;
   font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--red);
-  border: 1.5px solid var(--red);
-  border-radius: 2px;
-  padding: 3px 6px;
-  transform: rotate(-4deg);
+  color: #c0362c;
+  border: 2px solid #c0362c;
+  border-radius: 3px;
+  padding: 4px 8px;
+  transform: rotate(-6deg) scale(2.1);
+  opacity: 0;
+  mix-blend-mode: multiply;
+}
+
+[data-concept="airmail"]:is([data-step="5"], [data-step="6"]) .env-rubber-stamp {
+  animation: stamp-slam 0.34s cubic-bezier(0.3, 1.3, 0.4, 1) forwards;
+}
+
+@keyframes stamp-slam {
+  0% { opacity: 0; transform: rotate(-14deg) scale(2.1); }
+  55% { opacity: 1; transform: rotate(-5deg) scale(0.94); }
+  100% { opacity: 0.92; transform: rotate(-6deg) scale(1); }
 }
 
 /* Hogwarts: the parchment IS the back of the paper. Both fold flaps
@@ -1067,15 +1089,6 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
    creases, the crest, and the hand-written line, so the envelope back
    is assembled by the folding itself. Only the wax seal arrives after,
    because sealing is its own step in real life too. */
-[data-concept="hogwarts"] .env-bottom,
-[data-concept="hogwarts"] .env-top {
-  background:
-    radial-gradient(ellipse 26% 22% at 22% 44%, rgba(150, 106, 38, 0.13), transparent),
-    radial-gradient(ellipse 22% 18% at 76% 56%, rgba(150, 106, 38, 0.11), transparent),
-    radial-gradient(ellipse 18% 15% at 54% 40%, rgba(150, 106, 38, 0.08), transparent),
-    linear-gradient(140deg, #efe0bd, #e6d2a4);
-}
-
 [data-concept="hogwarts"] .env-face { opacity: 1; transition: none; background: none; box-shadow: none; }
 
 .env-for {
@@ -1200,6 +1213,104 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   font-weight: 700;
 }
 
+/* ---------- Owl post: the true envelope fold ---------- */
+/* Corners fold in toward the screen first, the bottom folds up over the
+   middle, and the pointed top closes the envelope last. */
+[data-concept="hogwarts"] .hw-c1,
+[data-concept="hogwarts"] .hw-c2,
+[data-concept="hogwarts"] .hw-bottom,
+[data-concept="hogwarts"] .hw-point {
+  background:
+    radial-gradient(ellipse 26% 22% at 30% 40%, rgba(150, 106, 38, 0.12), transparent),
+    radial-gradient(ellipse 22% 18% at 70% 60%, rgba(150, 106, 38, 0.1), transparent),
+    linear-gradient(140deg, #efe0bd, #e6d2a4);
+}
+
+/* Top-left corner to the center line. Crease: (50%,0) to (0,22%). */
+.hw-c1 {
+  clip-path: polygon(50% 0, 0 22%, 50% 22%);
+  transform-origin: 25% 11%;
+  transform: rotate3d(-1, 1, 0, 179deg);
+}
+[data-concept="hogwarts"]:is([data-step="1"], [data-step="2"], [data-step="3"]) .hw-c1 {
+  opacity: 1;
+  animation: fold-tl 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
+
+/* Top-right corner mirrors it. Crease: (50%,0) to (100%,22%). */
+.hw-c2 {
+  clip-path: polygon(50% 0, 100% 22%, 50% 22%);
+  transform-origin: 75% 11%;
+  transform: rotate3d(1, 1, 0, -179deg);
+}
+[data-concept="hogwarts"]:is([data-step="2"], [data-step="3"]) .hw-c2 {
+  opacity: 1;
+  animation: fold-tr 0.5s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
+
+/* Once the point folds down it carries the corner flaps with it. */
+[data-concept="hogwarts"]:is([data-step="4"], [data-step="5"], [data-step="6"], [data-step="7"]) .hw-c1,
+[data-concept="hogwarts"]:is([data-step="4"], [data-step="5"], [data-step="6"], [data-step="7"]) .hw-c2 {
+  opacity: 0;
+  transform: rotate3d(1, 1, 0, 0deg);
+}
+
+/* The bottom folds up over the middle. Crease: y = 60%. */
+.hw-bottom {
+  clip-path: polygon(0 20%, 100% 20%, 100% 60%, 0 60%);
+  transform-origin: 50% 60%;
+  transform: rotate3d(1, 0, 0, -179deg);
+}
+[data-concept="hogwarts"]:is([data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"], [data-step="7"]) .hw-bottom {
+  opacity: 1;
+  animation: env-fold-up 0.6s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
+
+/* The pointed top closes the envelope. Crease: y = 22%. */
+.hw-point {
+  clip-path: polygon(0 22%, 100% 22%, 50% 44%);
+  transform-origin: 50% 22%;
+  transform: rotate3d(1, 0, 0, 179deg);
+  background:
+    linear-gradient(180deg, #f0e2c0 22%, #e4cd9a 34%, #d0b477 44%);
+}
+[data-concept="hogwarts"]:is([data-step="4"], [data-step="5"], [data-step="6"], [data-step="7"]) .hw-point {
+  opacity: 1;
+  animation: env-fold-down 0.6s cubic-bezier(0.55, 0.06, 0.28, 0.99) forwards;
+}
+
+/* Base sheet clipping as each region folds away. */
+[data-concept="hogwarts"][data-step="1"] .giant-stamp.origami {
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 0 100%, 0 22%);
+}
+[data-concept="hogwarts"][data-step="2"] .giant-stamp.origami {
+  clip-path: polygon(50% 0, 100% 22%, 100% 100%, 0 100%, 0 22%);
+}
+[data-concept="hogwarts"][data-step="3"] .giant-stamp.origami {
+  clip-path: polygon(50% 0, 100% 22%, 100% 60%, 0 60%, 0 22%);
+}
+
+/* After the point folds down, the envelope is a clean rectangle. */
+[data-concept="hogwarts"]:is([data-step="4"], [data-step="5"], [data-step="6"], [data-step="7"]) .giant-stamp.origami {
+  clip-path: polygon(0 22%, 100% 22%, 100% 60%, 0 60%);
+}
+
+/* The seal presses at the point of the V, the address writes below it. */
+[data-concept="hogwarts"] .env-face { inset: 20% 0 40% 0; }
+
+[data-concept="hogwarts"] .wax-seal { top: 60%; width: 62px; height: 62px; }
+
+[data-concept="hogwarts"] .env-for {
+  top: 49.5%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-imfell), var(--serif);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #4a3413;
+}
+
 /* ---------- The quill writes the address ---------- */
 .quill-row { display: block; white-space: nowrap; }
 
@@ -1224,13 +1335,14 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 /* ---------- Hogwarts: the whole page goes to the castle ---------- */
 body[data-theme="hogwarts"] {
   --focus: #e8c15a;
-  background-color: #1a1109;
+  background-color: #120b04;
+  /* The Great Hall: floating candles under an enchanted ceiling, with a
+     dark scrim so the page stays readable over the artwork. */
   background-image:
-    radial-gradient(ellipse 120% 90% at 50% 100%, rgba(214, 148, 40, 0.14), transparent 55%),
-    radial-gradient(ellipse 140% 100% at 50% 50%, transparent 40%, rgba(6, 3, 0, 0.55) 100%),
-    repeating-linear-gradient(90deg, rgba(232, 193, 90, 0.02) 0px, rgba(232, 193, 90, 0.02) 1px, transparent 1px, transparent 5px),
-    repeating-linear-gradient(0deg, rgba(232, 193, 90, 0.02) 0px, rgba(232, 193, 90, 0.02) 1px, transparent 1px, transparent 5px),
-    linear-gradient(165deg, #221507, #1a1109 55%, #140c05);
+    linear-gradient(180deg, rgba(12, 7, 2, 0.25) 0%, rgba(12, 7, 2, 0.55) 55%, rgba(12, 7, 2, 0.86) 100%),
+    url("/great-hall.png");
+  background-size: cover, cover;
+  background-position: center top, center top;
 }
 
 body[data-theme="hogwarts"] .eyebrow { color: #e8c15a; }
@@ -1329,14 +1441,21 @@ body[data-theme="hogwarts"] .send-btn {
 
 body[data-theme="hogwarts"] .send-btn:hover:not(:disabled) { background: #57090f; }
 
-body[data-theme="hogwarts"] .flight-card {
-  background: linear-gradient(140deg, #f2e4c2, #e9d6a9);
-  color: #3c2a12;
+body[data-theme="hogwarts"] .flight-card { color: #f3e3bb; }
+
+body[data-theme="hogwarts"] .flight-kicker {
+  color: #d9b96a;
+  border-bottom-color: rgba(217, 185, 106, 0.35);
 }
 
-body[data-theme="hogwarts"] .flight-kicker,
-body[data-theme="hogwarts"] .flight-line p { color: #6b4c1c; }
-body[data-theme="hogwarts"] .flight-line strong { color: #3c2a12; }
+body[data-theme="hogwarts"] .flight-line p { color: rgba(243, 227, 187, 0.8); }
+body[data-theme="hogwarts"] .flight-line strong { color: #f3e3bb; }
+body[data-theme="hogwarts"] .flight-card .feedback-mark {
+  color: #d9b96a;
+  border-color: rgba(217, 185, 106, 0.5);
+}
+body[data-theme="hogwarts"] .card-postmark circle,
+body[data-theme="hogwarts"] .card-postmark path { stroke: rgba(217, 185, 106, 0.55); }
 body[data-theme="hogwarts"] .flight-again { background: #6e1218; color: #f3e3bb; }
 
 body[data-theme="hogwarts"] .story-eyebrow,
@@ -1434,16 +1553,7 @@ body[data-theme="hogwarts"] .concept-switch button[aria-pressed="true"] {
 }
 
 /* The address is written below the V, centered. */
-[data-concept="hogwarts"] .env-for {
-  top: 59.2%;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-family: var(--font-imfell), var(--serif);
-  font-size: 12.5px;
-  line-height: 1.45;
-  color: #4a3413;
-}
+
 
 /* ---------- The night over the castle ---------- */
 .hogwarts-scene {
@@ -1583,8 +1693,9 @@ body[data-theme="hogwarts"] .concept-switch button[aria-pressed="true"] {
   100% { transform: translate(46vw, -95vh) scale(0.5) rotate(14deg); opacity: 1; }
 }
 
-/* The delivery slip was under the paper the whole time; folding the
-   sheet away simply reveals it. It never animates in. */
+/* The confirmation was under the paper the whole time; folding the
+   sheet away simply reveals it, printed straight on the page. No card,
+   no container: the paper leaving is the last thing that animates. */
 .flight-card {
   position: absolute;
   inset: 0;
@@ -1592,27 +1703,21 @@ body[data-theme="hogwarts"] .concept-switch button[aria-pressed="true"] {
   height: fit-content;
   z-index: 0;
   width: 100%;
-  max-width: 440px;
-  background: var(--paper);
-  color: var(--ink);
-  border-radius: 4px;
-  padding: 22px 20px 20px;
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.05),
-    0 24px 52px -16px rgba(4, 12, 26, 0.55);
+  max-width: 400px;
+  color: var(--white-text);
+  padding: 10px;
 }
 
 .flight-kicker {
   font-family: var(--mono);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ink-soft);
-  opacity: 0.7;
-  margin: 0 0 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px dashed rgba(21, 49, 90, 0.3);
+  color: var(--white-text-faint);
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(248, 245, 236, 0.25);
   text-align: center;
 }
 
@@ -1625,19 +1730,36 @@ body[data-theme="hogwarts"] .concept-switch button[aria-pressed="true"] {
 .flight-line strong {
   display: block;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 16px;
   letter-spacing: 0.02em;
-  color: var(--ink);
-  margin-bottom: 3px;
+  color: var(--white-text);
+  margin-bottom: 5px;
 }
 
 .flight-line p {
   margin: 0;
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: 13px;
   line-height: 1.55;
-  color: var(--ink-soft);
+  color: var(--white-text-soft);
 }
+
+.flight-card .feedback-mark {
+  color: var(--white-text-soft);
+  border-color: rgba(248, 245, 236, 0.4);
+}
+
+.flight-line[data-state="success"] .feedback-mark {
+  color: #7ddb9b;
+  border-color: rgba(125, 219, 155, 0.65);
+}
+
+.card-postmark circle,
+.card-postmark path {
+  stroke: rgba(248, 245, 236, 0.55);
+}
+
+.flight-card .card-postmark { mix-blend-mode: normal; }
 
 .flight-line[data-state="success"] .feedback-mark {
   color: #2f854a;
@@ -1649,7 +1771,17 @@ body[data-theme="hogwarts"] .concept-switch button[aria-pressed="true"] {
   border-color: rgba(217, 67, 57, 0.6);
 }
 
-.flight-again { margin-top: 18px; }
+/* The one thing left to do deserves the loudest button on the page. */
+.flight-again {
+  margin-top: 22px;
+  background: var(--red);
+  color: #ffffff;
+  font-size: 14px;
+  padding: 15px 18px;
+  box-shadow: 0 10px 28px -8px rgba(217, 67, 57, 0.55);
+}
+
+.flight-again:hover { background: #c0362c !important; }
 
 .card-postmark {
   bottom: -14%;

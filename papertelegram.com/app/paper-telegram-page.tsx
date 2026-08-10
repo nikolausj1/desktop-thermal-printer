@@ -119,19 +119,20 @@ export function PaperTelegramPage() {
       at(350, () => setFoldStep(1)); // bottom third folds up
       at(1050, () => setFoldStep(2)); // top third folds down over it
       at(1750, () => setFoldStep(3)); // the folded letter settles
-      at(2250, () => setFoldStep(4)); // airmail markings press on
-      at(3150, () => setFlight("flying")); // and off it goes
-      at(4250, () => setFlight("gone"));
+      at(2350, () => setFoldStep(4)); // the address types on
+      at(4200, () => setFoldStep(5)); // the rubber stamp slams down
+      at(5000, () => setFlight("flying")); // and off it goes
+      at(6100, () => setFlight("gone"));
     } else {
-      at(350, () => setFoldStep(1)); // bottom third folds up, parchment out
-      at(1050, () => setFoldStep(2)); // top third folds down over it
-      at(1750, () => setFoldStep(3)); // left corner folds down to the V
-      at(2350, () => setFoldStep(4)); // right corner folds down to the V
-      at(3050, () => setFoldStep(5)); // an unseen quill writes the address
-      at(4900, () => setFoldStep(6)); // the wax seal is pressed on
-      at(5650, () => setFoldStep(7)); // Hedwig sweeps across
-      at(6550, () => setFlight("flying")); // and the letter is simply gone
-      at(7700, () => setFlight("gone"));
+      at(350, () => setFoldStep(1)); // top-left corner folds in
+      at(950, () => setFoldStep(2)); // top-right corner folds in
+      at(1650, () => setFoldStep(3)); // the bottom folds up over the middle
+      at(2450, () => setFoldStep(4)); // the pointed top closes the envelope
+      at(3250, () => setFoldStep(5)); // an unseen quill writes the address
+      at(5100, () => setFoldStep(6)); // the wax seal is pressed on
+      at(5850, () => setFoldStep(7)); // Hedwig sweeps across
+      at(6750, () => setFlight("flying")); // and the letter is simply gone
+      at(7900, () => setFlight("gone"));
     }
   }, [clearFlightTimers, concept]);
 
@@ -499,6 +500,21 @@ export function PaperTelegramPage() {
     </>
   );
 
+  // And as struck typewriter characters for the airmail envelope.
+  const typeLine = (text: string, baseDelayMs: number) => (
+    <>
+      {[...text].map((ch, i) => (
+        <span
+          key={`${i}-${ch}`}
+          className="type-char"
+          style={{ animationDelay: `${baseDelayMs + i * 52}ms` }}
+        >
+          {ch === " " ? " " : ch}
+        </span>
+      ))}
+    </>
+  );
+
   const recipientError = showErrors && !recipientValid ? "Choose Vinny or Chase." : "";
   const nameError = showErrors && !nameValid ? "Use 30 characters or fewer." : "";
   const messageError =
@@ -544,16 +560,6 @@ export function PaperTelegramPage() {
         ))}
       </div>
 
-      {hogwarts ? (
-        <div className="hogwarts-scene" aria-hidden="true">
-          <div className="night-stars" />
-          <div className="night-mist" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="castle" src="/castle.png" alt="" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="snitch" src="/snitch.png" alt="" />
-        </div>
-      ) : null}
 
       {demoAvailable ? (
         <button
@@ -613,7 +619,7 @@ export function PaperTelegramPage() {
         </section>
 
         <section className="stamp-col" aria-labelledby="form-title">
-          {flight === "flying" ? (
+          {flight === "flying" && concept === "plane" ? (
             <svg className="contrail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
               <path
                 d="M50,46 Q60,28 86,4 T160,-70"
@@ -643,25 +649,28 @@ export function PaperTelegramPage() {
 
             {(flight === "folding" || flight === "flying") && concept !== "plane" ? (
               <div className="fold-theater" aria-hidden="true">
-                <div className="fold-flap env-bottom" />
-                <div className="fold-flap env-top">
-                  {concept === "hogwarts" ? (
-                    <p className="env-for">
-                      {foldStep >= 5 ? (
-                        <>
-                          <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
-                          <span className="quill-row">{quillLine("The Desk by the Window, Seattle", 620)}</span>
-                        </>
-                      ) : null}
-                    </p>
-                  ) : null}
-                </div>
-                {concept === "hogwarts" ? (
+                {concept === "airmail" ? (
                   <>
-                    <div className="fold-flap env-vl" />
-                    <div className="fold-flap env-vr" />
+                    <div className="fold-flap env-bottom" />
+                    <div className="fold-flap env-top" />
                   </>
-                ) : null}
+                ) : (
+                  <>
+                    <div className="fold-flap hw-c1" />
+                    <div className="fold-flap hw-c2" />
+                    <div className="fold-flap hw-bottom">
+                      <p className="env-for">
+                        {foldStep >= 5 ? (
+                          <>
+                            <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
+                            <span className="quill-row">{quillLine("The Desk by the Window, Seattle", 620)}</span>
+                          </>
+                        ) : null}
+                      </p>
+                    </div>
+                    <div className="fold-flap hw-point" />
+                  </>
+                )}
                 <div className={`env-face${concept === "hogwarts" ? " hogwarts" : ""}`}>
                   {concept === "airmail" ? (
                     <>
@@ -670,10 +679,14 @@ export function PaperTelegramPage() {
                         <img src="/logo-plane.png" alt="" />
                       </div>
                       <p className="env-address">
-                        <span>To: {recipient || "Vinny & Chase"}</span>
-                        <span>A desk in Seattle</span>
+                        {foldStep >= 4 ? (
+                          <>
+                            <span>{typeLine(`To: ${recipient || "Vinny & Chase"}`, 0)}</span>
+                            <span>{typeLine("A desk in Seattle", 950)}</span>
+                          </>
+                        ) : null}
                       </p>
-                      <span className="env-par-avion">Par Avion</span>
+                      <span className="env-rubber-stamp">Paper Telegram</span>
                     </>
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -723,30 +736,6 @@ export function PaperTelegramPage() {
                     </svg>
                   </button>
                 ) : null}
-                <svg
-                  className={`postmark-fresh card-postmark${feedback?.state === "success" ? " stamped" : ""}`}
-                  aria-hidden="true"
-                  viewBox="0 0 200 200"
-                >
-                  <circle cx="100" cy="100" r="72" fill="none" stroke="var(--navy-ink)" strokeWidth="2.5" />
-                  <circle cx="100" cy="100" r="61" fill="none" stroke="var(--navy-ink)" strokeWidth="1.2" />
-                  <path
-                    className="wave"
-                    d="M18,96 q7,-11 14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0"
-                    fill="none"
-                    stroke="var(--navy-ink)"
-                    strokeWidth="1.6"
-                    opacity="0.85"
-                  />
-                  <path
-                    className="wave"
-                    d="M14,109 q7,-11 14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0 t14,0"
-                    fill="none"
-                    stroke="var(--navy-ink)"
-                    strokeWidth="1.6"
-                    opacity="0.7"
-                  />
-                </svg>
               </div>
             ) : null}
 

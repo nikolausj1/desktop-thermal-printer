@@ -487,9 +487,7 @@ export function PaperTelegramPage() {
         },
         body: JSON.stringify({
           name,
-          // The FOR prefix stays until the print worker renders the
-          // first-class recipient header, then it can be dropped.
-          message: `FOR ${telegramRecipient.toUpperCase()}\n\n${message}`,
+          message,
           recipient: telegramRecipient,
           theme: concept === "hogwarts" ? "owl-post" : "airmail",
           idempotencyKey: idempotencyKey.current,

@@ -2,7 +2,7 @@
 title: "STATUS - Desktop Thermal Printer"
 created: 2026-08-04
 modified: 2026-08-09
-version: 4.5
+version: 4.6
 author: Claude Fable 5 (claude-fable-5)
 tags:
 ---
@@ -23,19 +23,18 @@ MVP / Paper Telegram redesign
 
 ## Waiting on Me
 
-- [ ] **Visit `https://papertelegram.com` and send the first real telegram to the kids** (5 min)
-      - unblocks: confirming the full public path end to end on the new domain
+- [ ] **Send a real telegram and physically confirm the new receipt header** (5 min)
+      - unblocks: closing out the receipt upgrade; the paper should open with MESSAGE FOR in small type over the kid's name in large type, with a SENT BY AIRMAIL or SENT BY OWL POST footer
+- [ ] **Confirm the notification test push arrived on your phone** (1 min)
+      - unblocks: trusting the printed/failed/held pushes going forward; a test notification for Vinny from "Notification Test" was sent 2026-08-09 evening
 - [ ] **Confirm on an iPhone that the stamp perforation now renders** (1 min)
       - unblocks: closing out the Safari mask bug found on mobile
-- [ ] **Reset the new Supabase project's database password in the dashboard** (~3 min)
-      - unblocks: restoring the standard `supabase db push` path; authenticated Management API migrations and the running worker are not affected
 
 ## Next Up
 
-1. Send a first real telegram through `https://papertelegram.com` and physically confirm the print.
-2. Build the approved receipt upgrade: recipient and theme as first-class queue fields, worker prints "Message For" small over the kid's name big, theme identifiable on the receipt. Justin approved the NUC worker deployment for this on 2026-08-09 (rollout DB then cloud API then worker then site, each step backward compatible).
-3. Build the approved dashboard and notifications: a secret-key /dash page on papertelegram.com listing all messages, plus Supabase webhooks into Home Assistant pushing to Justin's phone on every successful print, failure, and held-for-review.
-4. Reset the Supabase database password when convenient.
+1. Physically confirm the new MESSAGE FOR receipt header with a real telegram.
+2. Decide whether the dashboard should grow approve/toss buttons for held messages and an emergency-pause toggle.
+3. Retire the old chatgpt.site v1 preview when convenient.
 
 ## Biggest Risk
 
@@ -110,6 +109,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - The social card (`og.png`), favicons, and apple-touch icon now carry the navy paper-plane identity: the card shows the brandline, headline, and a perforated stamp mock rendered from the real site CSS; the icon is the white fold plane on the navy linen.
 - The send delighter grew into a three-style product feature with an always-visible picker, iterated live with Justin testing on his phone (review controls also appear with `?review`): Plane (the form origami-folds step by step into a photoreal paper dart that launches nose-first), Airmail (the letter folds into an addressed airmail envelope whose striped border is carried in by the folds, addressed to the selected kid), and Owl post, which rethemes the ENTIRE page to a candlelit Hogwarts look: generated floating candles, Cinzel and IM Fell type, gold and crimson parchment form, Platform 9-3/4 details, an address written on by an unseen quill, a generated wax seal with the plane emblem, and a huge semi-photoreal Hedwig who sweeps between viewer and letter and simply takes it. For all styles the delivery slip sits under the paper the whole time and is revealed when the paper leaves. Assets generated with the OpenAI image API; wordmark studies from earlier remain in `_review/paper-telegram-wordmarks/` awaiting Justin's pick.
 - Iteration continued live with Justin reviewing each round (local first, then pushed on his word). Current state: Airmail has a typewriter-addressed envelope, a slammed PAPER TELEGRAM rubber stamp, a vintage route-map-and-clouds background, and no contrail. Owl post folds a true envelope (corners in, bottom up, pointed top closing last) from plain parchment with no perforation, an unseen quill writes the recipient large, a wax seal presses at the V whose overlapping flaps now cast real shadows, and the scene is a generated Great Hall of floating candles. The revealed confirmation is container-free with larger text and an amber send-another button. All live at papertelegram.com.
+- Receipt, dashboard, and notifications shipped (2026-08-09 evening): recipient and theme are first-class queue fields end to end (migration 20260809210000, submit_public_message_v3, claim returns them, site sends them, the FOR prefix hack is gone). Worker 0.3.0 deployed to the NUC prints MESSAGE FOR in small type over the kid's name at double size, with a SENT BY AIRMAIL / SENT BY OWL POST footer and a fallback that parses legacy FOR-prefixed messages; DesktopThermalPrinter was the only service touched and Plex, Plex Update Service, and Sports Box were verified running after. The private dashboard at /dash (secret key in ~/.secrets/api-keys.env as PAPERTELEGRAM_DASH_KEY; SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, DASH_KEY set on Vercel) lists the latest 200 messages. Phone notifications: migration 20260809220000 adds a pg_net trigger posting printed/failed/held events to a Home Assistant Nabu Casa webhook (URL in the RLS-locked notification_settings table, not in the public repo), and automation.paper_telegram_print_notifications pushes to notify.mobile_app_justinn; an end-to-end test fired successfully and the synthetic row was deleted. The owl post social card now shares the Paper Telegram headline; ?theme=owl-post links get the Great Hall card via per-request metadata. The Supabase pooler password now authenticates again, so standard `supabase db push` works; the old reset item is closed.
 - Ship decisions (2026-08-09): the theme switcher is a product feature with two shipping themes, Airmail (default) and Owl post; the Plane theme was retired because its fold never met the bar (its code remains dormant). Desktop switcher carries a "Theme" label; mobile uses a hamburger in the upper right that scrolls with the page. Justin picked wordmark 02 (serif with launching plane) as the site logo, now live in the hero for both themes. The stamp-corner top line was removed to shorten the form, the status light stays green in both themes with "Telegram Printer Online" as the constant bold line, the dad credit sits below the form, the footer carries the weekend-project line, and The Idea section mirrors justinnikolaus.com/printer with a kids-oriented lede. All live at papertelegram.com.
 - Codex added eight more focused airmail derivatives in `_review/paper-telegram-airmail-concepts/index.html`: Blue Horizon, Airmail Envelope, Paper Flight, Dusk Delivery, Junior Airmail, Route Map, First Class, and Folded Sky. Every direction increases contrast between the scene and receipt, retains Chase and Vinny as the only recipient choices, works at desktop and phone widths, and remains disconnected from the printer. Paper Flight and Junior Airmail make the paper plane a prominent project metaphor.
 - Codex's focused round-3 gallery is in `_review/paper-telegram-airmail-round3/`: Postal Wing, Folded Signal, Flight Path, Night Airmail, Air Post Badge, and Tiny Flight Club. All six use a textured dark-blue background, keep text left and receipt right on desktop, stack text above the receipt on mobile, and include a distinct code-native paper-plane wordmark. Postal Wing, Night Airmail, and Tiny Flight Club use red, white, and blue airmail borders around the torn receipt. The forms are preview-only and cannot reach the printer.

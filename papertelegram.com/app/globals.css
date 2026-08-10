@@ -1169,12 +1169,18 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   transition: opacity 0.15s linear;
 }
 
-.concept-switch {
+.switch-wrap {
   position: fixed;
   top: 14px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.concept-switch {
   display: flex;
   gap: 2px;
   background: rgba(8, 16, 28, 0.88);
@@ -1210,10 +1216,9 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
-  align-self: center;
-  padding: 0 6px 0 12px;
+  color: rgba(255, 255, 255, 0.55);
   white-space: nowrap;
+  text-shadow: 0 1px 6px rgba(4, 10, 20, 0.7);
 }
 
 /* ---------- Mobile theme menu (hamburger, scrolls with the page) ---------- */
@@ -1280,7 +1285,7 @@ textarea::placeholder { color: rgba(21, 49, 90, 0.4); }
 }
 
 @media (max-width: 719px) {
-  .concept-switch { display: none; }
+  .switch-wrap { display: none; }
   .theme-menu { display: flex; }
 }
 
@@ -1645,11 +1650,6 @@ body[data-theme="hogwarts"] .flow-tech { color: #e8c15a; }
 
 body[data-theme="hogwarts"] .story-intro h2,
 body[data-theme="hogwarts"] .system-flow h3 { color: #f3e3bb; }
-
-body[data-theme="hogwarts"] .system-flow li {
-  background: rgba(232, 193, 90, 0.06);
-  border-color: rgba(232, 193, 90, 0.2);
-}
 
 body[data-theme="hogwarts"] .technical-card {
   background: linear-gradient(140deg, #f2e4c2, #e9d6a9);
@@ -2078,9 +2078,6 @@ body[data-theme="hogwarts"] .made-by { color: #d9c9a1; }
 @media (min-width: 1020px) { .system-flow { grid-template-columns: repeat(4, 1fr); } }
 
 .system-flow li {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
   padding: 18px 16px 16px;
   display: flex;
   flex-direction: column;

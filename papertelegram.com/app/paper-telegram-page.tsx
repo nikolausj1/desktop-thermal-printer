@@ -15,8 +15,8 @@ type DelighterConcept = "plane" | "airmail" | "hogwarts";
 
 // The plane concept's fold never met the bar, so it is not offered.
 const THEME_OPTIONS = [
-  ["airmail", "✉ Airmail"],
-  ["hogwarts", "🦉 Owl post"],
+  ["airmail", "Airmail"],
+  ["hogwarts", "Owl post"],
 ] as const;
 
 type PrinterStatus = {
@@ -81,6 +81,14 @@ export function PaperTelegramPage() {
       localStorage.setItem("pt-delighter-concept", next);
     } catch {
       /* private browsing */
+    }
+    // Mirror the choice into the address bar so a copied URL shares it.
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("theme", next === "hogwarts" ? "owl-post" : "airmail");
+      window.history.replaceState(null, "", url);
+    } catch {
+      /* leave the URL alone if it cannot be parsed */
     }
   }, []);
 
@@ -155,7 +163,7 @@ export function PaperTelegramPage() {
 
   const typingActive = concept === "airmail" && flight === "folding" && foldStep >= 4;
   const addressLine1 = `To: ${recipient || "Vinny & Chase"}`;
-  const addressLine2 = "A desk in Seattle";
+  const addressLine2 = "Their house in Seattle";
 
   useEffect(() => {
     if (!typingActive) return;
@@ -193,6 +201,14 @@ export function PaperTelegramPage() {
       new URLSearchParams(window.location.search).has("review")
     ) {
       setDemoAvailable(true);
+    }
+    // A shared ?theme link wins; otherwise the visitor's saved pick.
+    const themeParam = new URLSearchParams(window.location.search).get("theme");
+    if (themeParam === "owl-post" || themeParam === "owl" || themeParam === "hogwarts") {
+      setConcept("hogwarts");
+    } else if (themeParam === "airmail") {
+      setConcept("airmail");
+    } else {
       try {
         const saved = localStorage.getItem("pt-delighter-concept");
         if (saved === "airmail" || saved === "hogwarts") {
@@ -564,23 +580,25 @@ export function PaperTelegramPage() {
         </div>
       ) : null}
 
-      <div className="concept-switch" role="group" aria-label="Theme">
+      <div className="switch-wrap">
         <span className="switch-label" aria-hidden="true">
           Theme
         </span>
-        {THEME_OPTIONS.map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            aria-pressed={concept === key}
-            onClick={() => {
-              pickConcept(key);
-              bringFormBack();
-            }}
-          >
-            {label}
-          </button>
-        ))}
+        <div className="concept-switch" role="group" aria-label="Theme">
+          {THEME_OPTIONS.map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={concept === key}
+              onClick={() => {
+                pickConcept(key);
+                bringFormBack();
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="theme-menu">

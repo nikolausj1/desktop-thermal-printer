@@ -107,6 +107,13 @@ export function resolveRecipient(job: PrintJob): {
       messageText: job.messageText.slice(match[0].length),
     };
   }
+  // A Paper Telegram with no name chosen is addressed to both kids. The
+  // theme is what proves it came from that site: the desk-printer page
+  // shares this queue and its messages carry no theme and no recipient,
+  // so those must keep the generic header.
+  if (job.theme === "airmail" || job.theme === "owl-post") {
+    return { recipient: "Vinny & Chase", messageText: job.messageText };
+  }
   return { recipient: null, messageText: job.messageText };
 }
 
@@ -120,7 +127,7 @@ export function buildMessageReceipt(job: PrintJob, timezone: string): Buffer {
   const sender = sanitizeReceiptText(job.senderName || "ANONYMOUS").slice(0, 30);
   const resolved = resolveRecipient(job);
   const recipient = resolved.recipient
-    ? sanitizeReceiptText(resolved.recipient).slice(0, 10).toUpperCase()
+    ? sanitizeReceiptText(resolved.recipient).slice(0, 24).toUpperCase()
     : null;
   const message = sanitizeReceiptText(resolved.messageText);
   const originSummary = buildOriginSummary(job.deviceLabel, job.locationLabel);

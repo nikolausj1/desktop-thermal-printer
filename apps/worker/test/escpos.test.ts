@@ -99,3 +99,21 @@ test("origin summary falls back cleanly when location or all metadata is missing
   );
   assert.equal(buildOriginSummary(null, null), null);
 });
+
+test("an unaddressed Paper Telegram is addressed to both kids", () => {
+  const receipt = buildMessageReceipt({ ...baseJob, theme: "airmail" }, "America/Los_Angeles");
+  const text = receipt.toString("ascii");
+
+  assert.match(text, /MESSAGE FOR\n\x1d!\x11VINNY & CHASE\n/);
+  assert.match(text, /SENT BY AIRMAIL/);
+});
+
+test("a desk-printer message keeps the generic header", () => {
+  // No theme and no recipient: this came from justinnikolaus.com/printer,
+  // which shares the queue and is not addressed to the kids at all.
+  const receipt = buildMessageReceipt(baseJob, "America/Los_Angeles");
+  const text = receipt.toString("ascii");
+
+  assert.match(text, /\x1d!\x11MESSAGE\n\x1d!\x00FROM THE INTERNET/);
+  assert.doesNotMatch(text, /VINNY & CHASE/);
+});

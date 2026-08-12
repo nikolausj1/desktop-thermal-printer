@@ -1540,9 +1540,15 @@ body[data-theme="hogwarts"] {
   background-color: #120b04;
   /* The Great Hall: floating candles under an enchanted ceiling, with a
      dark scrim so the page stays readable over the artwork. */
+  /* The photograph was a 2.4MB PNG, a format meant for flat graphics.
+     As a JPEG it is a twentieth of that, and browsers that understand
+     image-set take an even smaller WebP. The scrim hides any artefact. */
   background-image:
     linear-gradient(180deg, rgba(12, 7, 2, 0.25) 0%, rgba(12, 7, 2, 0.55) 55%, rgba(12, 7, 2, 0.86) 100%),
-    url("/great-hall.png");
+    url("/great-hall.jpg");
+  background-image:
+    linear-gradient(180deg, rgba(12, 7, 2, 0.25) 0%, rgba(12, 7, 2, 0.55) 55%, rgba(12, 7, 2, 0.86) 100%),
+    image-set(url("/great-hall.webp") type("image/webp"), url("/great-hall.jpg") type("image/jpeg"));
   background-size: cover, cover;
   background-position: center top, center top;
 }

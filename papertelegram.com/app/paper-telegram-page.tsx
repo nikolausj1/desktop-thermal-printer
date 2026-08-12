@@ -109,6 +109,9 @@ export function PaperTelegramPage() {
   const idempotencyKey = useRef<string | null>(null);
   const stampSurfaceRef = useRef<HTMLDivElement>(null);
   const flightTimers = useRef<number[]>([]);
+  // Identifies the submission currently on screen. Abandoning one bumps
+  // the number, which is how a late reply knows it is no longer wanted.
+  const submissionId = useRef(0);
 
   const clearFlightTimers = useCallback(() => {
     flightTimers.current.forEach((id) => window.clearTimeout(id));
@@ -161,6 +164,12 @@ export function PaperTelegramPage() {
 
   const bringFormBack = useCallback(() => {
     clearFlightTimers();
+    // Returning to the form abandons whatever was in the air. Without
+    // this the send button stayed disabled behind a poll nobody was
+    // watching, and that poll would later wipe the form mid-sentence.
+    submissionId.current += 1;
+    setSubmitting(false);
+    setButtonLabel("Send this telegram");
     setFeedback(null);
     setFlight("idle");
     setFoldStep(0);
@@ -227,7 +236,9 @@ export function PaperTelegramPage() {
     }
     w.__ptFlightDemo = (fail = false) => {
       launchFlight();
-      window.setTimeout(() => {
+      // Registered with the flight timers so returning to the form
+      // cancels it, the way a real submission's poll is now cancelled.
+      flightTimers.current.push(window.setTimeout(() => {
         setFeedback(
           fail
             ? { state: "error", mark: "!", label: "Telegram not printed", message: "Demo failure state." }
@@ -238,7 +249,7 @@ export function PaperTelegramPage() {
                 message: "Their message is now a real piece of paper.",
               },
         );
-      }, 2600);
+      }, 2600));
     };
     return () => {
       delete w.__ptFlightDemo;
@@ -251,13 +262,9 @@ export function PaperTelegramPage() {
     visibleLength(message.trim()) > 0 &&
     visibleLength(message.trim()) <= MAX_MESSAGE_LENGTH &&
     lineBreaks(message.trim()) <= MAX_MESSAGE_LINE_BREAKS;
-  const recipientValid = recipient !== "";
+  // Choosing a kid is optional: an unaddressed telegram goes to both.
   const canSubmit =
-    printerStatus.acceptingMessages &&
-    recipientValid &&
-    nameValid &&
-    messageValid &&
-    !submitting;
+    printerStatus.acceptingMessages && nameValid && messageValid && !submitting;
 
   // Real stamp perforations: evenly spaced semicircular bites, uniform
   // diameter and pitch, a punched hole shared at every corner. Recompute
@@ -400,15 +407,21 @@ export function PaperTelegramPage() {
   }, []);
 
   const pollMessageStatus = useCallback(
-    async (messageId: string, telegramRecipient: Exclude<Recipient, "">) => {
+    async (messageId: string, telegramRecipient: string, submission: number) => {
+      // Every state write below is guarded: if the visitor has abandoned
+      // this submission, a late reply must not clear a form they have
+      // started typing in again, or narrate a telegram they moved on from.
+      const isCurrent = () => submissionId.current === submission;
       for (let attempt = 0; attempt < MAX_MESSAGE_POLLS; attempt += 1) {
         await new Promise((resolve) => window.setTimeout(resolve, MESSAGE_POLL_MS));
+        if (!isCurrent()) return;
         try {
           const response = await fetch(`/api/printer/messages/${encodeURIComponent(messageId)}`, {
             headers: { accept: "application/json" },
             cache: "no-store",
           });
           const payload = await readJson(response);
+          if (!isCurrent()) return;
           if (!response.ok || payload.ok !== true) continue;
 
           if (payload.status === "printing") {
@@ -442,6 +455,7 @@ export function PaperTelegramPage() {
           }
 
           if (payload.terminal === true) {
+            if (!isCurrent()) return;
             idempotencyKey.current = null;
             if (payload.status === "sent_to_printer") {
               setRecipient("");
@@ -459,6 +473,7 @@ export function PaperTelegramPage() {
         }
       }
 
+      if (!isCurrent()) return;
       setFeedback({
         state: "progress",
         mark: "…",
@@ -475,7 +490,8 @@ export function PaperTelegramPage() {
     setShowErrors(true);
     if (!canSubmit) return;
 
-    const telegramRecipient = recipient as Exclude<Recipient, "">;
+    const telegramRecipient = recipient || "Vinny & Chase";
+    const submission = (submissionId.current += 1);
     setSubmitting(true);
     setButtonLabel("Checking the machine...");
     setFeedback({
@@ -510,7 +526,7 @@ export function PaperTelegramPage() {
         body: JSON.stringify({
           name,
           message,
-          recipient: telegramRecipient,
+          recipient: recipient || null,
           theme: concept === "hogwarts" ? "owl-post" : "airmail",
           idempotencyKey: idempotencyKey.current,
           website,
@@ -537,7 +553,7 @@ export function PaperTelegramPage() {
         message: "Waiting for the message machine.",
       });
       launchFlight();
-      await pollMessageStatus(payload.messageId, telegramRecipient);
+      await pollMessageStatus(payload.messageId, telegramRecipient, submission);
     } catch {
       setFeedback({
         state: "error",
@@ -565,7 +581,7 @@ export function PaperTelegramPage() {
   );
 
 
-  const recipientError = showErrors && !recipientValid ? "Choose Vinny or Chase." : "";
+  const recipientError = "";
   const nameError = showErrors && !nameValid ? "Use 30 characters or fewer." : "";
   const messageError =
     showErrors && !message.trim()

@@ -74,6 +74,11 @@ export function PaperTelegramPage() {
   const [concept, setConcept] = useState<DelighterConcept>("airmail");
   const [menuOpen, setMenuOpen] = useState(false);
   const [typedCount, setTypedCount] = useState(0);
+  // The paper keeps whichever recipient it launched with. The form clears
+  // itself the moment a print is confirmed, and that lands while the
+  // envelope is still in the air, which used to flip a letter addressed
+  // to one kid back to both of them mid-flight.
+  const [flightRecipient, setFlightRecipient] = useState<Recipient>("");
 
   const pickConcept = useCallback((next: DelighterConcept) => {
     setConcept(next);
@@ -119,6 +124,7 @@ export function PaperTelegramPage() {
     clearFlightTimers();
     setFoldStep(0);
     setTypedCount(0);
+    setFlightRecipient(recipient);
     setFlight("folding");
     const at = (ms: number, fn: () => void) =>
       flightTimers.current.push(window.setTimeout(fn, ms));
@@ -150,7 +156,8 @@ export function PaperTelegramPage() {
       at(6750, () => setFlight("flying")); // and the letter is simply gone
       at(7900, () => setFlight("gone"));
     }
-  }, [clearFlightTimers, concept]);
+    // recipient is a dependency because the flight snapshots it on launch.
+  }, [clearFlightTimers, concept, recipient]);
 
   const bringFormBack = useCallback(() => {
     clearFlightTimers();
@@ -162,7 +169,7 @@ export function PaperTelegramPage() {
   }, [clearFlightTimers]);
 
   const typingActive = concept === "airmail" && flight === "folding" && foldStep >= 4;
-  const addressLine1 = `To: ${recipient || "Vinny & Chase"}`;
+  const addressLine1 = `To: ${flightRecipient || "Vinny & Chase"}`;
   const addressLine2 = "Their house in Seattle";
 
   useEffect(() => {
@@ -784,7 +791,7 @@ export function PaperTelegramPage() {
                     <div className="fold-flap hw-point" />
                     <p className="env-for">
                       {foldStep >= 5 ? (
-                        <span className="quill-row">{quillLine(recipient || "Vinny & Chase", 0)}</span>
+                        <span className="quill-row">{quillLine(flightRecipient || "Vinny & Chase", 0)}</span>
                       ) : null}
                     </p>
                     <p className="env-for env-for-addr">

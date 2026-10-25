@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "papertelegram-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "papertelegram.com", "run", "dev", "--", "--port", "3123"],
+      "port": 3123
+    }
+  ]
+}

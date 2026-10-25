@@ -1,8 +1,8 @@
 ---
 title: "Desktop Thermal Printer - Agent Instructions"
 created: 2026-08-04
-modified: 2026-08-04
-version: 1.0
+modified: 2026-08-12
+version: 1.1
 author: Claude Sonnet 5 (claude-sonnet-5)
 tags:
 ---
@@ -63,3 +63,5 @@ This project is tracked by Oracle, a portfolio agent at the `_Projects` root tha
 5. Oracle trusts `STATUS.md` completely. It does not inspect code or git. An inaccurate status gives Justin a wrong portfolio picture.
 6. Edits marked "updated via Oracle at Justin's direction" are authoritative - Justin dictated them at the portfolio level. Reconcile, do not revert.
 7. Share what you learn. When you discover a reusable technique, fix, or gotcha that other projects would benefit from (environment-level, not specific to this product), record it briefly in an optional `## Lessons` section at the bottom of `STATUS.md`, below the divider. Oracle vets these and promotes the good ones into the shared Build Guide.
+
+8. **Do NOT edit `_Projects/_Templates/Project Build Guide.md` or `PRD Template.md`.** Only Oracle edits those. Justin's standing rule, 2026-08-12. This holds even when you find a real error in the guide: write the correction as a `## Lessons` entry in this project's STATUS.md and Oracle folds it in on the next run. If a guide error is actively blocking you, say so in `## Health` so it surfaces at the top of the next rollup.

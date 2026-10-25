@@ -2296,3 +2296,43 @@ body[data-theme="hogwarts"] .made-by { color: #d9c9a1; }
 }
 
 .site-footer p { margin: 0 0 6px; }
+
+/* Which channel this page is on: the public demo, or a private family link.
+   Sits under the status chip in the hero. The root while it still prints
+   shows nothing, so that page looks exactly as it always has. */
+.channel-note {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: var(--white-text-soft);
+  max-width: 44ch;
+  margin: 14px 0 0;
+  padding-left: 14px;
+  border-left: 2px solid rgba(248, 245, 236, 0.35);
+}
+
+.channel-note strong {
+  color: var(--white-text);
+  font-weight: 700;
+}
+
+.channel-note[data-channel="public"] {
+  border-left-color: var(--amber);
+}
+
+.channel-note[data-channel="family"] {
+  border-left-color: var(--green);
+}
+
+body[data-theme="hogwarts"] .channel-note {
+  color: rgba(243, 227, 187, 0.85);
+}
+
+body[data-theme="hogwarts"] .channel-note strong {
+  color: #f3e3bb;
+}
+
+body[data-theme="hogwarts"] .channel-note[data-channel="public"] {
+  border-left-color: rgba(232, 193, 90, 0.75);
+}

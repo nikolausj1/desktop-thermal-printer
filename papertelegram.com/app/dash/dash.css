@@ -182,3 +182,142 @@
     grid-area: extra;
   }
 }
+
+/* Root mode banner, family links, and the demo bucket (added 2026-10-24). */
+
+.dash-root {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--white-text-soft);
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(248, 245, 236, 0.18);
+  background: rgba(21, 49, 90, 0.4);
+}
+
+.dash-root strong {
+  color: var(--white-text);
+}
+
+.dash-root[data-mode="family"] {
+  border-color: rgba(232, 179, 63, 0.55);
+}
+
+.dash-root[data-mode="public"] {
+  border-color: rgba(63, 174, 98, 0.55);
+}
+
+.dash-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dash-section h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(19px, 3vw, 23px);
+  margin: 0;
+  color: var(--white-text);
+}
+
+.dash-section-note {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--white-text-faint);
+  margin: 0;
+  max-width: 72ch;
+}
+
+.dash-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  background: rgba(21, 49, 90, 0.55);
+  border: 1px solid rgba(248, 245, 236, 0.14);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.dash-link-main {
+  flex: 1 1 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.dash-link-label {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--white-text);
+}
+
+.dash-link-url {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--white-text-soft);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.dash-link-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--white-text-faint);
+  white-space: nowrap;
+}
+
+.dash-copy {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy-deep);
+  background: var(--white-text);
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  min-width: 96px;
+}
+
+.dash-copy:hover {
+  background: #fff;
+}
+
+.dash-copy:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.dash-copy[data-state="copied"] {
+  background: var(--green);
+  color: #fff;
+}
+
+.dash-copy[data-state="failed"] {
+  background: var(--amber);
+}
+
+.dash-household {
+  color: var(--white-text);
+}
+
+.dash-status-demo {
+  color: #7fb3ff;
+  border-color: #7fb3ff;
+  background: rgba(127, 179, 255, 0.12);
+}

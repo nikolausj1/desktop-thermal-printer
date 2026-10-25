@@ -15,6 +15,9 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL");
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const ipHashSalt = Deno.env.get("IP_HASH_SALT");
 const publicApiMode = Deno.env.get("PUBLIC_API_MODE") || "hold";
+// Shared with the papertelegram.com Vercel proxy. A request that carries it
+// came through the site; without it nothing can reach the printer.
+const proxyKey = Deno.env.get("PROXY_KEY") || "";
 
 if (!supabaseUrl || !serviceRoleKey || !ipHashSalt) {
   throw new Error("Public API is missing required server configuration.");
@@ -88,6 +91,47 @@ function requestIp(request: Request): string {
     request.headers.get("x-real-ip") ||
     "unknown"
   );
+}
+
+function timingSafeEqual(a: string, b: string): boolean {
+  const left = new TextEncoder().encode(a);
+  const right = new TextEncoder().encode(b);
+  if (left.length === 0 || left.length !== right.length) return false;
+  let diff = 0;
+  for (let i = 0; i < left.length; i += 1) diff |= left[i] ^ right[i];
+  return diff === 0;
+}
+
+type Channel = {
+  // family prints; public is the demo and never reaches the queue.
+  channel: "family" | "public";
+  // Which link the message came through, for the dashboard and the push.
+  household: string | null;
+  // True when the request provably came through the Vercel proxy.
+  trusted: boolean;
+};
+
+// The site's proxy tells us the channel, and proves it with PROXY_KEY. Anything
+// that did not come through the proxy (a direct call to this URL, or the old
+// justinnikolaus.com/printer page, which talks to us from the browser) is the
+// public demo, labelled by where it came from.
+function resolveChannel(request: Request): Channel {
+  const supplied = request.headers.get("x-pt-proxy-key") || "";
+  const trusted = proxyKey.length > 0 && timingSafeEqual(supplied, proxyKey);
+  if (trusted) {
+    const channel = request.headers.get("x-pt-channel") === "family" ? "family" : "public";
+    const household = (request.headers.get("x-pt-household") || "").trim().slice(0, 40) || null;
+    return { channel, household, trusted };
+  }
+
+  let hostname = "";
+  try {
+    hostname = new URL(request.headers.get("origin") || "").hostname;
+  } catch {
+    hostname = "";
+  }
+  const household = /(^|\.)justinnikolaus\.com$/.test(hostname) ? "justinnikolaus.com/printer" : "Direct";
+  return { channel: "public", household, trusted };
 }
 
 function mapSubmissionFailure(request: Request, result: JsonRecord): Response {
@@ -168,6 +212,13 @@ Deno.serve(async (request) => {
       return json(request, 413, { ok: false, error: "Request is too large." });
     }
 
+    // Fail loudly, not quietly: if the proxy secret is not configured here,
+    // a family telegram must not be silently downgraded to a demo note.
+    if (proxyKey.length === 0 && request.headers.get("x-pt-channel") === "family") {
+      console.error(JSON.stringify({ event: "proxy_key_missing" }));
+      return json(request, 503, { ok: false, error: "The telegram service is misconfigured. Nothing was sent." });
+    }
+
     let body: JsonRecord | null = null;
     try {
       body = object(await request.json());
@@ -210,9 +261,9 @@ Deno.serve(async (request) => {
       request.headers.get("sec-ch-ua-mobile"),
     );
     const location = await lookupApproximateLocation(ipAddress);
+    const { channel, household } = resolveChannel(request);
 
-    const { data, error } = await supabase.rpc("submit_public_message_v3", {
-      p_printer_id: "desk-rp820",
+    const sharedArguments = {
       p_sender_name: name.value || null,
       p_message_text: message.value,
       p_client_idempotency_key: idempotencyKey,
@@ -226,9 +277,35 @@ Deno.serve(async (request) => {
       p_location_country: location?.country || null,
       p_location_country_code: location?.countryCode || null,
       p_location_label: location?.label || null,
-      p_hold_for_review: publicApiMode !== "live",
       p_recipient: recipient,
       p_theme: theme,
+      p_household: household,
+    };
+
+    if (channel === "public") {
+      const { data, error } = await supabase.rpc("submit_demo_message", sharedArguments);
+      if (error) {
+        console.error(JSON.stringify({ event: "demo_submission_failed", code: error.code }));
+        return json(request, 503, { ok: false, error: "Your note could not be sent. Please try again." });
+      }
+      const row = Array.isArray(data) ? (data[0] as JsonRecord | undefined) : undefined;
+      if (!row || row.result_code !== "ok") {
+        return mapSubmissionFailure(request, row || { result_code: "invalid" });
+      }
+      return json(request, 202, {
+        ok: true,
+        demo: true,
+        terminal: true,
+        messageId: row.result_public_id,
+        status: row.result_status,
+        statusPath: `/messages/${row.result_public_id}`,
+      });
+    }
+
+    const { data, error } = await supabase.rpc("submit_public_message_v4", {
+      p_printer_id: "desk-rp820",
+      ...sharedArguments,
+      p_hold_for_review: publicApiMode !== "live",
     });
 
     if (error) {

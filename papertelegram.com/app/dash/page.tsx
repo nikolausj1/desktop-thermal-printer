@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { familyLinks, familyLinkUrl, rootChannel } from "../../lib/family-keys";
+import { CopyButton } from "./copy-button";
 import "./dash.css";
 
 // Private admin dashboard. Not linked from anywhere on the public site.
@@ -27,6 +29,8 @@ type MessageRow = {
   recipient: string | null;
   theme: string | null;
   status: string;
+  source: string | null;
+  household: string | null;
   submitted_at: string;
   sent_to_printer_at: string | null;
   failure_message: string | null;
@@ -35,7 +39,11 @@ type MessageRow = {
 };
 
 const SELECT_FIELDS =
-  "public_id,sequence_number,sender_name,message_text,recipient,theme,status,submitted_at,sent_to_printer_at,failure_message,device_label,location_label";
+  "public_id,sequence_number,sender_name,message_text,recipient,theme,status,source,household,submitted_at,sent_to_printer_at,failure_message,device_label,location_label";
+
+// Telegrams and public demo notes share one table and one fetch; the page
+// splits them. 300 covers months of family traffic.
+const FETCH_LIMIT = 300;
 
 async function fetchMessages(): Promise<MessageRow[]> {
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -45,7 +53,7 @@ async function fetchMessages(): Promise<MessageRow[]> {
     throw new Error("Dashboard is misconfigured: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
   }
 
-  const url = `${supabaseUrl}/rest/v1/messages?select=${SELECT_FIELDS}&order=submitted_at.desc&limit=200`;
+  const url = `${supabaseUrl}/rest/v1/messages?select=${SELECT_FIELDS}&order=submitted_at.desc&limit=${FETCH_LIMIT}`;
 
   const response = await fetch(url, {
     headers: {
@@ -62,13 +70,16 @@ async function fetchMessages(): Promise<MessageRow[]> {
   return (await response.json()) as MessageRow[];
 }
 
-// Collapses the full lifecycle status model down to the three visual
-// buckets the dashboard cares about: successfully printed, definitively
-// failed, or still in some in-between/held state (submitted, approved,
-// queued, claimed, printing, expired, rejected, deleted).
-function statusBucket(status: string): "printed" | "failed" | "held" {
+// Collapses the full lifecycle status model down to the visual buckets the
+// dashboard cares about: successfully printed, definitively failed, a public
+// demo note (never printed by design), or still in some in-between/held state
+// (submitted, approved, queued, claimed, printing, expired, rejected, deleted).
+type Bucket = "printed" | "failed" | "demo" | "held";
+
+function statusBucket(status: string): Bucket {
   if (status === "sent_to_printer") return "printed";
   if (status === "failed") return "failed";
+  if (status === "demo_delivered") return "demo";
   return "held";
 }
 
@@ -84,6 +95,41 @@ function formatSubmittedAt(iso: string): string {
   }
 }
 
+function plural(count: number, noun: string): string {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`;
+}
+
+function MessageCard({ message }: { message: MessageRow }) {
+  const bucket = statusBucket(message.status);
+  const origin = [message.device_label, message.location_label].filter(Boolean).join(" · ");
+  return (
+    <li className="dash-card">
+      <div className="dash-card-top">
+        <span className="dash-seq">#{message.sequence_number ?? "—"}</span>
+        <time className="dash-time" dateTime={message.submitted_at}>
+          {formatSubmittedAt(message.submitted_at)}
+        </time>
+        <span className={`dash-status dash-status-${bucket}`}>{message.status}</span>
+      </div>
+
+      <div className="dash-card-meta">
+        <span className="dash-recipient">To: {message.recipient ?? "—"}</span>
+        <span className="dash-sender">From: {message.sender_name || "Anonymous"}</span>
+        <span className="dash-theme">Theme: {message.theme ?? "—"}</span>
+        {message.household ? <span className="dash-household">via {message.household}</span> : null}
+      </div>
+
+      <p className="dash-message-text">{message.message_text}</p>
+
+      {message.status === "failed" && message.failure_message && (
+        <p className="dash-failure">Failure: {message.failure_message}</p>
+      )}
+
+      {origin && <p className="dash-origin">{origin}</p>}
+    </li>
+  );
+}
+
 export default async function DashPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const keyParam = params.key;
@@ -97,21 +143,31 @@ export default async function DashPage({ searchParams }: { searchParams: SearchP
     notFound();
   }
 
-  const messages = await fetchMessages();
+  const all = await fetchMessages();
+  const telegrams = all.filter((message) => message.source !== "public_demo");
+  const demoNotes = all.filter((message) => message.source === "public_demo");
+  const links = familyLinks();
+  const root = rootChannel();
 
-  const counts = messages.reduce<Record<string, number>>((acc, message) => {
+  const counts = telegrams.reduce<Record<string, number>>((acc, message) => {
     acc[message.status] = (acc[message.status] ?? 0) + 1;
     return acc;
   }, {});
-
   const statusEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+  // Telegrams per household, among the rows loaded.
+  const perHousehold = new Map<string, number>();
+  for (const message of telegrams) {
+    if (message.household) perHousehold.set(message.household, (perHousehold.get(message.household) ?? 0) + 1);
+  }
 
   return (
     <main className="dash-shell">
       <header className="dash-header">
         <h1>Paper Telegram — Dashboard</h1>
         <p className="dash-summary">
-          <strong>{messages.length}</strong> message{messages.length === 1 ? "" : "s"} shown (latest 200)
+          <strong>{plural(telegrams.length, "telegram")}</strong> and{" "}
+          <strong>{plural(demoNotes.length, "public demo note")}</strong> shown (latest {FETCH_LIMIT} in all)
           {statusEntries.length > 0 && (
             <>
               {" — "}
@@ -124,43 +180,71 @@ export default async function DashPage({ searchParams }: { searchParams: SearchP
             </>
           )}
         </p>
+        <p className="dash-root" data-mode={root}>
+          <strong>papertelegram.com root:</strong>{" "}
+          {root === "public"
+            ? "demo mode. Notes written there come to your phone and nothing prints. Only the family links print."
+            : "live. It still prints for anyone. Set ROOT_MODE to demo in Vercel and redeploy once the family has their links."}
+        </p>
       </header>
 
-      {messages.length === 0 ? (
-        <p className="dash-empty">No messages yet.</p>
-      ) : (
-        <ul className="dash-list">
-          {messages.map((message) => {
-            const bucket = statusBucket(message.status);
-            const origin = [message.device_label, message.location_label].filter(Boolean).join(" · ");
-            return (
-              <li key={message.public_id} className="dash-card">
-                <div className="dash-card-top">
-                  <span className="dash-seq">#{message.sequence_number ?? "—"}</span>
-                  <time className="dash-time" dateTime={message.submitted_at}>
-                    {formatSubmittedAt(message.submitted_at)}
-                  </time>
-                  <span className={`dash-status dash-status-${bucket}`}>{message.status}</span>
-                </div>
+      <section className="dash-section" aria-labelledby="links-title">
+        <h2 id="links-title">Family links</h2>
+        <p className="dash-section-note">
+          One private link per household. Text it to them, or let them scan the printer sticker. Telegrams
+          sent through a link carry its label, so the counts below say who is using it. To retire a link,
+          remove its key from FAMILY_KEYS in Vercel and redeploy; the others keep working.
+        </p>
+        {links.length === 0 ? (
+          <p className="dash-empty">No family links are configured. Set FAMILY_KEYS in Vercel.</p>
+        ) : (
+          <ul className="dash-links">
+            {links.map((link) => {
+              const url = familyLinkUrl(link.key);
+              return (
+                <li key={link.key} className="dash-link">
+                  <div className="dash-link-main">
+                    <span className="dash-link-label">{link.label}</span>
+                    <code className="dash-link-url">{url}</code>
+                  </div>
+                  <span className="dash-link-count">{plural(perHousehold.get(link.label) ?? 0, "telegram")}</span>
+                  <CopyButton value={url} label={link.label} />
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
 
-                <div className="dash-card-meta">
-                  <span className="dash-recipient">To: {message.recipient ?? "—"}</span>
-                  <span className="dash-sender">From: {message.sender_name || "Anonymous"}</span>
-                  <span className="dash-theme">Theme: {message.theme ?? "—"}</span>
-                </div>
+      <section className="dash-section" aria-labelledby="telegrams-title">
+        <h2 id="telegrams-title">Telegrams</h2>
+        {telegrams.length === 0 ? (
+          <p className="dash-empty">No telegrams yet.</p>
+        ) : (
+          <ul className="dash-list">
+            {telegrams.map((message) => (
+              <MessageCard key={message.public_id} message={message} />
+            ))}
+          </ul>
+        )}
+      </section>
 
-                <p className="dash-message-text">{message.message_text}</p>
-
-                {message.status === "failed" && message.failure_message && (
-                  <p className="dash-failure">Failure: {message.failure_message}</p>
-                )}
-
-                {origin && <p className="dash-origin">{origin}</p>}
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <section className="dash-section" aria-labelledby="demo-title">
+        <h2 id="demo-title">Public demo notes</h2>
+        <p className="dash-section-note">
+          Written on the public page, or sent straight to the API without a family link. Pushed to your
+          phone, never printed.
+        </p>
+        {demoNotes.length === 0 ? (
+          <p className="dash-empty">No demo notes yet.</p>
+        ) : (
+          <ul className="dash-list">
+            {demoNotes.map((message) => (
+              <MessageCard key={message.public_id} message={message} />
+            ))}
+          </ul>
+        )}
+      </section>
     </main>
   );
 }

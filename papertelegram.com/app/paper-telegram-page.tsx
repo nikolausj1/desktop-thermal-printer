@@ -56,7 +56,27 @@ async function readJson(response: Response) {
   }
 }
 
-export function PaperTelegramPage() {
+type PageProps = {
+  // "family" prints: the private links, and the root while ROOT_MODE is
+  // live. "public" is the demo: the same experience, but the note goes to
+  // Justin's phone and the printer stays quiet.
+  channel?: "family" | "public";
+  // The secret path segment this page was served from, sent back with
+  // every API call so the proxy can prove the channel to the edge function.
+  familyKey?: string;
+  household?: string;
+};
+
+export function PaperTelegramPage({ channel = "family", familyKey, household }: PageProps) {
+  const demo = channel === "public";
+  const apiHeaders = useCallback(
+    (extra: Record<string, string> = {}) => ({
+      accept: "application/json",
+      ...(familyKey ? { "x-pt-key": familyKey } : {}),
+      ...extra,
+    }),
+    [familyKey],
+  );
   const [recipient, setRecipient] = useState<Recipient>("");
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
@@ -264,7 +284,7 @@ export function PaperTelegramPage() {
     lineBreaks(message.trim()) <= MAX_MESSAGE_LINE_BREAKS;
   // Choosing a kid is optional: an unaddressed telegram goes to both.
   const canSubmit =
-    printerStatus.acceptingMessages && nameValid && messageValid && !submitting;
+    (demo || printerStatus.acceptingMessages) && nameValid && messageValid && !submitting;
 
   // Real stamp perforations: evenly spaced semicircular bites, uniform
   // diameter and pitch, a punched hole shared at every corner. Recompute
@@ -353,7 +373,7 @@ export function PaperTelegramPage() {
   const refreshPrinterStatus = useCallback(async () => {
     try {
       const response = await fetch("/api/printer/status", {
-        headers: { accept: "application/json" },
+        headers: apiHeaders(),
         cache: "no-store",
       });
       const payload = await readJson(response);
@@ -381,7 +401,7 @@ export function PaperTelegramPage() {
       setPrinterStatus(unavailable);
       return unavailable;
     }
-  }, []);
+  }, [apiHeaders]);
 
   useEffect(() => {
     const now = new Date();
@@ -417,7 +437,7 @@ export function PaperTelegramPage() {
         if (!isCurrent()) return;
         try {
           const response = await fetch(`/api/printer/messages/${encodeURIComponent(messageId)}`, {
-            headers: { accept: "application/json" },
+            headers: apiHeaders(),
             cache: "no-store",
           });
           const payload = await readJson(response);
@@ -482,7 +502,7 @@ export function PaperTelegramPage() {
       });
       resetSubmission();
     },
-    [refreshPrinterStatus, resetSubmission],
+    [apiHeaders, refreshPrinterStatus, resetSubmission],
   );
 
   async function submitTelegram(event: FormEvent<HTMLFormElement>) {
@@ -502,7 +522,7 @@ export function PaperTelegramPage() {
     });
 
     const latestStatus = await refreshPrinterStatus();
-    if (!latestStatus.acceptingMessages) {
+    if (!demo && !latestStatus.acceptingMessages) {
       setFeedback({
         state: "error",
         mark: "!",
@@ -519,10 +539,7 @@ export function PaperTelegramPage() {
     try {
       const response = await fetch("/api/printer/messages", {
         method: "POST",
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-        },
+        headers: apiHeaders({ "content-type": "application/json" }),
         body: JSON.stringify({
           name,
           message,
@@ -542,6 +559,36 @@ export function PaperTelegramPage() {
           message: payload.error || "Your telegram could not be sent. Please try again.",
         });
         if (response.status < 500) idempotencyKey.current = null;
+        resetSubmission();
+        return;
+      }
+
+      if (payload.demo === true) {
+        // The public demo: the note is already on its way to Justin's phone,
+        // so there is nothing to poll. Play the send, then say what happened.
+        // Same abandonment rule as a real submission: if the visitor already
+        // brought the form back, this late reply must not touch it.
+        if (submissionId.current !== submission) return;
+        idempotencyKey.current = null;
+        setFeedback({
+          state: "success",
+          mark: "✓",
+          label: "Your note reached Justin",
+          message: "This is the public demo, so the printer stayed quiet. Justin got your note on his phone.",
+        });
+        launchFlight();
+        // Clear the form once the folds have covered it, not before. The
+        // timer lives with the flight timers, so bringing the form back
+        // cancels it.
+        flightTimers.current.push(
+          window.setTimeout(() => {
+            setRecipient("");
+            setName("");
+            setMessage("");
+            setWebsite("");
+            setShowErrors(false);
+          }, 1600),
+        );
         resetSubmission();
         return;
       }
@@ -717,6 +764,16 @@ export function PaperTelegramPage() {
               <small>{printerStatus.message}</small>
             </span>
           </p>
+
+          {demo ? (
+            <p className="channel-note" data-channel="public">
+              <strong>Public demo.</strong> Notes written here reach Justin, not the printer.
+            </p>
+          ) : household ? (
+            <p className="channel-note" data-channel="family">
+              <strong>Private family link.</strong> {household}. Telegrams sent here really print.
+            </p>
+          ) : null}
         </section>
 
         <section className="stamp-col" aria-labelledby="form-title">

@@ -1,39 +1,19 @@
 import type { Metadata } from "next";
+import { rootChannel } from "../lib/family-keys";
 import { PaperTelegramPage } from "./paper-telegram-page";
+import { themeMetadata, type SearchParams } from "./theme-metadata";
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+// Read ROOT_MODE on every request so the flip from live to demo is an
+// environment change plus a redeploy, never a code change.
+export const dynamic = "force-dynamic";
 
-// A shared ?theme=owl-post link gets the Great Hall social card, so the
-// preview matches what the page will look like when it opens.
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
-  const params = await searchParams;
-  const theme = params.theme;
-  const owl = theme === "owl-post" || theme === "owl" || theme === "hogwarts";
-  if (!owl) return {};
-  return {
-    openGraph: {
-      title: "Send Vinny & Chase a Paper Telegram",
-      description: "A real printer. A real piece of paper. A message just for them.",
-      type: "website",
-      url: "/?theme=owl-post",
-      images: [
-        {
-          url: "/og-owl.png",
-          width: 1200,
-          height: 630,
-          alt: "A candlelit great hall behind a parchment letter addressed to Vinny and Chase",
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: "Send Vinny & Chase a Paper Telegram",
-      description: "A real printer. A real piece of paper. A message just for them.",
-      images: ["/og-owl.png"],
-    },
-  };
+  return themeMetadata(searchParams);
 }
 
 export default function Home() {
-  return <PaperTelegramPage />;
+  // While ROOT_MODE is "live" the root prints exactly as it always has. Once
+  // it is "demo", the root becomes the public demo and only the private
+  // family links (app/[slug]) reach the printer.
+  return <PaperTelegramPage channel={rootChannel()} />;
 }

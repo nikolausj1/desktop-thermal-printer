@@ -1,8 +1,8 @@
 ---
 title: "STATUS - Paper Telegram"
 created: 2026-08-04
-modified: 2026-10-25
-version: 5.6
+modified: 2026-10-28
+version: 5.7
 author: Claude Fable 5.1 (claude-fable-5-1)
 tags:
 ---
@@ -21,7 +21,7 @@ MVP / Paper Telegram redesign
 
 ## Health
 
-🟢 On-track - Paper Telegram is LIVE at `https://papertelegram.com` on Vercel with GitHub auto-deploys and Porkbun DNS. Family links, the public demo, per-household tracking, and the QR sticker shipped 2026-10-25 and are verified in production (a real telegram printed through a family link; a direct call to the Supabase URL became a demo note). The public root still prints until Justin flips `ROOT_MODE` to `demo`. The Windows worker was not touched.
+🔴 Blocked - Supabase has restricted the project (HTTP 402, `exceed_edge_functions_invocations_quota`) as of 2026-10-28. Both edge functions refuse every call, so nothing prints, the status chip reads unavailable, and the public demo cannot send; the database itself is unaffected. Only Justin can clear it (upgrade the plan or remove the spend cap in Supabase billing), after which the worker recovers on its own. Separately, the public root flipped to demo on 2026-10-28 at Justin's direction and the page-level checks passed; the family links remain the only way to print.
 
 ## Waiting on Me
 
@@ -31,13 +31,15 @@ MVP / Paper Telegram redesign
 - [ ] **Text each household its private link** (10 min). Open the dashboard, Family links section, Copy link per household, send it. Labels: Justin's family, Sheena's family, Friend family A/B/C, General. The Printer sticker key is the one on the QR.
       - unblocks: flipping the public root to demo without stranding anyone on the old bookmark
 - [ ] **Print and stick the QR** (5 min). `_review/qr-sticker/sticker-sheet-letter.pdf` at 100% on sticker paper, or send `sticker-1200px.png` to a sticker service.
-- [ ] **Say "flip"** (1 min) once the family has links, and the root becomes the public demo (ROOT_MODE=demo in Vercel plus a redeploy; Claude can do it on your word).
+- [ ] **Restore Supabase service** (5 min). Open `https://supabase.com/dashboard/project/vamppbjgfpwasjcvpaho/settings/billing/usage`. On the Free plan the only options are to upgrade to Pro (about $25 a month, 2M invocations included) or wait for the monthly reset; on Pro, remove the spend cap (overage is about $2 per extra million). Until then nothing prints.
+      - unblocks: every telegram and every demo note; the worker on the NUC is retrying and needs no restart
+- [x] ~~**Say "flip"**~~ **DONE 2026-10-28.** ROOT_MODE is `demo` on Vercel, redeployed, and the root shows the public demo note while the family pages still show their household line.
 - [ ] **Decide the fate of `justinnikolaus.com/printer`** (2 min). Since the gate shipped its posts are demo notes (labelled `justinnikolaus.com/printer` on the dashboard) while its copy still says it prints. Retire with a redirect (recommended), make it an honest demo, or treat it as family again.
 - [ ] **Confirm the test receipt printed** (1 min). "Dad's helper" to Vinny & Chase, sent 2026-10-25 through the Justin's family link, recorded as `sent_to_printer`.
 
 ## Next Up
 
-1. Flip the root to demo on Justin's word, after the family has their links.
+1. Cut the Edge Function invocation volume by about five times so this does not recur: the worker polls for work every 2 seconds and heartbeats every 15 (about 49K calls a day, 1.5M a month) and every open visitor tab polls status every 12 seconds (7.2K a day each). Proposed: adaptive worker polling (2 s while the queue is non-empty, 10 s when idle) with a 20 second heartbeat, a 10 second status cache in the Vercel proxy so many tabs share one upstream call, and status polling that pauses in hidden tabs. The worker part needs a NUC deploy, so it waits for Justin's permission.
 2. Settle `justinnikolaus.com/printer` (redirect, demo copy, or family).
 3. Optional: email delivery of demo notes (Resend free tier, DNS through the Porkbun API) if phone push is not enough.
 4. Decide whether the dashboard should grow approve/toss buttons for held messages and an emergency-pause toggle.
@@ -45,7 +47,7 @@ MVP / Paper Telegram redesign
 
 ## Biggest Risk
 
-The rollout order. Until `ROOT_MODE` flips, the public root prints for anyone, exactly as before; after it flips, a relative still on the old bookmark gets the demo until they switch to their link, so the links must go out first. The proxy-key gate is live and verified, so the 2026-08-12 abuse-control gap (post straight to the Supabase URL) is closed: such a call is now a demo note. The delighter fragility noted on 2026-08-12 still applies to any change in the submit or reset flow.
+The invocation budget. At the current cadence the worker alone uses about 1.5M Edge Function invocations a month, three times the Free plan's 500K and most of Pro's 2M, so a restriction will recur every month until the polling is cut or the plan absorbs it. While restricted the site cannot tell visitors why: the family form is disabled behind "Status unavailable" and the demo form accepts a note and then fails with a generic error. The rollout risk noted on 2026-10-25 is now live: a relative still on the old bookmark gets the demo until they use their link.
 
 ---
 
@@ -131,6 +133,7 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - The public root reads `ROOT_MODE` per request: `live` (current) prints as always with household `papertelegram.com root`; `demo` shows a one-line "Public demo" note under the status chip, lets the form send even when the printer is offline, plays the full fold-and-fly, and confirms "Your note reached Justin". The family page shows "Private family link. <household>. Telegrams sent here really print." The notification trigger posts a new `demo` event with `household` and `source` in every payload; `automation.paper_telegram_print_notifications` gained a demo branch ("💬 Public demo note") and the printed/failed/held pushes now say "via <household>".
 - Verified 2026-10-25 in production: unknown slugs 404 with the noindex header; a real family page returns 200 with the header, the meta tag, and the household note; the root renders with no channel note (still live); an inactive key gets 403; a direct POST to the Supabase URL without the secret returned `demo: true` (msg_8e1829c5...) and nothing queued; a telegram through the Justin's family link (msg_9e87e9ec...) went queued to `sent_to_printer` in under a minute; the demo flow through the real UI on a local build showed the animation and the demo confirmation; the automation ran three times (demo, printed, demo) with no errors. The dashboard was rendered locally against production data and shows the links, per-household counts, household chips, and the demo-notes section.
 - QR sticker assets are in `_review/qr-sticker/`: `sticker-1200px.png` (airmail stripe frame, paper plane in the centre, caption "Scan to send Vinny & Chase a Paper Telegram"), `sticker-sheet-letter.pdf` (six 2 inch and eight 1.5 inch stickers with cut guides, print at 100%), `qr-only.svg`, and the HTML sources. Error correction level H; the rendered PNG was decoded back to the sticker link with jsQR as a check. The sticker encodes its own key, so the shared links can be rotated without reprinting it.
+- Root flipped to demo 2026-10-28 (Justin: "flip the switch"): `ROOT_MODE` set to `demo` on Vercel (`vercel env rm` then `vercel env add`, since the CLI has no update) and the latest production deployment redeployed with `vercel redeploy <url>` (no `--yes` flag; it is non-interactive). Verified: the root shows the public demo note and no family line, a family page still shows its household line with the noindex header, and an inactive key still gets 403. The send checks could not pass because Supabase returned 402 `exceed_edge_functions_invocations_quota` on both functions (the REST API still answers), discovered during this verification. Nothing in the flip caused it: the volume comes from the worker's 2 second claim polling and 15 second heartbeat (about 49K invocations a day) plus visitor status polling every 12 seconds per open tab. Family links were handed to Justin in `_review/family-links.md` with a ready-to-paste text per household; he is sending them himself.
 - Upstream commits from 2026-08-12 (optional recipient, cancellable submissions, lighter Great Hall, STATUS 5.1 to 5.3) were found unpulled on this Mac and the work was rebased onto them; the demo branch respects the same submission-id abandonment rule. The two `react-hooks/set-state-in-effect` lint errors in `paper-telegram-page.tsx` predate this work and do not affect the Vercel build.
 - The owl post form is now flecked bone parchment on a hand-torn sheet (shipped 2026-08-10 after two review rounds in `_review/paper-telegram-parchment/` and `-r2/`; Justin picked r2 sample 03). Pale linen-rag base, two fibre layers, soft mottling, faint rim. The torn outline is a mask set inline by the page script rather than in CSS, because the owl post branch clears the perforation mask inline and inline beats the stylesheet; it scales with the sheet so it never rebuilds on resize. The form is lifted above the multiplying fibre layers, and the sheet drops its hairline ring, which would otherwise draw a rectangle around a torn edge.
 - Vercel Web Analytics is live and collecting (2026-08-09). Cookie-free, so no consent banner; view it at `https://vercel.com/justins-projects-a7ab9790/papertelegram/analytics`. Enabling is dashboard-only (no API), and the collection routes only appear on the deployment after the toggle is flipped, so an enable always needs a redeploy behind it. Verified after redeploy: both script paths return 200 and a real page view POSTed successfully.
@@ -149,4 +152,5 @@ Drawn from the PRD's §21 Deferred Backlog, which is unusually well stocked:
 - `vercel env add NAME production` and `supabase secrets set --env-file <file>` both take the value without it ever appearing on a command line or in chat: pipe it on stdin, or write a 0600 temp file and delete it. `supabase secrets list` prints SHA-256 digests of the values, not the values, but still grep for names only. (Paper Telegram, 2026-10-25)
 - A private URL should be a path, not a subdomain: every certificate issued for a hostname is published in certificate transparency logs, so `secret.example.com` is discoverable within minutes, while `example.com/secret` leaves no public record. Keep it out of `robots.txt` too, since a Disallow line publishes the path. (Paper Telegram, 2026-10-25)
 - Headless Chrome `--print-to-pdf` does not honour `mask-composite` / `-webkit-mask-composite`, so a frame drawn with a masked pseudo-element prints as a solid fill over the content even though `--screenshot` renders it correctly. Build printable frames from plain nested boxes. (Paper Telegram, 2026-10-25)
+- Supabase Edge Function invocations are a monthly budget (500K on Free, 2M on Pro) and a tight polling loop spends it fast: a worker that asks for work every 2 seconds plus a 15 second heartbeat is about 1.5M calls a month on its own, before any visitor traffic, and when the budget is exhausted every function in the project answers 402 until the plan is upgraded or the spend cap removed. Size the cadence against the budget before shipping a poller, poll adaptively (fast only while there is work), and cache shared status reads server-side. (Paper Telegram, 2026-10-28)
 - Before committing in a checkout that another agent also pushes to, `git fetch` and compare first. This Mac was six commits behind the repo after a Codex session, and the push was rejected mid-deploy; rebasing a staged change onto upstream is routine, but a stash popped afterwards re-applied the pre-rebase edits over the resolved files and had to be discarded. (Paper Telegram, 2026-10-25)

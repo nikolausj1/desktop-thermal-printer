@@ -3,8 +3,3 @@ project_id = "desktop-thermal-printer"
 [api]
 enabled = true
 
-[functions.worker-api]
-verify_jwt = false
-
-[functions.public-api]
-verify_jwt = false

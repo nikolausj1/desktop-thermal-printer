@@ -4,7 +4,7 @@ import {
   formatLocationLabel,
   inferDeviceLabel,
   lookupApproximateLocation,
-} from "../../../supabase/functions/_shared/origin-metadata.js";
+} from "../../../papertelegram.com/lib/origin-metadata.js";
 
 test("infers broad device labels without claiming laptop versus desktop", () => {
   assert.equal(

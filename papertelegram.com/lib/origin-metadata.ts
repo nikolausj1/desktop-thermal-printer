@@ -19,6 +19,8 @@ function cleanLocationPart(value: unknown, maximumLength: number): string | null
   if (typeof value !== "string") return null;
   const normalized = value
     .normalize("NFC")
+    // Control characters are exactly what this strips.
+    // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001f\u007f-\u009f]/gu, "")
     .replace(/\s+/gu, " ")
     .trim();

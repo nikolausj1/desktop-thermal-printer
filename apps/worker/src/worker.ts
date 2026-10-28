@@ -1,5 +1,5 @@
 import { buildMessageReceipt } from "./escpos.js";
-import { CloudClient } from "./cloud-client.js";
+import { CloudClient, WorkerApiError } from "./cloud-client.js";
 import type { WorkerConfig } from "./config.js";
 import { PrinterSendError, sendToPrinter } from "./printer.js";
 import { getPrinterHealth } from "./printer-status.js";
@@ -63,6 +63,9 @@ async function completeWithRetry(
         attempt,
         error: error instanceof Error ? error.message : String(error),
       });
+      // A conflict means the job is no longer ours to complete; retrying
+      // would never change that answer.
+      if (error instanceof WorkerApiError && error.status === 409) return;
       await delay(Math.min(30_000, 1000 * 2 ** Math.min(attempt - 1, 5)), signal);
     }
   }
@@ -145,6 +148,8 @@ export async function runWorker(
     workerVersion: config.workerVersion,
     printerId: config.printerId,
     printerAddress: `${config.printerIp}:${config.printerPort}`,
+    pollIntervalMs: config.pollIntervalMs,
+    pollIdleIntervalMs: config.pollIdleIntervalMs,
   });
 
   let nextHeartbeatAt = 0;
@@ -181,10 +186,17 @@ export async function runWorker(
       nextHeartbeatAt = Date.now() + config.heartbeatIntervalMs;
     }
 
+    // Poll quickly only while there is work. An empty queue, an unreachable
+    // printer, or a failed poll all wait the idle interval instead, which is
+    // what keeps the call volume small.
+    let waitMs = config.pollIdleIntervalMs;
     if (acceptingMessages) {
       try {
         const job = await cloud.claim(config.workerId, config.printerId);
-        if (job) await processJob(config, cloud, job, signal);
+        if (job) {
+          await processJob(config, cloud, job, signal);
+          waitMs = config.pollIntervalMs;
+        }
       } catch (error) {
         log("warn", "job_poll_failed", {
           error: error instanceof Error ? error.message : String(error),
@@ -192,7 +204,7 @@ export async function runWorker(
       }
     }
 
-    await delay(config.pollIntervalMs, signal);
+    await delay(waitMs, signal);
   }
 
   log("info", "worker_stopped", { workerId: config.workerId });

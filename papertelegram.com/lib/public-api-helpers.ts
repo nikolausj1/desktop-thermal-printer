@@ -6,6 +6,9 @@ export type ValidationResult =
   | { ok: true; value: string }
   | { ok: false; code: string };
 
+// Control characters (other than tab, newline, and carriage return) are
+// exactly what this rejects; they could carry printer commands.
+// eslint-disable-next-line no-control-regex
 const forbiddenControlCharacters = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/u;
 
 export function normalizeName(value: unknown): ValidationResult {
@@ -50,7 +53,7 @@ export function normalizeMessage(value: unknown): ValidationResult {
 }
 
 export function moderateMessage(message: string): ValidationResult {
-  if (/(.)\1{14,}/su.test(message)) {
+  if (/([\s\S])\1{14,}/u.test(message)) {
     return { ok: false, code: "repeated_characters" };
   }
 

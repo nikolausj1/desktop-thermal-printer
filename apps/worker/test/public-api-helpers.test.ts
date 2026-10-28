@@ -4,7 +4,7 @@ import {
   moderateMessage,
   normalizeMessage,
   normalizeName,
-} from "../../../supabase/functions/_shared/public-api-helpers.js";
+} from "../../../papertelegram.com/lib/public-api-helpers.js";
 
 test("normalizes optional names and enforces the length limit", () => {
   assert.deepEqual(normalizeName("  Alex   N.  "), { ok: true, value: "Alex N." });

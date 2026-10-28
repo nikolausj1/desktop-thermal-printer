@@ -1,6 +1,5 @@
 export interface WorkerConfig {
-  workerApiUrl: string;
-  workerApiKey: string;
+  databaseUrl: string;
   workerId: string;
   workerVersion: string;
   printerId: string;
@@ -10,6 +9,7 @@ export interface WorkerConfig {
   printerStatusUrl: string;
   heartbeatIntervalMs: number;
   pollIntervalMs: number;
+  pollIdleIntervalMs: number;
   cloudTimeoutMs: number;
   displayTimezone: string;
 }
@@ -36,23 +36,25 @@ function positiveInteger(
   return value;
 }
 
-function validateWorkerApiUrl(rawUrl: string): string {
+function validateDatabaseUrl(rawUrl: string): string {
   const url = new URL(rawUrl);
-  const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
-  if (url.protocol !== "https:" && !localHosts.has(url.hostname)) {
-    throw new Error("WORKER_API_URL must use HTTPS unless it targets localhost.");
+  if (url.protocol !== "postgresql:" && url.protocol !== "postgres:") {
+    throw new Error("DATABASE_URL must be a postgresql:// connection string.");
   }
-  return url.toString();
+  if (!url.username || !url.password) {
+    throw new Error("DATABASE_URL must include the worker role's user name and password.");
+  }
+  return rawUrl;
 }
 
 export function loadConfig(environment: NodeJS.ProcessEnv = process.env): WorkerConfig {
   const printerIp = environment.PRINTER_IP?.trim() || "192.168.4.77";
+  const pollIntervalMs = positiveInteger(environment, "POLL_INTERVAL_SECONDS", 2, 3600) * 1000;
 
   return {
-    workerApiUrl: validateWorkerApiUrl(required(environment, "WORKER_API_URL")),
-    workerApiKey: required(environment, "WORKER_API_KEY"),
+    databaseUrl: validateDatabaseUrl(required(environment, "DATABASE_URL")),
     workerId: environment.WORKER_ID?.trim() || "desktop-printer-nuc",
-    workerVersion: environment.WORKER_VERSION?.trim() || "0.3.0",
+    workerVersion: environment.WORKER_VERSION?.trim() || "0.5.0",
     printerId: environment.PRINTER_ID?.trim() || "desk-rp820",
     printerIp,
     printerPort: positiveInteger(environment, "PRINTER_PORT", 9100, 65535),
@@ -61,7 +63,12 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): Worker
       environment.PRINTER_STATUS_URL?.trim() || `http://${printerIp}/prn_stat.htm`,
     heartbeatIntervalMs:
       positiveInteger(environment, "HEARTBEAT_INTERVAL_SECONDS", 15, 3600) * 1000,
-    pollIntervalMs: positiveInteger(environment, "POLL_INTERVAL_SECONDS", 2, 3600) * 1000,
+    pollIntervalMs,
+    // Idle polling is the slow one; it never drops below the busy interval.
+    pollIdleIntervalMs: Math.max(
+      pollIntervalMs,
+      positiveInteger(environment, "POLL_IDLE_INTERVAL_SECONDS", 5, 3600) * 1000,
+    ),
     cloudTimeoutMs: positiveInteger(environment, "CLOUD_TIMEOUT_MS", 10_000, 60_000),
     displayTimezone: environment.DISPLAY_TIMEZONE?.trim() || "America/Los_Angeles",
   };

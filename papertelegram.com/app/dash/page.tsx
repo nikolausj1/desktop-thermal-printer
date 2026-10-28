@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { db } from "../../lib/db";
 import { familyLinks, familyLinkUrl, rootChannel } from "../../lib/family-keys";
 import { CopyButton } from "./copy-button";
 import "./dash.css";
@@ -38,36 +39,34 @@ type MessageRow = {
   location_label: string | null;
 };
 
-const SELECT_FIELDS =
-  "public_id,sequence_number,sender_name,message_text,recipient,theme,status,source,household,submitted_at,sent_to_printer_at,failure_message,device_label,location_label";
-
 // Telegrams and public demo notes share one table and one fetch; the page
 // splits them. 300 covers months of family traffic.
 const FETCH_LIMIT = 300;
 
 async function fetchMessages(): Promise<MessageRow[]> {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error("Dashboard is misconfigured: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
-  }
-
-  const url = `${supabaseUrl}/rest/v1/messages?select=${SELECT_FIELDS}&order=submitted_at.desc&limit=${FETCH_LIMIT}`;
-
-  const response = await fetch(url, {
-    headers: {
-      apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
-    },
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Dashboard query failed: ${response.status} ${response.statusText}`);
-  }
-
-  return (await response.json()) as MessageRow[];
+  // Read through the site's database role (see lib/db.ts); the function
+  // behind this is the only table access that role has.
+  const sql = db();
+  const rows = await sql`select * from public.get_dashboard_messages(${FETCH_LIMIT})`;
+  return rows.map((row) => ({
+    public_id: String(row.public_id),
+    sequence_number: row.sequence_number === null ? null : Number(row.sequence_number),
+    sender_name: (row.sender_name as string | null) ?? null,
+    message_text: String(row.message_text),
+    recipient: (row.recipient as string | null) ?? null,
+    theme: (row.theme as string | null) ?? null,
+    status: String(row.status),
+    source: (row.source as string | null) ?? null,
+    household: (row.household as string | null) ?? null,
+    submitted_at: row.submitted_at instanceof Date ? row.submitted_at.toISOString() : String(row.submitted_at),
+    sent_to_printer_at:
+      row.sent_to_printer_at instanceof Date
+        ? row.sent_to_printer_at.toISOString()
+        : ((row.sent_to_printer_at as string | null) ?? null),
+    failure_message: (row.failure_message as string | null) ?? null,
+    device_label: (row.device_label as string | null) ?? null,
+    location_label: (row.location_label as string | null) ?? null,
+  }));
 }
 
 // Collapses the full lifecycle status model down to the visual buckets the

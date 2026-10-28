@@ -2,7 +2,7 @@
 title: "STATUS - Paper Telegram"
 created: 2026-08-04
 modified: 2026-10-28
-version: 5.8
+version: 5.9
 author: Claude Fable 5.1 (claude-fable-5-1)
 tags:
 ---
@@ -13,7 +13,7 @@ tags:
 
 **Renamed to Paper Telegram** (papertelegram.com), 2026-08-10. Project now lives at `~/_Developer/Paper Telegram`; the GitHub repo remains `nikolausj1/desktop-thermal-printer`. (updated via Oracle at Justin's direction, 2026-08-10)
 
-A thermal-printer message system with two separate public experiences: the original desk-printer page at `justinnikolaus.com/printer`, plus the new Paper Telegram site for family and friends to send Chase or Vinny a note that becomes a real piece of paper. Since 2026-10-25 real printing lives behind private per-household links, and the public root is becoming a demo that sends notes to Justin's phone.
+A thermal-printer message system with two separate public experiences: the original desk-printer page at `justinnikolaus.com/printer`, plus the new Paper Telegram site for family and friends to send Chase or Vinny a note that becomes a real piece of paper. Since 2026-10-25 real printing lives behind private per-household links, and since 2026-10-28 the public root is a demo that sends notes to Justin's phone.
 
 ## Stage
 
@@ -32,13 +32,13 @@ MVP / Paper Telegram redesign
       - unblocks: flipping the public root to demo without stranding anyone on the old bookmark
 - [ ] **Print and stick the QR** (5 min). `_review/qr-sticker/sticker-sheet-letter.pdf` at 100% on sticker paper, or send `sticker-1200px.png` to a sticker service.
 - [x] ~~**Say "flip"**~~ **DONE 2026-10-28.** ROOT_MODE is `demo` on Vercel, redeployed, and the root shows the public demo note while the family pages still show their household line.
-- [ ] **Decide the fate of `justinnikolaus.com/printer`** (2 min). Since the gate shipped its posts are demo notes (labelled `justinnikolaus.com/printer` on the dashboard) while its copy still says it prints. Retire with a redirect (recommended), make it an honest demo, or treat it as family again.
+- [ ] **Decide the fate of `justinnikolaus.com/printer`** (2 min). The page is dead: the Supabase function it posted to no longer exists, so its form fails. Retire with a redirect to papertelegram.com (recommended) or strip the form; either needs the HostGator FTP access.
 - [ ] **Confirm the two test receipts printed** (1 min). Both from "Dad's helper" to Vinny & Chase through the Justin's family link, recorded as `sent_to_printer`: 2026-10-25 ("Testing the new family link") and 2026-10-28 ("The printer is back, now talking straight to the database").
 
 ## Next Up
 
 1. Remove the unused `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from Vercel once the direct-database deploy is confirmed in production; the code no longer reads either.
-2. Settle `justinnikolaus.com/printer` (redirect, demo copy, or family).
+2. Settle `justinnikolaus.com/printer` (redirect, or strip the form); it is dead since the edge functions were deleted.
 3. Optional: email delivery of demo notes (Resend free tier, DNS through the Porkbun API) if phone push is not enough.
 4. Decide whether the dashboard should grow approve/toss buttons for held messages and an emergency-pause toggle.
 5. Retire the old chatgpt.site v1 preview when convenient.

@@ -2,7 +2,7 @@
 title: "STATUS - Paper Telegram"
 created: 2026-08-04
 modified: 2026-10-28
-version: 5.9
+version: 5.10
 author: Claude Fable 5.1 (claude-fable-5-1)
 tags:
 ---
@@ -33,7 +33,7 @@ MVP / Paper Telegram redesign
 - [ ] **Print and stick the QR** (5 min). `_review/qr-sticker/sticker-sheet-letter.pdf` at 100% on sticker paper, or send `sticker-1200px.png` to a sticker service.
 - [x] ~~**Say "flip"**~~ **DONE 2026-10-28.** ROOT_MODE is `demo` on Vercel, redeployed, and the root shows the public demo note while the family pages still show their household line.
 - [ ] **Decide the fate of `justinnikolaus.com/printer`** (2 min). The page is dead: the Supabase function it posted to no longer exists, so its form fails. Retire with a redirect to papertelegram.com (recommended) or strip the form; either needs the HostGator FTP access.
-- [ ] **Confirm the two test receipts printed** (1 min). Both from "Dad's helper" to Vinny & Chase through the Justin's family link, recorded as `sent_to_printer`: 2026-10-25 ("Testing the new family link") and 2026-10-28 ("The printer is back, now talking straight to the database").
+- [x] ~~**Confirm the two test receipts printed**~~ **DONE 2026-10-28.** Justin confirmed the receipt printed, which proves the direct database path end to end: family link, Vercel handler, queue, NUC worker, paper.
 
 ## Next Up
 

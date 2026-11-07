@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 
 const STATUS_REFRESH_MS = 12_000;
@@ -56,18 +57,74 @@ async function readJson(response: Response) {
   }
 }
 
+// The real printer printing a telegram, filmed on the desk. Mounted with the
+// in-transit card (so it downloads during the fold), played once when the
+// paper leaves and the card is revealed, and left on its last frame. A muted
+// inline video plays on iPhone and Android without controls; if playback is
+// refused or the file fails, the same clip plays as a GIF. With reduced
+// motion the finished receipt is shown as a still instead.
+function PrintClip({ playing }: { playing: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [fallback, setFallback] = useState(false);
+  // Read once on mount. This component only ever mounts after the visitor
+  // presses send, so it never renders on the server.
+  const [reducedMotion] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+
+  useEffect(() => {
+    if (!playing || fallback || reducedMotion) return;
+    const video = videoRef.current;
+    if (!video) return;
+    // The attribute form of muted is what iOS checks before allowing inline
+    // playback without a tap; set it explicitly as well as through React.
+    video.muted = true;
+    video.defaultMuted = true;
+    const attempt = video.play();
+    if (attempt && typeof attempt.catch === "function") {
+      attempt.catch(() => setFallback(true));
+    }
+  }, [playing, fallback, reducedMotion]);
+
+  if (reducedMotion) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img className="print-clip" src="/print-clip-done.jpg" alt="" aria-hidden="true" />;
+  }
+  if (fallback) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img className="print-clip" src="/print-clip.gif" alt="" aria-hidden="true" />;
+  }
+  return (
+    <video
+      ref={videoRef}
+      className="print-clip"
+      muted
+      playsInline
+      preload="auto"
+      poster="/print-clip-first.jpg"
+      aria-hidden="true"
+      onError={() => setFallback(true)}
+    >
+      <source src="/print-clip.webm" type="video/webm" />
+      <source src="/print-clip.mp4" type="video/mp4" />
+    </video>
+  );
+}
+
 type PageProps = {
   // "family" prints: the private links, and the root while ROOT_MODE is
   // live. "public" is the demo: the same experience, but the note goes to
   // Justin's phone and the printer stays quiet.
   channel?: "family" | "public";
   // The secret path segment this page was served from, sent back with
-  // every API call so the proxy can prove the channel to the edge function.
+  // every API call so the handler can tell family from demo.
   familyKey?: string;
+  // Which link the page was served from. Not shown on the page; kept so the
+  // server can keep passing it.
   household?: string;
 };
 
-export function PaperTelegramPage({ channel = "family", familyKey, household }: PageProps) {
+export function PaperTelegramPage({ channel = "family", familyKey }: PageProps) {
   const demo = channel === "public";
   const apiHeaders = useCallback(
     (extra: Record<string, string> = {}) => ({
@@ -748,8 +805,7 @@ export function PaperTelegramPage({ channel = "family", familyKey, household }: 
           </h1>
           <p className="lede">
             Type a note here and a tiny printer in their house wakes up and prints it on real
-            paper. Make plans, tell a joke, or just say hi. It comes out as a real piece of paper
-            they can keep.
+            paper. It comes out as a real piece of paper they can keep.
           </p>
           <p className="nostalgia">
             For everyone who remembers when getting mail was the best part of the day.
@@ -765,15 +821,6 @@ export function PaperTelegramPage({ channel = "family", familyKey, household }: 
             </span>
           </p>
 
-          {demo ? (
-            <p className="channel-note" data-channel="public">
-              <strong>Public demo.</strong> Notes written here reach Justin, not the printer.
-            </p>
-          ) : household ? (
-            <p className="channel-note" data-channel="family">
-              <strong>Private family link.</strong> {household}. Telegrams sent here really print.
-            </p>
-          ) : null}
         </section>
 
         <section className="stamp-col" aria-labelledby="form-title">
@@ -792,6 +839,7 @@ export function PaperTelegramPage({ channel = "family", familyKey, household }: 
 
           {flight !== "idle" ? (
             <div className={`flight-card${flight === "flying" || flight === "gone" ? " revealed" : ""}`} role="status" aria-live="polite">
+              <PrintClip playing={flight === "flying" || flight === "gone"} />
               <p className="flight-kicker">Paper Telegram &middot; In transit</p>
               <div className="flight-line" data-state={feedback?.state || "progress"}>
                 <span className="feedback-mark" aria-hidden="true">
@@ -1118,6 +1166,19 @@ export function PaperTelegramPage({ channel = "family", familyKey, household }: 
         Built by their dad.
         <br />A fun nostalgic printer for two wonderful kids.
       </p>
+
+      <figure className="printer-figure">
+        {/* Served through the image optimizer: the transparent PNG is 800 KB
+            at source size, and this delivers a WebP sized to the viewport. */}
+        <Image
+          src="/printer-cutout.png"
+          alt="The Paper Telegram printer: a small white receipt printer with the paper plane wordmark on its front"
+          width={960}
+          height={878}
+          sizes="(max-width: 560px) 100vw, 500px"
+          loading="lazy"
+        />
+      </figure>
 
       <section className="project-story" aria-labelledby="story-title">
         <div className="story-intro">

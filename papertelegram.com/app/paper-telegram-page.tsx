@@ -8,6 +8,8 @@ const MESSAGE_POLL_MS = 1_500;
 const MAX_MESSAGE_POLLS = 80;
 const MAX_MESSAGE_LENGTH = 280;
 const MAX_MESSAGE_LINE_BREAKS = 6;
+// How long the in-transit card shows the still printer before the clip plays.
+const PRINT_CLIP_DELAY_MS = 1000;
 
 type Recipient = "" | "Chase" | "Vinny";
 type FeedbackState = "progress" | "success" | "error";
@@ -80,10 +82,15 @@ function PrintClip({ playing }: { playing: boolean }) {
     // playback without a tap; set it explicitly as well as through React.
     video.muted = true;
     video.defaultMuted = true;
-    const attempt = video.play();
-    if (attempt && typeof attempt.catch === "function") {
-      attempt.catch(() => setFallback(true));
-    }
+    // Hold on the still printer for a beat after the card opens, so the
+    // print reads as something happening rather than a jump cut.
+    const timer = window.setTimeout(() => {
+      const attempt = video.play();
+      if (attempt && typeof attempt.catch === "function") {
+        attempt.catch(() => setFallback(true));
+      }
+    }, PRINT_CLIP_DELAY_MS);
+    return () => window.clearTimeout(timer);
   }, [playing, fallback, reducedMotion]);
 
   if (reducedMotion) {

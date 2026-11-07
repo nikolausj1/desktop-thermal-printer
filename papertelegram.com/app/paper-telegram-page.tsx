@@ -629,7 +629,10 @@ export function PaperTelegramPage({ channel = "family", familyKey }: PageProps) 
 
       if (payload.demo === true) {
         // The public demo: the note is already on its way to Justin's phone,
-        // so there is nothing to poll. Play the send, then say what happened.
+        // so there is nothing to poll. Play the send and let the printing
+        // clip tell the story; the in-transit card shows no status line on
+        // the demo. The copy below is only read by the reduced-motion
+        // fallback, where the form itself has to say the telegram went.
         // Same abandonment rule as a real submission: if the visitor already
         // brought the form back, this late reply must not touch it.
         if (submissionId.current !== submission) return;
@@ -637,8 +640,8 @@ export function PaperTelegramPage({ channel = "family", familyKey }: PageProps) 
         setFeedback({
           state: "success",
           mark: "✓",
-          label: "Your note reached Justin",
-          message: "This is the public demo, so the printer stayed quiet. Justin got your note on his phone.",
+          label: "Telegram sent",
+          message: "Your telegram is on its way.",
         });
         launchFlight();
         // Clear the form once the folds have covered it, not before. The
@@ -848,15 +851,19 @@ export function PaperTelegramPage({ channel = "family", familyKey }: PageProps) 
             <div className={`flight-card${flight === "flying" || flight === "gone" ? " revealed" : ""}`} role="status" aria-live="polite">
               <PrintClip playing={flight === "flying" || flight === "gone"} />
               <p className="flight-kicker">Paper Telegram &middot; In transit</p>
-              <div className="flight-line" data-state={feedback?.state || "progress"}>
-                <span className="feedback-mark" aria-hidden="true">
-                  {feedback?.mark || "01"}
-                </span>
-                <div>
-                  <strong>{feedback?.label || "Telegram received"}</strong>
-                  <p>{feedback?.message || "Waiting for the message machine."}</p>
+              {/* The demo has no printer to report on, so the clip is the
+                  whole story: no status line, straight to the button. */}
+              {demo ? null : (
+                <div className="flight-line" data-state={feedback?.state || "progress"}>
+                  <span className="feedback-mark" aria-hidden="true">
+                    {feedback?.mark || "01"}
+                  </span>
+                  <div>
+                    <strong>{feedback?.label || "Telegram received"}</strong>
+                    <p>{feedback?.message || "Waiting for the message machine."}</p>
+                  </div>
                 </div>
-              </div>
+              )}
               {feedback?.state === "success" ? (
                 <button type="button" className="send-btn flight-again" onClick={bringFormBack}>
                   <span>Send another telegram</span>
